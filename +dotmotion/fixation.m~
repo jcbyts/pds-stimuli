@@ -1,0 +1,90 @@
+function fixation(p, sn)
+% check fixation state
+
+    currentEye=p.trial.(sn).eyeXYs(1:2,p.trial.iFrame);
+    
+    % check if fixation should be shown
+    if (p.trial.(sn).state == p.trial.(sn).states.START) && p.trial.iFrame > p.trial.(sn).preTrial
+        p.trial.(sn).draw.showFixation=true;
+    end
+    
+    % set fixation windowsize by state
+    if (p.trial.(sn).state == p.trial.(sn).states.FPON)
+        fixRadius=p.trial.(sn).fpOnRadius;
+    elseif (p.trial.(sn).state == p.trial.(sn).states.FPHOLD)
+        fixRadius=p.trial.(sn).fpHoldRadius;
+    else
+        fixRadius=nan;
+    end
+    
+    % is fixation held
+    isheld=fixationHeld(p.trial.(sn).fixXY, currentEye, fixRadius, p.trial.(sn).fixationWindowType);
+    
+    % if FPON
+    if (p.trial.(sn).state == p.trial.(sn).states.FPON) && isheld
+        p.trial.(sn).frameFpEntered=p.trial.iFrame;
+        p.trial.(sn).state=p.trial.(sn).states.FPHOLD;
+    end
+    
+    % if FPHOLD
+    if (p.trial.(sn).state == p.trial.(sn).states.FPON)
+        if isheld
+            % do nothing
+        elseif p.trial.iFrame > p.trial.(sn).states.minFixHold && p.trial.iFrame < p.trial.(sn).states.maxFixHold
+            p.trial.(sn).state=
+            p.trial.(sn).frameFpEntered=p.trial.iFrame;
+        p.trial.(sn).state=p.trial.(sn).states.FPHOLD;
+        
+    end
+    
+    for iTarget=1:length(p.trial.(sn).target)
+        cms=p.trial.(sn).target(iTarget).currentMotionState;
+        if cms>p.trial.(sn).target(iTarget).nMotionStates
+            continue;
+        end
+        held = fixationHeld(p.trial.(sn).target(iTarget).currentXY,currentEye,p.trial.(sn).target(iTarget).motionstates.fixationWindow(cms),p.trial.(sn).target(iTarget).motionstates.fixationType(cms) );
+        p.trial.(sn).target(iTarget).fixationStatus=held;      
+        if held
+           if isnan(p.trial.(sn).target(iTarget).motionstates.firstfixationFrame(cms))
+               p.trial.(sn).target(iTarget).motionstates.firstfixationFrame(cms)=p.trial.iFrame;
+           end
+           p.trial.(sn).target(iTarget).motionstates.fixationFrames(cms)=p.trial.(sn).target(iTarget).motionstates.fixationFrames(cms)+1;
+        else
+            %%add a consequence 0: nothing happens, 1:  reset
+            %%fixationFrames counter, 2: increase abort value
+            %%2: 3: increase abort value and stop the stimulus
+            if any(p.trial.(sn).target(iTarget).motionstates.fixationBreakConsequence(cms)==[1 2 3])
+                if ~isnan(p.trial.(sn).target(iTarget).motionstates.firstfixationFrame(cms))
+                    if p.trial.(sn).target(iTarget).motionstates.fixationBreakConsequence(cms)==2
+                        p.trial.(sn).target(iTarget).abort = p.trial.(sn).target(iTarget).abort + p.trial.(sn).target(iTarget).motionstates.proportionAbort(cms);
+                    elseif p.trial.(sn).target(iTarget).motionstates.fixationBreakConsequence(cms)==1
+                        p.trial.(sn).target(iTarget).motionstates.fixationFrames(cms) = 0;
+                    elseif p.trial.(sn).target(iTarget).motionstates.fixationBreakConsequence(cms)==3
+                        p.trial.(sn).target(iTarget).abort = p.trial.(sn).target(iTarget).abort + p.trial.(sn).target(iTarget).motionstates.proportionAbort(cms);
+                        p.trial.(sn).target(iTarget).stop = true;
+                    end
+                elseif p.trial.iFrame-p.trial.(sn).target(iTarget).motionstates.stateStartFrame(cms)>p.trial.(sn).target(iTarget).motionstates.fixationTimeout(cms)
+                    if p.trial.(sn).target(iTarget).motionstates.fixationBreakConsequence(cms)==2
+                        p.trial.(sn).target(iTarget).abort = p.trial.(sn).target(iTarget).abort + p.trial.(sn).target(iTarget).motionstates.proportionAbort(cms);
+                    elseif p.trial.(sn).target(iTarget).motionstates.fixationBreakConsequence(cms)==1
+                        p.trial.(sn).target(iTarget).motionstates.fixationFrames(cms) = 0;
+                    elseif p.trial.(sn).target(iTarget).motionstates.fixationBreakConsequence(cms)==3
+                        p.trial.(sn).target(iTarget).abort = p.trial.(sn).target(iTarget).abort + p.trial.(sn).target(iTarget).motionstates.proportionAbort(cms);
+                        p.trial.(sn).target(iTarget).stop = true;
+                    end
+    %             else% nothing
+                end
+            end
+        end
+    end
+end
+
+function held = fixationHeld(target, eye, window, type)
+    if type ==0 %pass
+        held=true;
+    elseif type ==1 %squarewindows window is half width
+        held=all(abs(target-eye)<window);
+    elseif type==2 %circular window is a radius
+        held=sqrt(sum((target-eye).^2))<window;
+    end
+end
