@@ -7,11 +7,15 @@ classdef fixation < handle
     %
     % The class constructor can be called with a range of arguments:
     %
-    %   centreSize - diameter of centre (pixels)
+    %   centreSize     - diameter of centre (pixels)
     %   surroundRadius - diameter of surround (pixels)
-    %   centreColour - colour of centre (clut index or [r,g,b])
+    %   centreColour   - colour of centre (clut index or [r,g,b])
     %   surroundColour - colour of surround (clut index or [r,g,b])
-    %   position - center of target (x,y; pixels)
+    %   position  - center of target (x,y; pixels)
+    %   fixType   - (1=dot, 2=bullseye, 3=bullseye + crosshairs)
+    %   winRadius - size of fixation window
+    %   winType   - type of window (1 = square, 2 = circle)
+    %   winColour - colour of the window (clut index or [r,g,b])
     
     % 16-06-2016 - Shaun L. Cloherty <s.cloherty@ieee.org>
     % 09-08-2016 - Jacob L. Yates <jacoby8s@gmail.com>  added cross hairs
@@ -22,7 +26,10 @@ classdef fixation < handle
         cColour@double = zeros([1,3]); % clut index or [r,g,b]
         sColour@double = ones([1,3]);
         position@double = [0.0, 0.0]; % [x,y] (pixels)
-        crosshairs@logical = false;
+        fixType@double = 2; % bullseye
+        winRadius@double=50;
+        winType@double=2;
+        winColour@double=ones(1,3);
     end
     
     properties (Access = private)
@@ -47,7 +54,11 @@ classdef fixation < handle
             p.addParameter('centreColour',o.cColour,@isfloat); % clut index or [r,g,b]
             p.addParameter('surroundColour',o.sColour,@isfloat);
             p.addParameter('position',o.position,@isfloat); % [x,y] (pixels)
-            p.addParameter('crosshairs', o.crosshairs, @logical)
+            p.addParameter('fixType', o.fixType, @isfloat)
+            p.addOptional('winRadius', o.winRadius, @isfloat)
+            p.addOptional('winType', o.winType, @isfloat)
+            p.addOptional('winColour', o.winColour, @isfloat)
+            
             try
                 p.parse(args{:});
             catch
@@ -62,7 +73,10 @@ classdef fixation < handle
             o.cColour = args.centreColour;
             o.sColour = args.surroundColour;
             o.position = args.position;
-            o.crosshairs = args.crosshairs;
+            o.fixType = args.fixType;
+            o.winRadius = args.winRadius;
+            o.winType = args.winType;
+            o.winColour = args.winColour;
         end
         
         function beforeTrial(o)
@@ -78,29 +92,44 @@ classdef fixation < handle
     
     methods (Access = public)
         function drawFixation(o)
-            %             r = floor(o.sSize./2); % radius in pixels
-            %
-            %             rect = kron([1,1],o.position) + kron(r(:),[-1, -1, +1, +1]);
-            %             Screen('FillOval',o.winPtr,o.sColour,rect');
-            %
-            %             r = floor(o.cSize./2);
-            %
-            %             rect = kron([1,1],o.position) + kron(r(:),[-1, -1, +1, +1]);
-            %             Screen('FillOval',o.winPtr,o.cColour,rect');
+            switch o.fixType
+                case 1 % single dot
+                    Screen('DrawDots', o.winPtr, o.position, o.sSize, o.sColour, [], 2);
+                case 2 % bullseye
+                    Screen('DrawDots', o.winPtr, o.position, o.sSize, o.sColour, [], 2);
+                    Screen('DrawDots', o.winPtr, o.position, o.cSize, o.cColour, [], 2);
+                case 3 % bullseye + crosshairs
+                    Screen('DrawDots', o.winPtr, o.position, o.sSize, o.sColour, [], 2);
+                    Screen('DrawDots', o.winPtr, o.position, o.cSize, o.cColour, [], 2);
+                    
+                    len=o.sSize*.5;
+                    line1=[o.position(1)+[-len len]; o.position(2)*[1 1]];
+                    line2=[o.position(1)*[1 1]; o.position(2)+[-len len]];
+                    Screen('DrawLines', o.winPtr, [line1 line2], 3, o.cColour, [], 2);
+                    Screen('DrawLines', o.winPtr, [line1 line2], 1, o.sColour, [], 2);
+            end
             
-            %             Screen('Drawdots',  p.trial.display.overlayptr,  p.trial.stimulus.fixationXY(:), p.trial.stimulus.fixdotW, p.trial.display.clut.fixation, p.trial.display.ctr(1:2), 2);
-            Screen('DrawDots', o.winPtr, o.position, o.sSize, o.sColour, [], 2);
-            Screen('DrawDots', o.winPtr, o.position, o.cSize, o.cColour, [], 2);
-            
-            if o.crosshairs
-                len=o.sSize*.5;
-                line1=[o.position(1)+[-len len]; o.position(2)*[1 1]];
-                line2=[o.position(1)*[1 1]; o.position(2)+[-len len]];
-                Screen('DrawLines', o.winPtr, [line1 line2], 3, o.cColour, [], 2);
-                Screen('DrawLines', o.winPtr, [line1 line2], 1, o.sColour, [], 2);
+            if o.winType == 2 % circular window is a radius
+                fpCirc = diag(o.position)*ones(2,91)+o.winRadius*[sind(0:4:360); cosd(0:4:360)];
+                Screen('FramePoly',o.winPtr, o.winColour, fpCirc',3);
+            elseif o.winType == 1 % squarewindows window is half width
+                fpRect=[o.position-o.winRadius o.position+o.winRadius];
+                Screen('FrameRect', o.winPtr, o.winColour, fpRect);
             end
             
             
+            
+        end
+        
+        function held=isheld(o, currentEye)
+            
+            if o.winType == 0 % pass
+                held=true;
+            elseif o.winType == 1 % squarewindows window is half width
+                held=all(abs(o.position-currentEye)<o.winRadius);
+            elseif o.winType == 2 % circular window is a radius
+                held=sqrt(sum((o.position-currentEye).^2))<o.winRadius;
+            end
             
         end
     end % methods

@@ -8,19 +8,31 @@ if nargin<3
 end
 
 pldapsDefaultTrialFunction(p,state)
-switch state
-    case p.trial.pldaps.trialStates.framePrepareDrawing;
-        dotmotion.framePrepareDrawing(p, stimulusname);
+
+dotmotion.fixation(p, state, stimulusname)
+% dotmotion.motion(p, state, stimulusname)
+% dotmotion.choice(p, state, stimulusname)
+
+
+% switch state
+%     case p.trial.pldaps.trialStates.framePrepareDrawing;
+%         dotmotion.fixation(p, stimulusname)
+%         
+%         dotmotion.motion(p, stimulusname)
+%         
+%         dotmotion.choice(p, stimulusname)
+%     case p.trial.pldaps.trialStates.trialSetup;
+%         dotmotion.trialSetup(p, stimulusname);
         
-    case p.trial.pldaps.trialStates.frameDraw;
-        frameDraw(p, stimulusname);
-        
-    case p.trial.pldaps.trialStates.trialSetup;
-        dotmotion.trialSetup(p, stimulusname);
-        
-    case p.trial.pldaps.trialStates.trialCleanUpandSave;
-        cleanUpAndSave(p, stimulusname);
-end
+%         
+%     case p.trial.pldaps.trialStates.frameDraw;
+% %         frameDraw(p, stimulusname);
+%         
+
+%         
+%     case p.trial.pldaps.trialStates.trialCleanUpandSave;
+%         cleanUpAndSave(p, stimulusname);
+% end
 
 
 end
