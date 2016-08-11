@@ -1,4 +1,4 @@
-function setupRandomSeed(p)
+function p=setupRandomSeed(p)
 % set random seed for a PLDAPS session
 % p=setupRandomSeed(p)
 

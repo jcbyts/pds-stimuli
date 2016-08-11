@@ -2,7 +2,7 @@ function p = TestDotMotion(p)
 
 p = pdsDefaultTrialStructure(p); 
 
-stimuli.setupRandomSeed(p);
+p=stimuli.setupRandomSeed(p);
 
 defaultColors(p);
 p.trial.stimulus.eyeW=8;
@@ -13,21 +13,33 @@ sn='stimulus';
 %% Timing
  
 % setup timing paramters
-Params=struct();
-Params.preTrial     = ceil(1*p.trial.display.frate);
-Params.fixWait      = ceil(1*p.trial.display.frate);
-Params.fixHold      = 10;
-Params.preStim      = 50;
-Params.targOnset    = ceil(.1*p.trial.display.frate);
-Params.targHold     = 1;
-Params.targDuration = inf;
+p.trial.(sn).preTrial     = 1;
+p.trial.(sn).fixWait      = 5;
+p.trial.(sn).minFixHold   = .1;
+p.trial.(sn).maxFixHold   = 10;
+p.trial.(sn).preStim      = .05;
+p.trial.(sn).targOnset    = ceil(.1*p.trial.display.frate);
+p.trial.(sn).targHold     = 1;
+p.trial.(sn).targDuration = inf;
+
+% fixation parameters
+p.trial.(sn).fixDotW=20; % pixels
+p.trial.(sn).fixDotXY=[0 0];
 
 % setup motion parameters
-Params.nDirections=8;
-Params.speeds=15;
-Params.coherences=1;
-Params.lifetime=5;
-Params.maxRadius
+p.trial.(sn).nDirections=8;
+p.trial.(sn).speeds=15;
+p.trial.(sn).coherences=1;
+p.trial.(sn).lifetime=5;
+p.trial.(sn).maxRadius=5;
+p.trial.(sn).position=[2 2];
+p.trial.(sn).mode=1;
+p.trial.(sn).dist=1;
+
+dotmotion.updateConditions(p);
+% p.defaultParameters.(stimulusname).states
+p = defaultTrialVariables(p, sn);
+% dotmotion.updateConditions
 % 
 % 
 % 
@@ -60,11 +72,11 @@ Params.maxRadius
 %     'maxRadius', 100, ...
 %     'position', [500 500]);
 % 
-hFix=stimuli.fixation(p.trial.display.overlayptr, ...
-    'centreSize', p.trial.(sn).fixdotW/2, ...
-    'surroundSize', p.trial.(sn).fixdotW, ...
-    'position', p.trial.display.ctr(1:2));
-% 
+% hFix=stimuli.fixation(p.trial.display.overlayptr, ...
+%     'centreSize', p.trial.(sn).fixdotW/2, ...
+%     'surroundSize', p.trial.(sn).fixdotW, ...
+%     'position', p.trial.display.ctr(1:2));
+% % 
 % d.beforeTrial
 % 
 % 

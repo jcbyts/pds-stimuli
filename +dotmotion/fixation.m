@@ -1,20 +1,27 @@
 function fixation(p, state, sn)
+% fixation state management
 
 switch state
     case p.trial.pldaps.trialStates.framePrepareDrawing
+        
         checkFixation(p, sn)
         
     case p.trial.pldaps.trialStates.trialSetup
         
         p.trial.(sn).hFix=stimuli.fixation(p.trial.display.overlayptr, ...
-            'centreSize', p.trial.(sn).fixdotW/2, ...
-            'surroundSize', p.trial.(sn).fixdotW, ...
-            'position', p.trial.display.ctr(1:2));
+            'centreSize', p.trial.(sn).fixDotW/2, ...
+            'surroundSize', p.trial.(sn).fixDotW, ...
+            'position', p.trial.display.ctr(1:2)+pds.deg2px(p.trial.(sn).fixDotXY(:), p.trial.display.viewdist, p.trial.display.w2px, true)', ...
+            'fixType', 2, ...
+            'winType', 2, ...
+            'centreColour', p.trial.display.clut.bg, ...
+            'surroundColour', p.trial.display.clut.bg, ...
+            'winColour', p.trial.display.clut.bg);
         
-        p.trial.(sn).hFix.cColour=p.trial.display.clut.bg;
-        p.trial.(sn).hFix.sColour=p.trial.display.clut.bg;
+        p.trial.(sn).state=p.trial.(sn).states.START;
         
-    case p.trial.pldaps.trialStates.frameUpdate
+    case p.trial.pldaps.trialStates.frameDraw
+        p.trial.(sn).hFix.drawFixation
         
 end
 
@@ -22,50 +29,38 @@ end
 end
 
 function checkFixation(p, sn)
-    currentEye=p.trial.(sn).eyeXYs(1:2,p.trial.iFrame);
-    
+    currentEye=[p.trial.eyeX p.trial.eyeY]; %p.trial.(sn).eyeXYs(1:2,p.trial.iFrame);
+%     fprintf('checking: state ')
     % check if fixation should be shown
     switch p.trial.(sn).state
         case p.trial.(sn).states.START
-            
+%             fprintf('START\n')
             
             % time to turn on fixation
-            if p.trial.iFrame > p.trial.(sn).preTrial
-                p.trial.(sn).state=p.trial.(sn).states.FPON;
-                p.trial.(sn).hFix.cColour = p.trial.display.clut.targetnull;
-                p.trial.(sn).hFix.sColour = p.trial.display.clut.black;
-                
-                p.trial.(sn).colorFixWindow = p.trial.display.clut.window;
-                p.trial.(sn).timeFpEntered = p.trial.ttime;
-                p.trial.(sn).frameFpEntered = p.trial.iFrame;
+            if p.trial.ttime > p.trial.(sn).preTrial
+                fixOn(p,sn) % fixation point on
             end
             
         case p.trial.(sn).states.FPON
-            fixRadius=p.trial.(sn).fpOnRadius;
+%             fprintf('FPON\n')
             % is fixation held
-            isheld=fixationHeld(p.trial.(sn).fixXY, currentEye, fixRadius, p.trial.(sn).fixationWindowType);
-            if isheld && p.trial.iFrame < p.trial.(sn).fixWait
-                p.trial.(sn).frameFpEntered=p.trial.iFrame;
-                p.trial.(sn).state=p.trial.(sn).states.FPHOLD;
-            else
-                p.trial.(sn).state=p.trial.(sn).states.BREAKFIX;
+            isheld=p.trial.(sn).hFix.isheld(currentEye);
+            if isheld && p.trial.ttime < p.trial.(sn).fixWait + p.trial.(sn).timeFpOn
+                fixHold(p,sn)
+            elseif p.trial.ttime > p.trial.(sn).fixWait + p.trial.(sn).timeFpOn
+                breakFix(p,sn)
             end
             
         case p.trial.(sn).states.FPHOLD
-            fixRadius=p.trial.(sn).fpHoldRadius;
+%             fprintf('FPHOLD\n')
             % is fixation held
-            isheld=fixationHeld(p.trial.(sn).fixXY, currentEye, fixRadius, p.trial.(sn).fixationWindowType);
-            if isheld && p.trial.iFrame < p.trial.(sn).states.maxFixHold
+            isheld=p.trial.(sn).hFix.isheld(currentEye);
+            if isheld && p.trial.ttime < p.trial.(sn).maxFixHold + p.trial.(sn).timeFpEntered
                 % do nothing
-            elseif p.trial.iFrame > p.trial.(sn).states.minFixHold 
-                p.trial.(sn).state=p.trial.(sn).states.CHOOSETARG;
-                p.trial.(sn).hFix.cColour = p.trial.display.clut.bg;
-                p.trial.(sn).hFix.sColour = p.trial.display.clut.bg;
-                p.trial.(sn).timeFpOff = p.trial.ttime;
-                p.trial.(sn).frameFpOff = p.trial.iFrame;
-                
+            elseif ~isheld && p.trial.ttime > p.trial.(sn).minFixHold + p.trial.(sn).timeFpEntered
+               fixOff(p,sn)
             else % break fixation
-                p.trial.(sn).state=p.trial.(sn).BREAKFIX;
+                breakFix(p,sn)
             end
             
             
@@ -73,12 +68,43 @@ function checkFixation(p, sn)
 
 end
 
-function held = fixationHeld(target, eye, window, type)
-if type ==0 %pass
-    held=true;
-elseif type ==1 %squarewindows window is half width
-    held=all(abs(target-eye)<window);
-elseif type==2 %circular window is a radius
-    held=sqrt(sum((target-eye).^2))<window;
+function breakFix(p,sn)
+p.trial.(sn).hFix.cColour = p.trial.display.clut.bg;
+p.trial.(sn).hFix.sColour = p.trial.display.clut.bg;
+p.trial.(sn).hFix.winColour=p.trial.display.clut.bg;
+% PsychPortAudio('Start', p.trial.sound.breakfix)
+
+p.trial.(sn).timeFpOff = p.trial.ttime;
+p.trial.(sn).frameFpOff = p.trial.iFrame;
+p.trial.(sn).state=p.trial.(sn).states.BREAKFIX;
 end
+
+function fixOn(p,sn)
+p.trial.(sn).hFix.cColour = p.trial.display.clut.white;
+p.trial.(sn).hFix.sColour = p.trial.display.clut.black;
+p.trial.(sn).hFix.winColour=p.trial.display.clut.window;
+
+p.trial.(sn).timeFpOn = p.trial.ttime;
+p.trial.(sn).frameFpOn = p.trial.iFrame;
+p.trial.(sn).state=p.trial.(sn).states.FPON;
+end
+
+function fixHold(p,sn)
+p.trial.(sn).hFix.cColour = p.trial.display.clut.white;
+p.trial.(sn).hFix.sColour = p.trial.display.clut.black;
+p.trial.(sn).hFix.winColour=p.trial.display.clut.greenbg;
+
+p.trial.(sn).timeFpEntered = p.trial.ttime;
+p.trial.(sn).frameFpEntered = p.trial.iFrame;
+p.trial.(sn).state=p.trial.(sn).states.FPHOLD;
+end
+
+function fixOff(p,sn)
+p.trial.(sn).hFix.cColour = p.trial.display.clut.bg;
+p.trial.(sn).hFix.sColour = p.trial.display.clut.bg;
+p.trial.(sn).hFix.winColour=p.trial.display.clut.bg;
+
+p.trial.(sn).timeFpOff = p.trial.ttime;
+p.trial.(sn).frameFpOff = p.trial.iFrame;
+p.trial.(sn).state=p.trial.(sn).states.CHOOSETARG;
 end
