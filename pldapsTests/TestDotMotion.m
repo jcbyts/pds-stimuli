@@ -26,15 +26,21 @@ p.trial.(sn).targDuration = inf;
 p.trial.(sn).fixDotW=20; % pixels
 p.trial.(sn).fixDotXY=[0 0];
 
+n=8;
+p.trial.(sn).conds.directions=0:(360/n):(360-360/n);
+p.trial.(sn).conds.speeds=15;
 % setup motion parameters
-p.trial.(sn).nDirections=8;
-p.trial.(sn).speeds=15;
-p.trial.(sn).coherences=1;
-p.trial.(sn).lifetime=5;
-p.trial.(sn).maxRadius=5;
-p.trial.(sn).position=[2 2];
-p.trial.(sn).mode=1;
-p.trial.(sn).dist=1;
+
+p.trial.(sn).motion1.type='dots';
+p.trial.(sn).motion1.size=.3;
+p.trial.(sn).motion1.density=100;
+p.trial.(sn).motion1.coherence=1;
+p.trial.(sn).motion1.bandwidth=0;
+p.trial.(sn).motion1.lifetime=55; % frames
+p.trial.(sn).motion1.radius=5;
+p.trial.(sn).motion1.position=[2 2];
+p.trial.(sn).motion1.mode=1;
+p.trial.(sn).motion1.dist=1;
 
 dotmotion.updateConditions(p);
 % p.defaultParameters.(stimulusname).states

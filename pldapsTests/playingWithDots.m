@@ -38,9 +38,8 @@ d.beforeTrial
 
 %%
 f.winRadius=f.winRadius+randn;
-d.drawDots;
+d.draw;
 f.drawFixation
-d.afterFrame;
+d.update;
 Screen('Flip', p.trial.display.ptr, 0);
 Screen('FillRect', p.trial.display.overlayptr, 0);
-d.moveDots;

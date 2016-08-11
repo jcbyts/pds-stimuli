@@ -59,7 +59,7 @@ classdef dots < handle
   end
   
   methods (Access = public)
-    function o = dots(winPtr,varargin), % marmoview's initCmd
+    function o = dots(winPtr,varargin)
       o.winPtr = winPtr;
       
       if nargin == 1,
@@ -126,7 +126,7 @@ classdef dots < handle
     end
         
     function beforeTrial(o)
-      o.initDots([1:o.numDots]); % all dots!
+      o.initialize([1:o.numDots]); % all dots!
       
       % initialise dots' lifetime
       if o.lifetime ~= Inf,
@@ -136,20 +136,17 @@ classdef dots < handle
       end
     end
     
-    function beforeFrame(o)
-      o.drawDots();
-    end
         
-    function afterFrame(o)
+    function update(o)
       % decrement frame counters
       o.frameCnt = o.frameCnt - 1;
-      
-      o.moveDots();
+      o.move();
     end
+    
   end % methods
     
   methods (Access = public)        
-    function initDots(o,idx)
+    function initialize(o,idx)
       % initialises dot positions
       n = length(idx); % the number of dots to (re-)place
       
@@ -210,7 +207,7 @@ classdef dots < handle
       
     end
                 
-    function moveDots(o), 
+    function move(o)
       % calculate future position
       x = o.x + o.dx;
       y = o.y + o.dy;
@@ -235,11 +232,11 @@ classdef dots < handle
       if ~isempty(idx),
 %         fprintf(1,'%i dots expired\n',length(idx));
         % (re-)place dots randomly within the aperture
-        o.initDots(idx);
+        o.initialize(idx);
       end
     end
     
-    function drawDots(o)
+    function draw(o)
       % dotType:
       %
       %   0 - square dots (default)

@@ -10,7 +10,7 @@ end
 pldapsDefaultTrialFunction(p,state)
 
 dotmotion.fixation(p, state, stimulusname)
-% dotmotion.motion(p, state, stimulusname)
+dotmotion.motionStates(p, state, stimulusname)
 % dotmotion.choice(p, state, stimulusname)
 
 
