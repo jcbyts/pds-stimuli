@@ -29,42 +29,48 @@ end
 end
 
 function checkFixation(p, sn)
-    currentEye=[p.trial.eyeX p.trial.eyeY]; %p.trial.(sn).eyeXYs(1:2,p.trial.iFrame);
+currentEye=[p.trial.eyeX p.trial.eyeY]; %p.trial.(sn).eyeXYs(1:2,p.trial.iFrame);
 %     fprintf('checking: state ')
-    % check if fixation should be shown
-    switch p.trial.(sn).state
-        case p.trial.(sn).states.START
-%             fprintf('START\n')
-            
-            % time to turn on fixation
-            if p.trial.ttime > p.trial.(sn).preTrial
-                fixOn(p,sn) % fixation point on
-            end
-            
-        case p.trial.(sn).states.FPON
-%             fprintf('FPON\n')
-            % is fixation held
-            isheld=p.trial.(sn).hFix.isheld(currentEye);
-            if isheld && p.trial.ttime < p.trial.(sn).fixWait + p.trial.(sn).timeFpOn
-                fixHold(p,sn)
-            elseif p.trial.ttime > p.trial.(sn).fixWait + p.trial.(sn).timeFpOn
-                breakFix(p,sn)
-            end
-            
-        case p.trial.(sn).states.FPHOLD
-%             fprintf('FPHOLD\n')
-            % is fixation held
-            isheld=p.trial.(sn).hFix.isheld(currentEye);
-            if isheld && p.trial.ttime < p.trial.(sn).maxFixHold + p.trial.(sn).timeFpEntered
-                % do nothing
-            elseif ~isheld && p.trial.ttime > p.trial.(sn).minFixHold + p.trial.(sn).timeFpEntered
-               fixOff(p,sn)
-            else % break fixation
-                breakFix(p,sn)
-            end
-            
-            
-    end
+% check if fixation should be shown
+switch p.trial.(sn).state
+    case p.trial.(sn).states.START
+        %             fprintf('START\n')
+        
+        % time to turn on fixation
+        if p.trial.ttime > p.trial.(sn).preTrial
+            fixOn(p,sn) % fixation point on
+        end
+        
+    case p.trial.(sn).states.FPON
+        %             fprintf('FPON\n')
+        % is fixation held
+        isheld=p.trial.(sn).hFix.isheld(currentEye);
+        if isheld && p.trial.ttime < p.trial.(sn).fixWait + p.trial.(sn).timeFpOn
+            fixHold(p,sn)
+        elseif p.trial.ttime > p.trial.(sn).fixWait + p.trial.(sn).timeFpOn
+            breakFix(p,sn)
+        end
+        
+    case p.trial.(sn).states.FPHOLD
+        %             fprintf('FPHOLD\n')
+        % fixation controls motion
+        if ~p.trial.(sn).showMotion && p.trial.iFrame > p.trial.(sn).frameFpEntered + p.trial.(sn).preStim
+            motionOn(p,sn)
+        end
+        
+        % is fixation held
+        isheld=p.trial.(sn).hFix.isheld(currentEye);
+        if isheld && p.trial.ttime < p.trial.(sn).maxFixHold + p.trial.(sn).timeFpEntered
+            % do nothing
+        elseif ~isheld && p.trial.ttime > p.trial.(sn).minFixHold + p.trial.(sn).timeFpEntered
+            fixOff(p,sn)
+            motionOff(p,sn)
+        else % break fixation
+            breakFix(p,sn)
+        end
+        
+        
+end
 
 end
 
@@ -107,4 +113,20 @@ p.trial.(sn).hFix.winColour=p.trial.display.clut.bg;
 p.trial.(sn).timeFpOff = p.trial.ttime;
 p.trial.(sn).frameFpOff = p.trial.iFrame;
 p.trial.(sn).state=p.trial.(sn).states.CHOOSETARG;
+end
+
+function motionOn(p,sn)
+if ~p.trial.(sn).showMotion
+    p.trial.(sn).showMotion=true;
+    p.trial.(sn).timeStimOn=p.trial.ttime;
+    p.trial.(sn).frameStimOn=p.trial.iFrame;
+end
+end
+
+function motionOff(p,sn)
+if p.trial.(sn).showMotion
+    p.trial.(sn).showMotion=false;
+    p.trial.(sn).timeStimOff=p.trial.ttime;
+    p.trial.(sn).frameStimOff=p.trial.iFrame;
+end
 end
