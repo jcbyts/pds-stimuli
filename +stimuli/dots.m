@@ -35,6 +35,7 @@ classdef dots < handle
     maxRadius@double; % maximum radius (pixels)
     position@double; % aperture position (x,y; pixels)
     colour@double;
+    visible@logical=true; % is the stimulus visible
   end
     
   properties (Access = public) %private)
@@ -94,6 +95,7 @@ classdef dots < handle
       p.addParameter('position',[0.0,0.0],@(x) isvector(x) && isreal(x)); % [x,y] (pixels)
                   
       p.addParameter('colour',zeros(1,3),@double);
+      p.addParameter('visible',true,@islogical)
       try
         p.parse(args{:});
       catch
@@ -114,7 +116,7 @@ classdef dots < handle
       o.coherence = args.coherence;
       o.dist = args.dist;
       o.bandwdth = args.bandwdth;
-
+      o.visible = args.visible;
       o.truncateGauss = -1; % multiples of std. dev. (i.e., o.bw)
       
       o.lifetime = args.lifetime;
@@ -244,9 +246,10 @@ classdef dots < handle
       %   2 - round, anti-aliased dots (favour quality)
       %   3 - round, anti-aliased dots (built-in shader)
       %   4 - square dots (built-in shader)
-      dotType = 1;
-      Screen('DrawDots',o.winPtr,[o.x(:), -1*o.y(:)]', o.size, o.colour, o.position, dotType);
-
+      dotType =2;
+      if o.visible
+        Screen('DrawDots',o.winPtr,[o.x(:), -1*o.y(:)]', o.size, o.colour, o.position, dotType);
+      end
 %       if 0,
 %         plot(o.x+o.position(1),o.y+o.position(2),'o');
 %         axis equal;
