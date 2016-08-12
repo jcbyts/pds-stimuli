@@ -11,10 +11,12 @@ classdef targetAnnulus<handle
 %   visible         - logical, is the target drawn
     properties (Access = public)
         position@double; % center of annulus
-        minRadius@double; % inner radius (in pixels)
-        maxRadius@double; % inner radius (in pixels)
+        radius@double;    % radius, center of ring (in pixels)
+        size@double; % width of ring (in pixels)
+        winSize@double; % size of window relativ
         thetaSpan@double; % range spanned
         colour@double;
+        winColour@double;
         visible@logical; % is the target visible
         held=@double;
     end
@@ -24,6 +26,10 @@ classdef targetAnnulus<handle
         winPtr; % PTB window
         polyx@double;
         polyy@double;
+        winpolyx@double;
+        winpolyy@double;
+        winRadiusMin@double;
+        winRadiusMax@double;
     end
     
     methods (Access = public)
@@ -38,10 +44,12 @@ classdef targetAnnulus<handle
             p=inputParser;
             p.StructExpand = true;
             p.addParameter('position',[0 0], @isfloat)
-            p.addParameter('minRadius', 100, @isfloat)
-            p.addParameter('maxRadius', 200, @isfloat)
+            p.addParameter('radius', 100, @isfloat)
+            p.addParameter('size', 200, @isfloat)
+            p.addParameter('winSize', 200, @isfloat)
             p.addParameter('thetaSpan', [0 360], @isfloat)
             p.addParameter('colour', zeros(1,3), @isfloat)
+            p.addParameter('winColour', ones(1,3), @isfloat)
             p.addParameter('visible', true)
             try
                p.parse(args{:});
@@ -52,10 +60,12 @@ classdef targetAnnulus<handle
             
             args=p.Results;
             o.position=args.position;
-            o.minRadius=args.minRadius;
-            o.maxRadius=args.maxRadius;
+            o.radius=args.radius;
+            o.size=args.size;
+            o.winSize=args.winSize;
             o.thetaSpan=args.thetaSpan;
             o.colour=args.colour;
+            o.winColour=args.winColour;
             o.visible=args.visible;
             o.held=false;
         end
@@ -64,8 +74,14 @@ classdef targetAnnulus<handle
             th=o.thetaSpan(1):o.thetaSpan(2);
             x=cosd(th);
             y=sind(th);
-            o.polyx=[o.minRadius*x o.maxRadius*fliplr(x) o.minRadius*x(1)];
-            o.polyy=[o.minRadius*y o.maxRadius*fliplr(y) o.minRadius*y(1)];
+            minRadius=o.radius-o.size;
+            maxRadius=o.radius+o.size;
+            o.winRadiusMin=o.radius-o.winSize;
+            o.winRadiusMax=o.radius+o.winSize;
+            o.polyx=[minRadius*x maxRadius*fliplr(x) minRadius*x(1)];
+            o.polyy=[minRadius*y maxRadius*fliplr(y) minRadius*y(1)];
+            o.winpolyx=[o.winRadiusMin*x o.winRadiusMax*fliplr(x) o.winRadiusMin*x(1)];
+            o.winpolyy=[o.winRadiusMin*y o.winRadiusMax*fliplr(y) o.winRadiusMin*y(1)];
         end
         
         function update(o)
@@ -76,13 +92,14 @@ classdef targetAnnulus<handle
             [th, rho]=cart2pol(xy(1), xy(2));
             th=th*180/pi;
             th=mod(th,360);
-            h = rho > o.minRadius & rho < o.maxRadius & th>o.thetaSpan(1) & th < o.thetaSpan(2);
+            h = rho > o.winRadiusMin & rho < o.winRadiusMax & th>o.thetaSpan(1) & th < o.thetaSpan(2);
             o.held=o.held+h;
         end
         
         function draw(o)
             if o.visible
                 Screen('FillPoly', o.winPtr, o.colour, [o.polyx(:)+o.position(1), o.polyy(:)+o.position(2)])
+                Screen('FramePoly', o.winPtr, o.winColour, [o.winpolyx(:)+o.position(1), o.winpolyy(:)+o.position(2)])
             end
         end    
     end
