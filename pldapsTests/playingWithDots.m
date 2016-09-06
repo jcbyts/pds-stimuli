@@ -7,6 +7,48 @@ p.trial.display.useOverlay=2;
 p=pds.datapixx.init(p);
 
 
+%% test pixel noise
+
+
+n=stimuli.pixelNoise(p.trial.display.ptr, 'type', 'sparse', 'sigma', .05);
+n.setup
+
+iter=10;
+while iter > 0
+    
+    n.update
+    n.draw
+    Screen('Flip', p.trial.display.ptr, 0);
+    pause(.1)
+    iter=iter-1;
+end
+
+%% test gaussian noise
+
+n=stimuli.gaussianNoise(p.trial.display.ptr);
+n.setup
+
+%%
+t0=GetSecs;
+n.update
+t1=GetSecs-t0;
+fprintf('update took %0.5f ms\n', t1*1e3)
+t0=GetSecs;
+n.draw
+t1=GetSecs-t0;
+fprintf('draw took %0.5f ms\n', t1*1e3)
+Screen('Flip', p.trial.display.ptr, 0);
+
+%%
+tex = CreateProceduralGaussBlob(p.trial.display.ptr, 150, 150, [0 0 0 0], 1, -.5);
+%             n.tex2 = CreateProceduralGaussBlob(n.ptr, 150, 150, [1 1 1 0], 0, .5);
+            
+Screen('DrawTexture', p.trial.display.ptr, tex, [], [400 400 800 800], [], [], [], 0, [], kPsychDontDoRotation, [-.5, 10, 1, 0]);
+Screen('DrawTexture', p.trial.display.ptr, tex, [], [400 400 800 800], [], [], [], 0, [], kPsychDontDoRotation, [.5, 10, 1, 0]);
+
+Screen('Flip', p.trial.display.ptr, 0);
+
+Screen('Close', tex)
 %%
 
 d=stimuli.dots(p.trial.display.ptr, ...
@@ -41,6 +83,8 @@ t=stimuli.targetAnnulus(p.trial.display.overlayptr, ...
 
 d.beforeTrial
 t.beforeTrial
+
+
 
 
 
