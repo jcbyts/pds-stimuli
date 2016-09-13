@@ -31,17 +31,22 @@ end
 
 
 % initialize no backgrounds
-p.trial.(sn).background.on=false;
+p.trial.(sn).background.on=true;
         
 %% Noise
 
-p.trial.(sn).noise.type='sparse';
-p.trial.(sn).noise.dim=[10 10];
-p.trial.(sn).noise.xy=[0 0];
-p.trial.(sn).noise.checkSize=2;
-p.trial.(sn).noise.sigma=.05;
-p.trial.(sn).noise.on=true;
-p.trial.(sn).noise.gazeContingent=true;
+p.trial.(sn).pixelNoise.type='sparse';
+p.trial.(sn).pixelNoise.dim=[10 10];
+p.trial.(sn).pixelNoise.xy=[0 0];
+p.trial.(sn).pixelNoise.checkSize=2;
+p.trial.(sn).pixelNoise.sigma=.05;
+p.trial.(sn).pixelNoise.on=false;
+p.trial.(sn).pixelNoise.gazeContingent=true;
+
+p.trial.(sn).gaussianNoise.sc=10;
+p.trial.(sn).gaussianNoise.count=200;
+p.trial.(sn).gaussianNoise.contrast=.25;
+p.trial.(sn).gaussianNoise.on=true;
 
 
 

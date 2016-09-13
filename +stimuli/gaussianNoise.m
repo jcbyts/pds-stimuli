@@ -15,6 +15,7 @@ classdef gaussianNoise < handle
         dc
         scale
         dim
+        ranNumGen
     end
     
     properties (Access = private)
@@ -30,10 +31,11 @@ classdef gaussianNoise < handle
             ip=inputParser();
             ip.addParameter('count', 100)
             ip.addParameter('dim', [1920 1080])
-            ip.addParameter('sc', 10)
+            ip.addParameter('sc', 100)
             ip.addParameter('contrast', .5)
             ip.addParameter('aspectratio', 1.0)
             ip.addParameter('dc', .5)
+            ip.addParameter('rng', RandStream('twister'))
             ip.parse(varargin{:})
             
             n.ptr=ptr;
@@ -43,6 +45,7 @@ classdef gaussianNoise < handle
             n.sc=ip.Results.sc;
             n.aspectratio=ip.Results.aspectratio;
             n.dc=ip.Results.dc;
+            n.ranNumGen=ip.Results.rng;
             
         end
         
@@ -53,61 +56,52 @@ classdef gaussianNoise < handle
             % identically:
             n.mypars = repmat([n.contrast, n.sc, n.aspectratio, 0]', 1, n.count);
             
-            n.tex = CreateProceduralGaussBlob(n.ptr, 150, 150, [0 0 0 0], 1, -.5);
-            
-            Screen('DrawTexture', n.ptr, n.tex, [], [], [], [], [], [], [], kPsychDontDoRotation, [n.contrast, n.sc, n.aspectratio, 0]);
-            n.texrect = Screen('Rect', n.tex);
-            n.inrect = repmat(n.texrect', 1, n.count);
+            [n.tex, n.texrect] = CreateProceduralGaussBlob(n.ptr, 250, 250, [0 0 0 0], 1, .5);
 
-            n.dstRects = zeros(4, n.count);
-            for i=1:n.count
-                n.scale(i) = 1*(0.1 + 0.9 * randn);
-                n.dstRects(:, i) = CenterRectOnPoint(n.texrect * n.scale(i), rand * n.dim(1), rand * n.dim(2))';
-            end
+            Screen('DrawTexture', n.ptr, n.tex, [], CenterRectOnPoint(n.texrect, n.dim(1)/2, n.dim(2)/2), [], [], [], [], [], kPsychDontDoRotation, [n.contrast, n.sc, n.aspectratio, 0]);
+            n.inrect = repmat(n.texrect', 1, n.count);
             
-            n.x=rand(n.count,1) * n.dim(1);
-            n.y=rand(n.count,1) * n.dim(2);
-            n.mypars(1,:) = sign(randn(1,n.count))*n.contrast;
-            n.scale=.1*randn(1,n.count).^4;
+            n.x=rand(n.ranNumGen,1,n.count) * n.dim(1);
+            n.y=rand(n.ranNumGen,1,n.count) * n.dim(2);
+            n.mypars(1,:) = sign(randn(n.ranNumGen,1,n.count))*n.contrast;
+            n.scale=.1*randn(n.ranNumGen,1,n.count).^4;
+            n.dstRects = CenterRectOnPointd(n.inrect .* repmat(n.scale,4,1), n.x, n.y);
         end
         
         function update(n)
-            % "Pulse" the aspect-ratio of each gabor with a sine-wave timecourse:
-%             n.mypars(3,:) = 1.0 + 0.25 * sin(n.count*0.1);
-            
-%             t0=GetSecs;
-            ix=rand(n.count,1)<.5;
+            ix=rand(n.ranNumGen,n.count,1)<.5;
             ns=sum(ix);
-            n.x(ix)=rand(ns,1) * n.dim(1);
-            n.y(ix)=rand(ns,1) * n.dim(2);
-%             t1=GetSecs-t0;
-%             fprintf('update (randomize) took %0.5f ms\n', t1*1e3)
-    % Recompute dstRects destination rectangles for each patch, given the
-    % 'per gabor' scale and new center location (x,y):
-%     tic        
-%             tmp=n.inrect .* repmat(n.scale,4,1);
-            n.scale=.1*randn(1,n.count).^4;
+            n.x(ix)=ceil(rand(n.ranNumGen,ns,1) * n.dim(1));
+            n.y(ix)=ceil(rand(n.ranNumGen,ns,1) * n.dim(2));
+            
+            n.scale=.1+rand(n.ranNumGen,1,n.count)*2;
+
             sx=n.scale.*n.texrect(3)/2;
             sy=n.scale.*n.texrect(4)/2;
-            n.dstRects=[n.x'-sx;n.y'-sy;n.x'+sx;n.y'+sy];
-%             tmp(1,:)=tmp(1,:)+n.x';
-%             tmp(2,:)=tmp(2,:)+n.y';
-%             tmp(3,:)=tmp(3,:)+n.x';
-%             tmp(4,:)=tmp(4,:)+n.y';
-%             n.dstRects=tmp;
-%             toc
-            
-%             n.dstRects = CenterRectOnPointd(n.inrect .* repmat(n.scale,4,1), n.x(:)', n.y(:)');
-%             t1=GetSecs-t0;
-%             fprintf('update (total) took %0.5f ms\n', t1*1e3)
+            n.dstRects=[n.x-sx;n.y-sy;n.x+sx;n.y+sy];
         end
         
         
         function draw(n)
-%             t0=GetSecs;
-            Screen('DrawTextures', n.ptr, n.tex, [], n.dstRects, 0, [], [], [], [], kPsychDontDoRotation, n.mypars);
-%             t1=GetSecs-t0;
-%             fprintf('draw (internal) took %0.5f ms\n', t1*1e3)
+            Screen('DrawTextures', n.ptr, n.tex, [], n.dstRects, 0, 0, [], [], [], kPsychDontDoRotation, n.mypars);
+        end
+        
+        function img=image(n)
+            [xx,yy]=meshgrid(0:(n.dim(1)-1), 0:(n.dim(2)-1));
+            s=[n.texrect(3) n.texrect(4)];
+            fun=@(x,y,s,c) c*exp(- ( (xx-x).^2 + (yy - y).^2)/(2*s^2));
+            img=0;
+            for i=1:n.count
+                tmp=fun(n.x(i), n.y(i), n.scale(i).*n.sc, n.mypars(1,i)*n.contrast);
+                tmp=tmp*512;
+                % window out texture region
+                ix=abs(xx-n.x(i))>s(1)*n.scale(i) & abs(yy-n.y(i))>s(2)*n.scale(i);
+                tmp(ix)=0;
+                img=img+tmp;
+            end
+            img(abs(img)<1)=0;
+            img=img+127;
+            img=ceil(img);
         end
     end
     

@@ -39,41 +39,18 @@ classdef textures < handle
 %   end
   
   methods % set/get dependent properties
-    % dependent property set methods
-%     function o = set.alpha(o,value),
-%       % get selected textures...
-%       idx = o.getTexIdx(o.id);
-% 
-%       if isscalar(value),
-%         value = repmat(value,size(idx));
-%       end
-%       
-%       assert(length(value) == length(idx));
-%       
-%       for ii = 1:length(idx),
-%         o.texture{idx(ii)}.alpha = value(ii);
-%       end
-%     end
-    
-    % dependent property get methods
-%     function value = get.alpha(o),
-%       % get selected textures...
-%       idx = o.getTexIdx(o.id);
-% 
-%       value = cellfun(@(x) x.alpha, o.texture(idx), 'UniformOutput', 1);
-%     end
 
-    function value = get.texIds(o),
+    function value = get.texIds(o)
       value = cellfun(@(x) x.id, o.texture, 'UniformOutput', 0);
     end
     
-    function value = get.numTex(o),
+    function value = get.numTex(o)
       value = length(o.texture);
     end
   end
   
   methods (Access = public)
-    function o = textures(winPtr,varargin), % marmoview's initCmd?
+    function o = textures(winPtr,varargin) % marmoview's initCmd?
       o.winPtr = winPtr;
       
       if nargin == 1,
@@ -85,13 +62,13 @@ classdef textures < handle
       p = inputParser;
 %       p.KeepUnmatched = true;
       p.StructExpand = true;
-      p.addParamValue('size',NaN,@isfloat); % pixels
-      p.addParamValue('position',o.position,@isfloat); % [x,y] (pixels)
-      p.addParamValue('alpha',o.alpha,@isfloat); % opacity, 0..1
+      p.addParameter('size',NaN,@isfloat); % pixels
+      p.addParameter('position',o.position,@isfloat); % [x,y] (pixels)
+      p.addParameter('alpha',o.alpha,@isfloat); % opacity, 0..1
 
       try
         p.parse(args{:});
-      catch,
+      catch
         warning('Failed to parse name-value arguments.');
         return;
       end
@@ -103,19 +80,19 @@ classdef textures < handle
       o.alpha = args.alpha;
     end
         
-    function beforeTrial(o),
+    function beforeTrial(o)
     end
     
-    function beforeFrame(o),
+    function beforeFrame(o)
       o.drawTextures();
     end
         
-    function afterFrame(o),
+    function afterFrame(o)
     end
   end % methods
     
   methods (Access = public)        
-    function drawTextures(o),
+    function drawTextures(o)
       % get textures to draw...
       idx = o.getTexIdx(o.id);
       
@@ -138,7 +115,7 @@ classdef textures < handle
       Screen('DrawTextures',o.winPtr,texPtr,[],rect',[],filterMode,o.alpha);
     end
     
-    function addTexture(o,id,img,varargin),
+    function addTexture(o,id,img,varargin)
       % add IMG to the list of textures, with texture id ID.
       %
       % IMG can be a NxM matrix of pixel luminance values, an NxMx3 matrix

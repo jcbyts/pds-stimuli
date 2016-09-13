@@ -1,5 +1,9 @@
+sca
+clear settingsStruct
+settingsStruct.display.destinationFactorNew=GL_ONE_MINUS_SRC_ALPHA;
+settingsStruct.display.sourceFactorNew=GL_SRC_ALPHA;
 
-p=pldaps(@plain, 'test');
+p=pldaps(@plain, 'test', settingsStruct);
 
 p=openScreen(p);
 p.trial.display.switchOverlayCLUTs=0;
@@ -25,9 +29,9 @@ end
 
 %% test gaussian noise
 
-n=stimuli.gaussianNoise(p.trial.display.ptr);
+n=stimuli.gaussianNoise(p.trial.display.ptr, 'contrast', .25, 'sc', 20, 'count', 200);
 n.setup
-
+Screen('Flip', p.trial.display.ptr, 0);
 %%
 t0=GetSecs;
 n.update
@@ -38,6 +42,18 @@ n.draw
 t1=GetSecs-t0;
 fprintf('draw took %0.5f ms\n', t1*1e3)
 Screen('Flip', p.trial.display.ptr, 0);
+
+im=n.image;
+img=Screen('GetImage', p.trial.display.ptr, [0 0 1920 1080]);
+figure(1); clf
+subplot(131); imagesc(mean(img,3)); colorbar; title('PTB image'); subplot(132); imagesc(im); colorbar; title('Matlab Evaluated Gaussians'); subplot(133); imagesc(mean(img,3)-(im)); colorbar; title('Difference')
+
+figure(2); clf
+imdiff=mean(img,3)-(im);
+[i,j]=find(imdiff==max(imdiff(:)), 1);
+plot(img(i,:,1)); hold on; plot(im(i,:))
+
+
 
 %%
 tex = CreateProceduralGaussBlob(p.trial.display.ptr, 150, 150, [0 0 0 0], 1, -.5);
