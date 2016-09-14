@@ -92,9 +92,9 @@ classdef pixelNoise < handle
             tmp=randn(n.size(1), n.size(2))*n.sigma;
             tmp(abs(tmp)<.1)=0;
             tmp=sign(tmp);
-            n.img=tmp; %+n.dc;
-%             n.img=min(n.img, 1);
-%             n.img=max(n.img, 0);
+            n.img=tmp+n.dc;
+            n.img=min(n.img, 1);
+            n.img=max(n.img, 0);
         end
     end
     

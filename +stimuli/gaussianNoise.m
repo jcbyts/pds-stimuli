@@ -81,6 +81,9 @@ classdef gaussianNoise < handle
             n.dstRects=[n.x-sx;n.y-sy;n.x+sx;n.y+sy];
         end
         
+        function c=getContrast(n)
+            c=n.mypars(1,:);
+        end
         
         function draw(n)
             Screen('DrawTextures', n.ptr, n.tex, [], n.dstRects, 0, 0, [], [], [], kPsychDontDoRotation, n.mypars);
