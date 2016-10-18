@@ -32,3 +32,4 @@ for k=1:numel(p.data)
     title(sprintf('Trial: %d', k))
     pause
 end
+

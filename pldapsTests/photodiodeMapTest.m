@@ -6,6 +6,33 @@
 % 4) natBackground
 % 5) hartleyGratings
 
+%% debug photodiode
+
+
+p=pldaps(@plain);
+p=openScreen(p);
+p.trial.display.switchOverlayCLUTs=0;
+p.trial.display.useOverlay=1;
+p=pds.datapixx.init(p);
+
+%%
+iter=1;
+while iter<1e3
+    
+    if mod(iter, 100)<5
+        Datapixx('SetDoutValues', 2^1); Datapixx('RegWr');
+        Screen('FillRect', p.trial.display.ptr, 1)
+        Datapixx('SetDoutValues',0); Datapixx('RegWr');
+    Screen('Flip', p.trial.display.ptr)
+    else
+    Screen('FillRect', p.trial.display.ptr, 0);
+    Screen('Flip', p.trial.display.ptr);
+    end
+     
+    iter=iter+1;
+end
+
+
 %% Open a pldaps window
 subject='test';
 
@@ -92,28 +119,3 @@ p=pldaps(@plain, settingsStruct);
 p.trial.pldaps.pause.preExperiment=false;
 p.run
 
-%% debug photodiode
-
-
-p=pldaps(@plain, settingsStruct);
-p=openScreen(p);
-p.trial.display.switchOverlayCLUTs=0;
-p.trial.display.useOverlay=2;
-p=pds.datapixx.init(p);
-
-%%
-iter=1;
-while iter<10e3
-    
-    if mod(iter, 100)<5
-        Datapixx('SetDoutValues', 2^1); Datapixx('RegWr');
-        Screen('FillRect', p.trial.display.ptr, 1)
-        Datapixx('SetDoutValues',0); Datapixx('RegWr');
-    Screen('Flip', p.trial.display.ptr)
-    else
-    Screen('FillRect', p.trial.display.ptr, 0)
-    Screen('Flip', p.trial.display.ptr)
-    end
-     
-    iter=iter+1;
-end

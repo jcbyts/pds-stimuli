@@ -9,6 +9,7 @@ end
 
 
 switch state
+        
     case p.trial.pldaps.trialStates.framePrepareDrawing
         
     case p.trial.pldaps.trialStates.frameUpdate
@@ -47,7 +48,7 @@ switch state
     case p.trial.pldaps.trialStates.experimentPostOpenScreen
         
         if ~isfield(p.trial.(sn), 'spatialScale')
-            p.trial.(sn).spatialScale=10;
+            p.trial.(sn).spatialScale=20;
         end
         
         if ~isfield(p.trial.(sn), 'count')
@@ -55,7 +56,7 @@ switch state
         end
         
         if ~isfield(p.trial.(sn), 'contrast')
-            p.trial.(sn).contrast=.25;
+            p.trial.(sn).contrast=.5;
         end
         
         if ~isfield(p.trial.(sn), 'on')
