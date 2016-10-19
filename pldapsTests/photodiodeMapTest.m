@@ -6,30 +6,35 @@
 % 4) natBackground
 % 5) hartleyGratings
 
-%% debug photodiode
-
+%% Flash black to white to test photodiode
 
 p=pldaps(@plain);
 p=openScreen(p);
 p.trial.display.switchOverlayCLUTs=0;
 p.trial.display.useOverlay=1;
 p=pds.datapixx.init(p);
-
 %%
-iter=1;
-while iter<1e3
+iter=5;
+t0=GetSecs;
+t1=GetSecs-t0;
+
+while t1<10
     
-    if mod(iter, 100)<5
+    t1=GetSecs-t0;
+    if iter<5
         Datapixx('SetDoutValues', 2^1); Datapixx('RegWr');
-        Screen('FillRect', p.trial.display.ptr, 1)
+        Screen('FillRect', p.trial.display.ptr, 1);
         Datapixx('SetDoutValues',0); Datapixx('RegWr');
-    Screen('Flip', p.trial.display.ptr)
+        Screen('Flip', p.trial.display.ptr);
+        if iter==0
+            iter=100;
+        end
     else
-    Screen('FillRect', p.trial.display.ptr, 0);
-    Screen('Flip', p.trial.display.ptr);
+        Screen('FillRect', p.trial.display.ptr, 0);
+        Screen('Flip', p.trial.display.ptr);
     end
-     
-    iter=iter+1;
+    
+    iter=iter-1;
 end
 
 
@@ -97,18 +102,15 @@ settingsStruct.(sn).stateFunction.requestedStates.trialPrepare=true;
 settingsStruct.(sn).stateFunction.requestedStates.frameUpdate=true;
 settingsStruct.(sn).stateFunction.requestedStates.frameDraw=true;
 settingsStruct.(sn).stateFunction.requestedStates.trialCleanUpandSave=true;
+% important parameters
+settingsStruct.(sn).N=3; % number in the base level
+settingsStruct.(sn).levels=5; % number of levels
+
 
 settingsStruct.display.destinationFactorNew=GL_ONE;
 settingsStruct.display.sourceFactorNew=GL_ONE;
-% settingsStruct.openephys.stateFunction.name='pds.openephys.openephys';
-% settingsStruct.openephys.use=false;
-% settingsStruct.openephys.stateFunction.acceptsLocationInput=true;
-% settingsStruct.openephys.stateFunction.order=0;
-% settingsStruct.openephys.stateFunction.requestedStates.experimentPostOpenScreen=true;
-% settingsStruct.openephys.stateFunction.requestedStates.experimentCleanUp=true;
-% settingsStruct.openephys.stateFunction.requestedStates.trialSetup=true;
-% settingsStruct.openephys.stateFunction.requestedStates.trialCleanUpandSave=true;
-% 
+
+
 settingsStruct.datapixx.use=true;
 settingsStruct.datapixx.LogOnsetTimestampLevel=1;
 settingsStruct.display.useOverlay=1;

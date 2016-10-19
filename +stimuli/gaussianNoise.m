@@ -6,10 +6,16 @@ classdef gaussianNoise < handle
         ptr
         tex
         rect
+        contrast
+        lifetime
+        N
+        step
+        levels
+        sigma0
+        count
         x
         y
-        contrast
-        count
+        gridpos
         sc
         aspectratio
         dc
@@ -23,24 +29,40 @@ classdef gaussianNoise < handle
         texrect
         inrect
         dstRects
+        sigmas
+        ns
+        sx
+        sy
+        life
+        levelix
     end
     
     methods
         % constructor
         function n=gaussianNoise(ptr, varargin)
             ip=inputParser();
-            ip.addParameter('count', 100)
+            ip.addParameter('N', 4)
+            ip.addParameter('levels', 4)
+            ip.addParameter('sigma0', 2)
+            ip.addParameter('step', 1)
+            ip.addParameter('sc', 30)
             ip.addParameter('dim', [1920 1080])
-            ip.addParameter('sc', 100)
             ip.addParameter('contrast', .5)
             ip.addParameter('aspectratio', 1.0)
             ip.addParameter('dc', .5)
+            ip.addParameter('lifetime', 1)
             ip.addParameter('rng', RandStream('twister'))
             ip.parse(varargin{:})
             
             n.ptr=ptr;
+            n.lifetime=ip.Results.lifetime;
             n.contrast=ip.Results.contrast;
-            n.count=ip.Results.count;
+            n.N=ip.Results.N;
+            n.step=ip.Results.step;
+            n.sigma0=ip.Results.sigma0;
+            n.levels=ip.Results.levels;
+            n.ns=n.N.^(1:n.levels);
+            n.count=sum(n.ns);
             n.dim=ip.Results.dim;
             n.sc=ip.Results.sc;
             n.aspectratio=ip.Results.aspectratio;
@@ -51,7 +73,6 @@ classdef gaussianNoise < handle
         
         
         function setup(n)
-            
             % Initialize matrix with spec for all 'ngabors' patches to start off
             % identically:
             n.mypars = repmat([n.contrast, n.sc, n.aspectratio, 0]', 1, n.count);
@@ -60,25 +81,70 @@ classdef gaussianNoise < handle
 
             Screen('DrawTexture', n.ptr, n.tex, [], CenterRectOnPoint(n.texrect, n.dim(1)/2, n.dim(2)/2), [], [], [], [], [], kPsychDontDoRotation, [n.contrast, n.sc, n.aspectratio, 0]);
             n.inrect = repmat(n.texrect', 1, n.count);
+            n.sigmas = n.sigma0./((n.step*2).^((1:n.levels)-1));
             
-            n.x=rand(n.ranNumGen,1,n.count) * n.dim(1);
-            n.y=rand(n.ranNumGen,1,n.count) * n.dim(2);
+            n.sx=ceil(n.dim(1)./n.sigmas);
+            n.sy=ceil(n.dim(2)./n.sigmas);
+            
+            n.life=randi(n.ranNumGen,n.lifetime,[1 n.count]); 
+            
+            % get index for each level
+            n.levelix=arrayfun(@(x,y) x:y, 1+[0 cumsum(n.ns(1:end-1))], cumsum(n.ns), 'UniformOutput', false);
+            n.scale=zeros(1,n.count);
+            
+            for level=1:n.levels
+                n.scale(n.levelix{level})=n.sigmas(level);
+            end
+            
+            n.x=zeros(1, n.count);%rand(n.ranNumGen,1,n.count) * n.dim(1);
+            n.y=zeros(1, n.count);%rand(n.ranNumGen,1,n.count) * n.dim(2);
+            n.gridpos=zeros(1, n.count);
             n.mypars(1,:) = sign(randn(n.ranNumGen,1,n.count))*n.contrast;
-            n.scale=.1*randn(n.ranNumGen,1,n.count).^4;
             n.dstRects = CenterRectOnPointd(n.inrect .* repmat(n.scale,4,1), n.x, n.y);
         end
         
         function update(n)
-            ix=rand(n.ranNumGen,n.count,1)<.5;
-            ns=sum(ix);
-            n.x(ix)=ceil(rand(n.ranNumGen,ns,1) * n.dim(1));
-            n.y(ix)=ceil(rand(n.ranNumGen,ns,1) * n.dim(2));
             
-            n.scale=.1+rand(n.ranNumGen,1,n.count)*2;
+            
+            for level=1:n.levels
+                ix=n.life==0 & n.scale==n.sigmas(level);
+                c=sum(ix);
+                if c==0
+                    continue
+                end
+                
+                n.gridpos(ix)=randi(n.sx(level)*n.sy(level), [c 1]);
+                [i,j]=ind2sub([n.sy(level) n.sx(level)], n.gridpos(ix));
+    
+                n.x(ix)=((j-1) ./ n.sx(level)) * (n.dim(1));
+                n.y(ix)=((i-1) ./ n.sy(level)) * (n.dim(2));
+                
+                n.life(ix)=n.lifetime+1;
+            end
+            
+            n.life=n.life-1;
 
-            sx=n.scale.*n.texrect(3)/2;
-            sy=n.scale.*n.texrect(4)/2;
-            n.dstRects=[n.x-sx;n.y-sy;n.x+sx;n.y+sy];
+            tx=n.scale.*n.texrect(3)/2;
+            ty=n.scale.*n.texrect(4)/2;
+            n.dstRects=[n.x-tx;n.y-ty;n.x+tx;n.y+ty];
+        end
+        
+        function [gridx, gridy]=getGrid(n, level)
+            if exist('level', 'var')
+                xgrid=(((1:n.sx(level))-1) ./n.sx(level)) * n.dim(1);
+                ygrid=(((1:n.sy(level))-1) ./n.sy(level)) * n.dim(2);
+                [gridx,gridy]=meshgrid(xgrid, ygrid);
+            else
+                
+                gridx=cell(n.levels,1);
+                gridy=cell(n.levels,1);
+                
+                for level=1:n.levels
+                    xgrid=(((1:n.sx(level))-1) ./n.sx(level)) * n.dim(1);
+                    ygrid=(((1:n.sy(level))-1) ./n.sy(level)) * n.dim(2);
+                    [gridx{level},gridy{level}]=meshgrid(xgrid, ygrid);
+                end
+            end
         end
         
         function c=getContrast(n)

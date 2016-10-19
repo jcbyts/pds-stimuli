@@ -41,7 +41,7 @@ end
 
 %% test gaussian noise
 
-n=stimuli.gaussianNoise(p.trial.display.ptr, 'contrast', .5, 'sc', p.trial.display.ppd, 'levels', 5, 'N', 2);
+n=stimuli.gaussianNoise(p.trial.display.ptr, 'contrast', .5, 'sc', p.trial.display.ppd, 'levels', 5);
 n.setup
 Screen('Flip', p.trial.display.ptr, 0);
 %% Draw

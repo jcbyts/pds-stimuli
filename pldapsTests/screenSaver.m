@@ -1,0 +1,79 @@
+
+
+
+%% open screen
+p=pldaps(@screenSaverTrial, 'test'); p.run
+
+p=openScreen(p);
+p.trial.display.switchOverlayCLUTs=0;
+p.trial.display.useOverlay=2;
+p=pds.datapixx.init(p);
+
+%% load up images
+imgDir='/media/marmorig/Data/tofu.psych.upenn.edu/fulldb/cd12B_closeup_ground_cover_woods_shade_sun/';
+fileList=dir(fullfile(imgDir,'*LUM.mat'));
+
+numToShow=10;
+imgIndex=randi(numel(fileList), numToShow, 1);
+%% Make Textures
+A.tex = nan(numToShow,1);
+
+for i=1:numToShow
+    tmp=load(fullfile(imgDir, fileList(imgIndex(i)).name));
+    m=tmp.LUM_Image/max(tmp.LUM_Image(:));
+    A.tex(i)=Screen('MakeTexture',p.trial.display.ptr,m*256);
+    
+end
+
+%%
+while 1
+    pause(10)
+    Screen('DrawTexture', p.trial.display.ptr, A.tex(randi(numToShow)), [], [0 0 1900 1080] )
+    Screen('Flip',p.trial.display.ptr)
+end
+
+%%
+
+d=stimuli.dots(p.trial.display.ptr, ...
+    'size', 5, ...
+    'speed', 5, ... 
+    'direction', 90, ...
+    'numDots', 30, ...
+    'coherence', .5, ...
+    'mode', 1, ...
+    'dist', 1, ...
+    'bandwdth', 50, ...
+    'lifetime', 5, ...
+    'maxRadius', 100, ...
+    'position', p.trial.display.ctr(1:2));
+
+f=stimuli.fixation(p.trial.display.overlayptr, ...
+    'centreSize', 10, ...
+    'surroundSize', 20, ...
+    'position', p.trial.display.ctr(1:2), ...
+    'fixType', 2, ...
+    'winType', 2, ...
+    'centreColour', p.trial.display.clut.black, ...
+    'surroundColour', p.trial.display.clut.white, ...
+    'winColour', 2);
+
+t=stimuli.targetAnnulus(p.trial.display.overlayptr, ...
+    'radius', 10, ...
+    'size', 300, ...
+    'position', p.trial.display.ctr(1:2), ...
+    'thetaSpan', [0 45], ...
+    'colour', p.trial.display.clut.window);
+
+d.beforeTrial
+t.beforeTrial
+
+
+
+%%
+f.winRadius=f.winRadius+randn;
+d.draw;
+t.draw;
+f.drawFixation
+d.update;
+Screen('Flip', p.trial.display.ptr, 0);
+Screen('FillRect', p.trial.display.overlayptr, 0);
