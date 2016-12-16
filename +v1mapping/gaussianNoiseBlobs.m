@@ -62,7 +62,7 @@ switch state
         end
         
         if ~isfield(p.trial.(sn), 'contrast')
-            p.trial.(sn).contrast=.5;
+            p.trial.(sn).contrast=.25;
         end
         
         if ~isfield(p.trial.(sn), 'on')

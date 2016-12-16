@@ -129,6 +129,10 @@ classdef gaussianNoise < handle
             n.dstRects=[n.x-tx;n.y-ty;n.x+tx;n.y+ty];
         end
         
+        function ix=getLevelIndex(n, level)
+            ix=n.levelix{level};
+        end
+        
         function [gridx, gridy]=getGrid(n, level)
             if exist('level', 'var')
                 xgrid=(((1:n.sx(level))-1) ./n.sx(level)) * n.dim(1);
@@ -171,6 +175,146 @@ classdef gaussianNoise < handle
             img(abs(img)<1)=0;
             img=img+127;
             img=ceil(img);
+        end
+        
+        function lvl=getLevels(n,idx)
+            gridx=n.getGrid;
+            nb=cumsum(cellfun(@(x) numel(x), gridx));
+            si=[1; nb(1:end-1)+1]; % starting index for each level
+            lvl=arrayfun(@(x) find(x >= si & x <= nb), idx(:));
+        end
+        
+        function [B, x0, y0]=getBasis(n, idx, win)
+            warning('implement version that uses procedural gaussians')
+            [xx,yy]=meshgrid(1:n.dim(1),1:n.dim(2)); % pixels of screen
+            [gridx, gridy]=n.getGrid;
+            nb=cellfun(@(x) numel(x), gridx);
+            si=[1; nb(1:end-1)+1]; % starting index for each level
+            ilevel=arrayfun(@(x) find(x >= si & x <= nb), idx(:));
+            
+            if exist('win', 'var')
+               ii=((xx>=win(1) & xx<=win(3) & yy >= win(2) & yy <= win(4)));
+
+               xx=reshape(xx(ii), [win(4)-win(2)+1 win(3)-win(1)+1]); 
+               yy=reshape(yy(ii), [win(4)-win(2)+1 win(3)-win(1)+1]); 
+            end
+            B=zeros(numel(xx), numel(idx));
+            
+            for level=1:n.levels
+                gridi=idx(ilevel==level) - (si(level)-1);
+                if isempty(gridi)
+                    continue
+                end
+                xp=gridx{level}(gridi);
+                yp=gridy{level}(gridi);
+                
+                B(:,ilevel==level)=n.contrast*exp(-.5*(bsxfun(@minus, xx(:), xp(:)').^2 + ...
+                    bsxfun(@minus, yy(:), yp(:)').^2)/(n.sc*n.sigmas(level))^2);
+            end
+            
+            x0=xx(1,:);
+            y0=yy(:,1)';
+            
+        end
+        
+        
+        function [Bw, x0, y0]=evaulateWeightsOnBasis(n, idx, w, win)
+            warning('implement version that uses procedural gaussians')
+            [xx,yy]=meshgrid(1:n.dim(1),1:n.dim(2)); % pixels of screen
+            [gridx, ~]=n.getGrid;
+            nb=cellfun(@(x) numel(x), gridx);
+            si=[1; nb(1:end-1)+1]; % starting index for each level
+            ilevel=arrayfun(@(x) find(x >= si & x <= nb), idx(:));
+            
+            if exist('win', 'var')
+               ii=((xx>=win(1) & xx<=win(3) & yy >= win(2) & yy <= win(4)));
+
+               xx=reshape(xx(ii), [win(4)-win(2)+1 win(3)-win(1)+1]); 
+               yy=reshape(yy(ii), [win(4)-win(2)+1 win(3)-win(1)+1]); 
+            end
+            Bw=zeros(numel(xx),1);
+            
+            for i=1:numel(idx)
+                pos=n.getXYcenters(idx(i));
+                sig=n.sigmas(ilevel(i));
+                
+                g=n.contrast*exp(-.5* ((xx(:)-pos(1)).^2 + ...
+                    (yy(:)-pos(2)).^2)/(n.sc*sig)^2);
+                Bw=Bw+g*w(i);
+            end
+            
+            x0=xx(1,:);
+            y0=yy(:,1)';
+            
+        end
+        
+        
+        function pos=getXYcenters(n,idx)
+            [gridx, gridy]=n.getGrid;
+            gridx=cell2mat(cellfun(@(x) x(:), gridx, 'UniformOutput', false));
+            gridy=cell2mat(cellfun(@(x) x(:), gridy, 'UniformOutput', false));
+            pos = [gridx(idx) gridy(idx)];
+        end
+        
+        function [fr, po, co]=getProjectedStim(n, pos, idx)
+            
+%             nFrames=size(pos,1);
+            c=sign(n.getContrast)';
+            
+            fr=[];
+            po=[];
+            co=[];
+            
+            for i=1:numel(idx)
+                ii=pos==idx(i);
+                
+                if ~any(ii(:))
+                    continue
+                end
+                [tmpfr,tmpsh]=ind2sub(size(pos),find(ii));
+                
+                fr=[fr; tmpfr(:)];
+                po=[po; i*ones(numel(tmpfr),1)];
+                co=[co; c(tmpsh)];
+            end
+            
+%             posNew=zeros(numel(pos),1);
+%             for i=1:numel(idx)
+%                 posNew(pos==idx)=i;
+%             end
+%             cut=posNew==0;
+%             fr(cut)=[];
+%             posNew(cut)=[];
+%             con(cut)=[];
+%             
+%             XB=sparse(fr, pos, con, nFrames, numel(idx));
+        end
+        
+        function ix=getNextLevelIdx(n, idx)
+            if ~exist('idx', 'var') || isempty(idx)
+                gridx=n.getGrid(1);
+                ix=1:numel(gridx);
+                return
+            end
+            lvls=n.getLevels(idx);
+            currentLevel=max(lvls);
+            if currentLevel==n.levels
+                return
+            end
+            thisLevel=idx(lvls==currentLevel);
+            pos=n.getXYcenters(thisLevel);
+            minxy=min(pos, [], 1);
+            maxxy=max(pos, [], 1);
+            [gridx, gridy]=n.getGrid;
+            nb=sum(cellfun(@numel, gridx(1:currentLevel)));
+            gridx=gridx{currentLevel+1};
+            gridy=gridy{currentLevel+1};
+            s=2*n.sigmas(currentLevel)*n.sc;
+            win=[minxy(1)-s minxy(2)-s maxxy(1)+s maxxy(2)+s];
+            
+            ii=gridx(:)>=win(1) & gridx(:) <= win(3) ...
+                & gridy(:)>=win(2) & gridy(:) <= win(4);
+            ix=nb+find(ii);
         end
     end
     
