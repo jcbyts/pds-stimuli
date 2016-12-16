@@ -60,4 +60,5 @@ switch state
         
     case p.trial.pldaps.trialStates.trialCleanUpandSave
         p.trial.(sn).texShown(p.trial.iFrame+1:end)=[];
+        Screen('Close', p.trial.(sn).tex)
 end
