@@ -12,7 +12,7 @@ if nargin==1
     
     p = pdsDefaultTrialStructure(p);
     
-    p.defaultParameters.pldaps.trialMasterFunction='runModularTrial';
+%     p.defaultParameters.pldaps.trialMasterFunction='runModularTrial';
     p.defaultParameters.pldaps.trialFunction='faceForage';
     
     p.trial.pldaps.maxTrialLength = 5;
