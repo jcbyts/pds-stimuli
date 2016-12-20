@@ -21,6 +21,7 @@ classdef dots < handle
   % 14-06-2016 - Shaun L. Cloherty <s.cloherty@ieee.org>
   
   properties (Access = public),
+      p=@pldaps
     size@double; % pixels
     speed@double; % pixels/s
     direction@double; % radians (?)
@@ -60,8 +61,9 @@ classdef dots < handle
   end
   
   methods (Access = public)
-    function o = dots(winPtr,varargin)
-      o.winPtr = winPtr;
+    function o = dots(p,varargin)
+      o.p=p;
+        o.winPtr = o.p.trial.display.ptr;
       
       if nargin == 1,
         return

@@ -1,13 +1,13 @@
 sca
-clear settingsStruct
-settingsStruct.display.destinationFactorNew=GL_ONE;
-settingsStruct.display.sourceFactorNew=GL_ONE;
+% clear settingsStruct
+settingsStruct.display.destinationFactorNew=GL_ONE_MINUS_SRC_ALPHA;
+settingsStruct.display.sourceFactorNew=GL_SRC_ALPHA;
 
 p=pldaps(@plain, 'test', settingsStruct);
 
 p=openScreen(p);
 % p.trial.display.switchOverlayCLUTs=0;
-p.trial.display.useOverlay=1;
+p.trial.display.useOverlay=2;
 p=pds.datapixx.init(p);
 
 
@@ -81,7 +81,7 @@ Screen('Flip', p.trial.display.ptr, 0);
 Screen('Close', tex)
 %%
 
-d=stimuli.dots(p.trial.display.ptr, ...
+d=stimuli.dots(p, ...
     'size', 5, ...
     'speed', 5, ... 
     'direction', 90, ...
@@ -94,23 +94,27 @@ d=stimuli.dots(p.trial.display.ptr, ...
     'maxRadius', 100, ...
     'position', p.trial.display.ctr(1:2));
 
+p.trial.d=d;
+
 f=stimuli.fixation(p.trial.display.overlayptr, ...
-    'centreSize', 10, ...
-    'surroundSize', 20, ...
+    'centreSize', 5, ...
+    'surroundSize', 5, ...
     'position', p.trial.display.ctr(1:2), ...
-    'fixType', 2, ...
+    'fixType', 1, ...
     'winType', 2, ...
     'centreColour', p.trial.display.clut.black, ...
     'surroundColour', p.trial.display.clut.white, ...
     'winColour', 2);
 
 t=stimuli.targetAnnulus(p.trial.display.overlayptr, ...
-    'radius', 10, ...
-    'size', 300, ...
+    'radius', 100, ...
+    'size', 5, ...
+    'winSize', 6, ...
     'position', p.trial.display.ctr(1:2), ...
-    'thetaSpan', [0 45], ...
-    'colour', p.trial.display.clut.window);
+    'thetaSpan', [0 360], ...
+    'colour', 2);
 
+d=p.trial.d;
 d.beforeTrial
 t.beforeTrial
 
@@ -120,9 +124,46 @@ t.beforeTrial
 
 %%
 f.winRadius=f.winRadius+randn;
+tic
 d.draw;
+toc
+% d.colour=[0 0 0];
 t.draw;
 f.drawFixation
 d.update;
 Screen('Flip', p.trial.display.ptr, 0);
 Screen('FillRect', p.trial.display.overlayptr, 0);
+
+%% testing faces for faceforage
+subject='test';
+load settingsStruct.mat
+settingsStruct.display.useOverlay=1;
+settingsStruct.display.destinationFactorNew=GL_ONE_MINUS_SRC_ALPHA;
+settingsStruct.display.sourceFactorNew=GL_SRC_ALPHA;
+settingsStruct.display.screenSize=[]; %[0 0 1500 900];
+settingsStruct.pldaps.draw.grid.use=0;
+% settingsStruct.display.switchOverlayCLUTs=1;
+% sc='faceForage';
+% settingsStruct.(sc).stateFunction.name='faceForage';
+% settingsStruct.(sc).use=true;
+% settingsStruct.(sc).stateFunction.acceptsLocationInput=true;
+% settingsStruct.(sc).stateFunction.order=-5;
+% settingsStruct.(sc).stateFunction.requestedStates.experimentPostOpenScreen=true;
+% settingsStruct.(sc).stateFunction.requestedStates.experimentPreOpenScreen=true;
+% % settingsStruct.(sc).stateFunction.requestedStates.experimentCleanUp=true;
+% settingsStruct.(sc).stateFunction.requestedStates.trialSetup=true;
+% settingsStruct.(sc).stateFunction.requestedStates.frameUpdate=true;
+% settingsStruct.(sc).stateFunction.requestedStates.framePrepareDrawing=true;
+% settingsStruct.(sc).stateFunction.requestedStates.frameDraw=true;
+% settingsStruct.(sc).stateFunction.requestedStates.trialCleanUpandSave=true;
+
+settingsStruct.pldaps.useModularStateFunctions = true;
+settingsStruct.pldaps.trialMasterFunction='runModularTrial';
+
+p=pldaps(@faceForage,subject, settingsStruct);
+%  p=pldaps(@gta.setup.dotGrid,subject, settingsStruct);
+p = defaultBitNames(p);
+p.trial.pldaps.useModularStateFunctions = true;
+p.trial.pldaps.experimentAfterTrialsFunction=[];
+p.trial.pldaps.pause.preExperiment=false;
+p.run
