@@ -13,7 +13,7 @@ if nargin==1
     p = pdsDefaultTrialStructure(p);
     
 %     p.defaultParameters.pldaps.trialMasterFunction='runModularTrial';
-    p.defaultParameters.pldaps.trialFunction='faceForage';
+    p.defaultParameters.pldaps.trialFunction='marmoview.faceForage';
     
     p.trial.pldaps.maxTrialLength = 5;
     p.trial.pldaps.maxFrames = p.trial.pldaps.maxTrialLength*p.trial.display.frate;
