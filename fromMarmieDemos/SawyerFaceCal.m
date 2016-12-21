@@ -3,7 +3,7 @@ subject='test';
 settingsStruct.behavior.reward.defaultAmount=.05;
 settingsStruct.display.destinationFactorNew=GL_ONE_MINUS_SRC_ALPHA;
 settingsStruct.display.sourceFactorNew=GL_SRC_ALPHA;
-settingsStruct.pldaps.pause.type=2;
+settingsStruct.pldaps.pause.type=1;
 
 settingsStruct.eyelink.useRawData=true;
 settingsStruct.pldaps.useModularStateFunctions = true;
