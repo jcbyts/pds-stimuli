@@ -1,4 +1,4 @@
-function [p,S]=faceForageDemo()
+function [p,S]=faceForageDemo(settingsStruct)
 S=struct;
 S.protocolTitle='faceForage';
 

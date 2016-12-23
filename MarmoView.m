@@ -26,7 +26,7 @@ function varargout = MarmoView(varargin)
 
 % Edit the above text to modify the response to help MarmoView
 
-% Last Modified by GUIDE v2.5 20-Dec-2016 20:55:30
+% Last Modified by GUIDE v2.5 22-Dec-2016 16:20:47
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -36,6 +36,8 @@ gui_State = struct('gui_Name',       mfilename, ...
                    'gui_OutputFcn',  @MarmoView_OutputFcn, ...
                    'gui_LayoutFcn',  [] , ...
                    'gui_Callback',   []);
+               
+   
 if nargin && ischar(varargin{1})
     gui_State.gui_Callback = str2func(varargin{1});
 end
@@ -56,6 +58,9 @@ function MarmoView_OpeningFcn(hObject, eventdata, handles, varargin)
 % varargin   command line arguments to MarmoView (see VARARGIN)
 % Choose default command line output for MarmoView
 handles.output = hObject;
+if nargin>3 && varargin{1}
+    return
+end
 
 %%%%% IMPORTANT GROUNDWORK FOR THE GUI IS PLACED HERE %%%%%%%%%%%%%%%%%%%%%
 
@@ -76,17 +81,18 @@ handles.A.DataPlot1 = handles.DataPlot1;
 handles.A.DataPlot2 = handles.DataPlot2;
 handles.A.DataPlot3 = handles.DataPlot3;
 
+handles.calibratePressed=false;
 S=struct;
 % (re-)position the gui window...
 %
 % persistent settings are saved in handles.calibFile
 if exist('settings','var') && isstruct(settings)
-  if isfield(settings,'guiLocation'),
+  if isfield(settings,'guiLocation')
      S.guiLocation = settings.guiLocation; % <-- overrides rig settings!?
   end
 end
 
-if isfield(S,'guiLocation'),
+if isfield(S,'guiLocation')
   set(hObject,'Position',S.guiLocation);
 end
   
@@ -102,8 +108,8 @@ handles.runTask = false;
 handles.stopTask = false;
 
 % SET ACCESS TO GUI CONTROLS
-set(handles.Initialize,'Enable','Off');
-set(handles.ClearSettings,'Enable','Off');
+handles.Initialize.Enable='Off';
+handles.ClearSettings.Enable='Off';
 set(handles.RunTrial,'Enable','Off');
 set(handles.PauseTrial,'Enable','Off');
 set(handles.FlipFrame,'Enable','Off');
@@ -159,7 +165,7 @@ else
 end
 
 % If file exists, then we can get the protocol initialized
-if exist(fullfile(handles.settingsPath,handles.settingsFile),'file');
+if exist(fullfile(handles.settingsPath,handles.settingsFile),'file')
     set(handles.Initialize,'Enable','on');
     tstring = 'Ready to initialize protocol...';
 else
@@ -189,41 +195,52 @@ guidata(hObject, handles); drawnow;
 
 % GET PROTOCOL SETTINGS
 addpath(handles.settingsPath)
+%%
+%% add target trace plot
+settingsStruct.pldaps.trialMasterFunction='runModularTrial';
+settingsStruct.marmoview.stateFunction.name='marmoview.afterTrialFunction';
+settingsStruct.marmoview.use=true;
+settingsStruct.marmoview.stateFunction.acceptsLocationInput=true;
+settingsStruct.marmoview.stateFunction.order=inf;
+settingsStruct.marmoview.stateFunction.requestedStates.experimentPostOpenScreen=true;
+settingsStruct.marmoview.stateFunction.requestedStates.trialSetup=true;
+% settingsStruct.marmoview.stateFunction.requestedStates.frameUpdate=true;
+settingsStruct.marmoview.stateFunction.requestedStates.trialCleanUpandSave=true;
+
+%%
 fname=handles.settingsFile(1:end-2);
-[handles.p, handles.S]=eval(fname);
+[handles.p, handles.S]=eval([fname '(settingsStruct)']);
 
 
 % SHOW THE PROTOCOL TITLE
 set(handles.ProtocolTitle,'String',handles.S.protocolTitle);
 
 % INITIALIZE THE PROTOCOL
+set(handles.RunTrial,'Enable','On');
+set(handles.FlipFrame,'Enable','On');
+set(handles.ShowBackground,'Enable','On');
+set(handles.ShowBlack,'Enable','On');
+set(handles.ClearSettings,'Enable','On');
+set(handles.ParameterPanel,'Visible','On');
+set(handles.EyeTrackerPanel,'Visible','On');
+set(handles.OutputPanel,'Visible','On');
+set(handles.TaskPerformancePanel,'Visible','On')
+
+% % UPDATE GUI STATUS
+set(handles.StatusText,'String','Protocol is ready to run trials.');
+% % Now that a protocol is loaded (but not running), task light is red
+ChangeLight(handles.TaskLight,[1 0 0]);
+
+guidata(hObject, handles); drawnow;
+
+handles.p.trial.pldaps.pause.type=2;
+handles.p.trial.pldaps.pause.preExperiment=1;
 handles.p.run
 
-% % SET UP THE OUTPUT PANEL
-% % Get the output file name components
-% handles.outputPrefix = handles.S.protocol;
-% set(handles.OutputPrefixEdit,'String',handles.outputPrefix);
-% handles.outputSubject = handles.S.subject;
-% set(handles.OutputSubjectEdit,'String',handles.outputSubject);
-% handles.outputDate = datestr(now,'ddmmyy');
-% set(handles.OutputDateEdit,'String',handles.outputDate);
-% i = 0; handles.outputSuffix = '00';
-% % Generate the file name
-% handles.A.outputFile = strcat(handles.outputPrefix,'_',handles.outputSubject,...
-%     '_',handles.outputDate,'_',handles.outputSuffix,'.mat');
-% % If the file name already exists, iterate the suffix to a nonexistant file
-% while exist([handles.outputPath handles.A.outputFile],'file')
-%     i = i+1; handles.outputSuffix = num2str(i,'%.2d');
-%     handles.A.outputFile = strcat(handles.outputPrefix,'_',handles.outputSubject,...
-%         '_',handles.outputDate,'_',handles.outputSuffix,'.mat');
-% end
-% 
-% % Show the file name on the GUI
-% set(handles.OutputSuffixEdit,'String',handles.outputSuffix);
-% set(handles.OutputFile,'String',handles.A.outputFile);
-% % Note that a new output file is being used
-% handles.A.newOutput = 1;
-% 
+% Show filename in the gui
+handles.OutputFile.String=handles.p.trial.session.experimentFile;
+
+ 
 % % SET UP THE PARAMETERS PANEL
 % % Trial counting section of the parameters
 % handles.A.j = 1; handles.A.finish = handles.S.finish;
@@ -246,20 +263,9 @@ handles.p.run
 % set(handles.ParameterEdit,'String',num2str(handles.P.(handles.pNames{1})));
 % 
 % % UPDATE ACCESS TO CONTROLS
-set(handles.RunTrial,'Enable','On');
-set(handles.FlipFrame,'Enable','On');
-set(handles.ShowBackground,'Enable','On');
-set(handles.ShowBlack,'Enable','On');
-set(handles.ClearSettings,'Enable','On');
-set(handles.ParameterPanel,'Visible','On');
-set(handles.EyeTrackerPanel,'Visible','On');
-set(handles.OutputPanel,'Visible','On');
-set(handles.TaskPerformancePanel,'Visible','On')
+
 % 
-% % UPDATE GUI STATUS
-% set(handles.StatusText,'String','Protocol is ready to run trials.');
-% % Now that a protocol is loaded (but not running), task light is red
-% ChangeLight(handles.TaskLight,[1 0 0]);
+
 % 
 % % FINALLY, RESET THE JUICE COUNTER WHENEVER A NEW PROTOCOL IS LOADED
 % handles.A.juiceCounter = 0;
@@ -358,11 +364,6 @@ guidata(hObject, handles);
 
 %%%%% TRIAL CONTROL PANEL %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function RunTrial_Callback(hObject, eventdata, handles)
-% SET THE TASK TO RUN
-handles.runTask = true;
-
-% SET TASK LIGHT TO GREEN
-ChangeLight(handles.TaskLight,[0 1 0]);
 
 % UPDATE ACCESS TO CONTROLS
 set(handles.RunTrial,'Enable','Off');
@@ -372,207 +373,89 @@ set(handles.ShowBlack,'Enable','Off');
 set(handles.CloseGui,'Enable','Off');
 set(handles.ClearSettings,'Enable','Off')
 set(handles.PauseTrial,'Enable','On');
-set(handles.CenterEye,'Enable','On');
-set(handles.OutputPrefixEdit,'Enable','Off');
-set(handles.OutputSubjectEdit,'Enable','Off');
-set(handles.OutputDateEdit,'Enable','Off');
-set(handles.OutputSuffixEdit,'Enable','Off');
-
-% UPDATE GUI STATUS
-set(handles.StatusText,'String','Protocol trials are running.');
-
-% RESET THE JUICER COUNTER BEFORE ENTERING THE RUN LOOP
-handles.A.juiceCounter = 0;
-% UPDATE THE HANDLES 
-guidata(hObject,handles); drawnow;
-
-% MOVE TASK RELATED STRUCTURES OUT OF HANDLES FOR THE RUN LOOP -- this way
-% if a callback interrupts the run task function, we can update any changes
-% the interrupting callback makes to handles without affecting those task
-% related structures. E.g. we can run the task using parameters as they 
-% were at the start of the trial, while getting ready to cue any changes 
-% the user made on the next trial.
-A = handles.A;
-S = handles.S;
-P = handles.P;
-D = handles.D;
-
-%%% SC: eye posn data
-if S.viewpoint
-  % tell ViewPoint to (re-)start recording of eye posn data
-  vpx_SendCommandString('dataFile_Pause No');
-end
-%%%
-
-
-% RUN TRIALS
-while handles.runTask && A.j <= A.finish
-    
-    % 'pause', 'drawnow', 'figure', 'getframe', or 'waitfor' will allow
-    % other callbacks to interrupt this run task callback -- be aware that
-    % if handles aren't properly managed then changes either in the run
-    % loop or in other parts of the GUI may be out-of-sync. Nothing changes
-    % to GUI-wide handles until the local callback puts them there. If
-    % other callbacks change handles, and they are not brought into this
-    % callback, then those changes are lost when this run loop updates that
-    % handles. This concept is explained further right below during the 
-    % nextCmd handles management.
-    
-    % EXECUTE THE NEXT TRIAL COMMAND
-    eval(handles.nextCmd);
-    % UPDATE IN CASE JUICE VOLUME WAS CHANGED USING A PARAMETER
-    if handles.A.juiceVolume ~= A.juiceVolume
-%         fprintf(A.pump,['0 VOL ' num2str(A.juiceVolume/1000)]);
-        handles.reward.volume = A.juiceVolume; % A.juiceVolume is in milliliters
-%         set(handles.JuiceVolumeText,'String',[num2str(A.juiceVolume*1e3) ' ul']); % displayed in microliters!
-        set(handles.JuiceVolumeText,'String',sprintf('%3i ul',A.juiceVolume*1e3));
-        handles.A.juiceVolume = A.juiceVolume;
-    end
-    % UPDATE HANDLES FROM ANY CHANGES DURING NEXT TRIAL -- IF THIS ISN'T
-    % DONE, THEN THE OTHER CALLBACKS WILL BE USING A DIFFERENT HANDLES
-    % STRUCTURE THAN THIS LOOP IS
-    guidata(hObject,handles);
-    % ALLOW OTHER CALLBACKS INTO THE QUEUE AND UPDATE HANDLES -- 
-    % HERE, HAVING UPDATED ANY RUN LOOP CHANGES TO HANDLES, WE LET OTHER
-    % CALLBACKS DO THEIR THING. WE THEN GRAB THOSE HANDLES SO THE RUN LOOP
-    % IS ON THE SAME PAGE. FORTUNATELY, IF A PARAMETER CHANGES IN HANDLES,
-    % THAT WON'T AFFECT THE CURRENT TRIAL WHICH IS USING 'P', NOT handles.P
-    pause(.001); handles = guidata(hObject);
-    
-    % EXECUTE THE RUN TRIAL COMMAND
-    eval(handles.runCmd);
-    % UPDATE HANDLES FROM ANY CHANGES DURING RUN TRIAL
-    guidata(hObject,handles);
-    % ALLOW OTHER CALLBACKS INTO THE QUEUE AND UPDATE HANDLES
-    pause(.001); handles = guidata(hObject);
-    
-    % THE END OF THE TRIAL HAS A LOT OF THINGS TO CONSIDER, BUT THIS COULD
-    % ALL BE PLACED IN THE END TRIAL COMMAND IF I TRUSTED THE USER TO NOT
-    % ACCIDENTALLY LEAVE OUT ONE OF THESE IMPORTANT STEPS
-    
-    % PRE END COMMAND -- PLACE SOME UNIVERSAL THINGS TO HAVE IN THE DATA,
-    % INTO THE DATA STRUCTURE
-    D.P(A.j,1) = P; % THE TRIAL PARAMETERS
-    D.juiceButtonCount(A.j,1) = handles.A.juiceCounter; % SUPPLEMENTARY JUICE DURING THE TRIAL
-    D.juiceVolume(A.j,1) = A.juiceVolume; % THE VOLUME OF JUICE PULSES DURING THE TRIAL
-    % NOW ANY PARAMETERS THE USER MAY HAVE CHANGED WHILE RUNNING THIS TRIAL
-    % REPLACE 'P' FOR THE NEXT TRIAL. THIS IS DONE BEFORE THE END TRIAL
-    % COMMAND, BECAUSE IT MAY VETO CHANGES IF APPLYING A TRIALS LIST
-    P = handles.P;
-    % EXECUTE THE END TRIAL COMMAND
-    eval(handles.endCmd);
-    % SAVE THE DATA
-    cd(handles.outputPath);             % goto output directory
-    save(A.outputFile,'S','D');         % save settings and data to output file
-    cd(handles.taskPath);               % return to task directory
-    % UPDATE TRIAL COUNT AND FINISH NUMBER
-    A.j = A.j+1;
-    set(handles.TrialCountText,'String',num2str(A.j-1));
-    A.finish = handles.A.finish;
-    set(handles.TrialMaxText,'String',num2str(A.finish));
-    % UPDATE IN CASE JUICE VOLUME WAS CHANGED DURING END TRIAL
-    if handles.A.juiceVolume ~= A.juiceVolume
-%         fprintf(A.pump,['0 VOL ' num2str(A.juiceVolume/1000)]);
-        handles.reward.volume = A.juiceVolume; % A.juiceVolume is in milliliters
-%         set(handles.JuiceVolumeText,'String',[num2str(A.juiceVolume*1e3) ' ul']); % displayed in microliters!
-        set(handles.JuiceVolumeText,'String',sprintf('%3i ul',A.juiceVolume*1e3));
-        handles.A.juiceVolume = A.juiceVolume;
-    end    
-    % UPDATE THE TASK RELATED STRUCTURES IN CASE OF LEAVING THE RUN LOOP
-    handles.A = A;
-    handles.S = S;
-    handles.P = P;
-    handles.D = D;
-    % UPDATE THE PARAMETER LIST TO SHOW THE NEXT TRIAL PARAMETERS
-    for i = 1:size(handles.pNames,1);
-        pName = handles.pNames{i};
-        tName = sprintf('%s = %2g',pName,handles.P.(pName));
-        handles.pList{i,1} = tName;
-    end
-    set(handles.Parameters,'String',handles.pList);
-    
-    % UPDATE THE HANDLES STRUCTURE FROM ALL OF THESE CHANGES
-    guidata(hObject,handles);
-    % ALLOW OTHER CALLBACKS INTO THE THE QUEUE. IF PARAMETERS ARE CHANGED
-    % BY CHANCE THIS LATE IN THE LOOP, THEY WILL NOT BE CHANGED UNTIL
-    % REACHING THE END OF THE NEXT TRIAL, BECAUSE P HAS ALREADY BEEN
-    % ESTABLISHED FOR THE NEXT TRIAL. IF YOU EXIT THE LOOP, THOUGH, THEN P
-    % WILL BE UPDATED BY ANY CHANGES TO THE HANDLES
-    pause(.001); handles = guidata(hObject);
-    
-    % STOP RUN TASK IF SET TO DO SO
-    if handles.stopTask
-        handles.runTask = false;
-    end
-end
-
-%%% SC: eye posn data
-if S.viewpoint,
-  % tell ViewPoint to pause recording of eye posn data
-  vpx_SendCommandString('dataFile_Pause Yes');
-end
-%%%
-
-% NO TASK RUNNING FLAGS SHOULD BE ON ANYMORE
-handles.runTask = false;
-handles.stopTask = false;
-
-% UPDATE THE PARAMETERS LIST IN CASE OF ANY CHANGES MADE AFTER RUNNING THE
-% END TRIAL COMMAND
-for i = 1:size(handles.pNames,1);
-    pName = handles.pNames{i};
-    tName = sprintf('%s = %2g',pName,handles.P.(pName));
-    handles.pList{i,1} = tName;
-end
-set(handles.Parameters,'String',handles.pList);
-
-% UPDATE ACCESS TO CONTROLS
-set(handles.RunTrial,'Enable','On');
-set(handles.FlipFrame,'Enable','On');
-set(handles.ShowBackground,'Enable','On');
-set(handles.ShowBlack,'Enable','On');
-set(handles.CloseGui,'Enable','On');
-set(handles.ClearSettings,'Enable','On')
-set(handles.PauseTrial,'Enable','Off');
 set(handles.CenterEye,'Enable','Off');
-set(handles.OutputPrefixEdit,'Enable','On');
-set(handles.OutputSubjectEdit,'Enable','On');
-set(handles.OutputDateEdit,'Enable','On');
-set(handles.OutputSuffixEdit,'Enable','On');
+handles.CTargFix.Enable         = 'Off';
+handles.CTargVert.Enable        = 'Off';
+handles.CTargHoriz.Enable       = 'Off';
+handles.CTargGrid.Enable        = 'Off';
+handles.CTargCorners.Enable     = 'Off';
+handles.CTargRandom.Enable      = 'Off';
+
+% SET TASK LIGHT TO GREEN
+ChangeLight(handles.TaskLight,[0 1 0]);
 
 % UPDATE GUI STATUS
-set(handles.StatusText,'String','Protocol is ready to run trials.');
-% SET TASK LIGHT TO RED
-ChangeLight(handles.TaskLight,[1 0 0]);
+set(handles.StatusText,'String','Press P to Pause.');
 
-% UPDATE HANDLES STRUCTURE
-guidata(hObject,handles);
+guidata(hObject,handles); drawnow
+
+handles.p.trial.pldaps.quit=0;
+ShowCursor;
 
 
 % STOP THE TRIAL LOOP ONCE THE CURRENT TRIAL HAS COMPLETED
 function PauseTrial_Callback(hObject, eventdata, handles)
-% Pause button can also act as an unpause button
-switch handles.stopTask
-    case 0
-        handles.stopTask = true;
-        % SET TASK LIGHT TO ORANGE
-        ChangeLight(handles.TaskLight,[.9 .7 .2]);
-    case 1
-        handles.stopTask = false;
-        % SET TASK LIGHT BACK TO GREEN
-        ChangeLight(handles.TaskLight,[0 1 0]);
-end
 
-% UPDATE HANDLES STRUCTURE
-guidata(hObject,handles);
+if handles.p.trial.pldaps.quit==0
+    handles.p.trial.pldaps.quit=1;
+    ShowCursor;
+    % UPDATE ACCESS TO CONTROLS
+    handles.RunTrial.Enable         = 'On';
+    handles.FlipFrame.Enable        = 'On';
+    handles.PauseTrial.Enable       = 'Off';
+    handles.EyeTrackerPanel.Visible = 'On';
+    handles.GainDownX.Enable        = 'On';
+    handles.GainDownY.Enable        = 'On';
+    handles.GainUpX.Enable          = 'On';
+    handles.GainUpY.Enable          = 'On';
+    handles.ShiftDown.Enable        = 'On';
+    handles.ShiftUp.Enable          = 'On';
+    handles.ShiftLeft.Enable        = 'On';
+    handles.ShiftRight.Enable       = 'On';
+    handles.ShowBackground.Enable   = 'On';
+    handles.ShowBlack.Enable        = 'On';
+    handles.GiveJuice.Enable        = 'On';
+    handles.StatusText.String='PLDAPS Paused';
+    
+    % calibration options
+    handles.CTargFix.Enable         = 'Off';
+    handles.CTargVert.Enable        = 'Off';
+    handles.CTargHoriz.Enable       = 'Off';
+    handles.CTargGrid.Enable        = 'Off';
+    handles.CTargCorners.Enable     = 'Off';
+    handles.CTargRandom.Enable      = 'Off';
+    
+    
+    % UPDATE GUI STATUS
+    set(handles.StatusText,'String','Protocol is ready to run trials.');
+    % SET TASK LIGHT TO RED
+    ChangeLight(handles.TaskLight,[1 0 0]);
+    
+    guidata(hObject,handles); drawnow
+else
+    % UPDATE ACCESS TO CONTROLS
+    handles.RunTrial.Enable         = 'On';
+    handles.FlipFrame.Enable        = 'On';
+    handles.PauseTrial.Enable       = 'Off';
+    handles.EyeTrackerPanel.Visible = 'On';
+    handles.GainDownX.Enable        = 'On';
+    handles.GainDownY.Enable        = 'On';
+    handles.GainUpX.Enable          = 'On';
+    handles.GainUpY.Enable          = 'On';
+    handles.ShiftDown.Enable        = 'On';
+    handles.ShiftUp.Enable          = 'On';
+    handles.ShiftLeft.Enable        = 'On';
+    handles.ShiftRight.Enable       = 'On';
+    handles.ShowBackground.Enable   = 'On';
+    handles.ShowBlack.Enable        = 'On';
+    handles.GiveJuice.Enable        = 'On';
+    handles.StatusText.String='PLDAPS Paused';
+end
 
 
 % GIVE A JUICE REWARD
 function GiveJuice_Callback(hObject, eventdata, handles)
-% fprintf(handles.A.pump,'0 RUN');
-handles.reward.deliver();
-handles.A.juiceCounter = handles.A.juiceCounter + 1;
-guidata(hObject,handles);
+pds.behavior.reward.give(handles.p)
 
 
 % CHANGE THE SIZE OF THE JUICE REWARD TO BE DELIVERED
@@ -581,22 +464,15 @@ function JuiceVolumeEdit_Callback(hObject, eventdata, handles)
 vol = get(hObject,'String'); % volume is entered in microliters!!
 volML = str2double(vol)/1e3; % milliliters
 % fprintf(handles.A.pump,['0 VOL ' volML]);
-handles.reward.volume = volML; % milliliters
-set(handles.JuiceVolumeText,'String',[vol ' ul']); % displayed in microliters!!
-set(hObject,'String',''); % why?
-handles.A.juiceVolume = volML; % <-- A.juiceVolume should *always* be in milliliters!
-guidata(hObject,handles);
+handles.p.trial.behavior.reward.defaultAmount=volML;
+handles.JuiceVolumeText.String=[vol ' ul']; % displayed in microliters!!
+% set(hObject,'String',''); % why?
+% guidata(hObject,handles); % is this necessary?
 
 
 % RESETS THE DISPLAY SCREEN IF IT WAS INTERUPTED (BY E.G. ALT-TAB)
 function FlipFrame_Callback(hObject, eventdata, handles)
-% If a bkgd parameter exists, flip frame with background color value
-if isfield(handles.P,'bkgd')
-    Screen('FillRect',handles.A.window,uint8(handles.P.bkgd));
-end
-Screen('Flip',handles.A.window);
-
-
+Screen('Flip', handles.p.trial.display.ptr, 0);
 
 
 %%%%% PARAMETER CONTROL %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -752,35 +628,14 @@ guidata(hObject,handles);
 UpdateEyeText(handles);
 UpdateEyePlot(handles);
 
-%%%%% OUTPUT PANEL CALLBACKS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function OutputPrefixEdit_CreateFcn(hObject, eventdata, handles)
-function OutputPrefixEdit_Callback(hObject, eventdata, handles)
-handles.outputPrefix = get(hObject,'String');
-handles = UpdateOutputFilename(handles);
-guidata(hObject,handles);
-
-function OutputSubjectEdit_CreateFcn(hObject, eventdata, handles)
-function OutputSubjectEdit_Callback(hObject, eventdata, handles)
-handles.outputSubject = get(hObject,'String');
-handles = UpdateOutputFilename(handles);
-guidata(hObject,handles);
-
-function OutputDateEdit_CreateFcn(hObject, eventdata, handles)
-function OutputDateEdit_Callback(hObject, eventdata, handles)
-handles.outputDate = get(hObject,'String');
-handles = UpdateOutputFilename(handles);
-guidata(hObject,handles);
-
-function OutputSuffixEdit_CreateFcn(hObject, eventdata, handles)
-function OutputSuffixEdit_Callback(hObject, eventdata, handles)
-handles.outputSuffix = get(hObject,'String');
-handles = UpdateOutputFilename(handles);
-guidata(hObject,handles);
-
 %%%%% CLOSE THE GUI %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function CloseGui_Callback(hObject, eventdata, handles)
 % close the gui window
-close(handles.gui); % see gui_CloseRequestFcn()
+try
+    close(handles.gui); % see gui_CloseRequestFcn()
+catch
+    close(handles.gui, 'force');
+end
 
 %%%%% AUXILLIARY FUNCTIONS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function ChangeLight(h,col)
@@ -804,20 +659,7 @@ if ~handles.runTask && handles.A.j > 1   % At least 1 trial must be complete in 
 end
 
 function handles = UpdateOutputFilename(handles)
-% Generate the file name
-handles.A.outputFile = strcat(handles.outputPrefix,'_',handles.outputSubject,...
-    '_',handles.outputDate,'_',handles.outputSuffix,'.mat');
-set(handles.OutputFile,'String',handles.A.outputFile);
-% If the file name already exists, provide a warning that data will be
-% overwritten
-if exist([handles.outputPath handles.A.outputFile],'file')
-    w=warndlg('Data file alread exists, running the trial loop will overwrite.');
-    set(w,'Position',[441.75 -183 270.75 75.75]);
-end
-% Note that a new output file is being used. For example, someone might
-% want to be sure the trials list is started over if the output file name
-% changes. Currently I don't have any protocols implementing this.
-handles.A.newOutput = 1;
+handles.OutputFile.String=handles.p.trial.session.experimentFile;
 
 % --- Executes on mouse press over axes background ---- ZOOM FOR EYE TRACE
 function EyeTrace_ButtonDownFcn(hObject, eventdata, handles)
@@ -877,46 +719,46 @@ save(filename,'guiLocation','-append');
 delete(hObject);
 
 
-% --- Executes on key press with focus on gui or any of its controls.
-function gui_WindowKeyPressFcn(hObject, eventdata, handles)
-% hObject    handle to gui (see GCBO)
-% eventdata  structure with the following fields (see MATLAB.UI.FIGURE)
-%	Key: name of the key that was pressed, in lower case
-%	Character: character interpretation of the key(s) that was pressed
-%	Modifier: name(s) of the modifier key(s) (i.e., control, shift) pressed
-% handles    structure with handles and user data (see GUIDATA)
-
-% intercept keyboard events here and look for shortcuts. Known keyboard
-% shortcuts are:
-%
-%   ctrl-j = give juice
-%   ctrl-r = run trial
-%   ctrl-p = pause trial
-
-if isempty(eventdata.Modifier),
-  return
-end
-
-if ~any(cellfun(@(x) strcmp(x,'control'), eventdata.Modifier)),
-  return
-end
-
-switch eventdata.Key,
-  case 'j',
-    % fake a call to GiveJuice callback()
-    GiveJuice_Callback(handles.GiveJuice,[],handles);
-    handles.reward.report()
-  case 'r',
-    % fake a call to RunTrial_callback()
-    if strcmp(get(handles.RunTrial,'Enable'),'on'),
-      RunTrial_Callback(handles.RunTrial,[],handles);
-    end
-  case 'p',
-    % fake a call to PauseTrial_callback()
-    if strcmp(get(handles.PauseTrial,'Enable'),'on'),
-      PauseTrial_Callback(handles.RunTrial,[],handles);
-    end
-end
+% % % --- Executes on key press with focus on gui or any of its controls.
+% % function gui_WindowKeyPressFcn(hObject, eventdata, handles)
+% % % hObject    handle to gui (see GCBO)
+% % % eventdata  structure with the following fields (see MATLAB.UI.FIGURE)
+% % %	Key: name of the key that was pressed, in lower case
+% % %	Character: character interpretation of the key(s) that was pressed
+% % %	Modifier: name(s) of the modifier key(s) (i.e., control, shift) pressed
+% % % handles    structure with handles and user data (see GUIDATA)
+% % 
+% % % intercept keyboard events here and look for shortcuts. Known keyboard
+% % % shortcuts are:
+% % %
+% % %   ctrl-j = give juice
+% % %   ctrl-r = run trial
+% % %   ctrl-p = pause trial
+% % 
+% % if isempty(eventdata.Modifier)
+% %   return
+% % end
+% % 
+% % if ~any(cellfun(@(x) strcmp(x,'control'), eventdata.Modifier)),
+% %   return
+% % end
+% % 
+% % switch eventdata.Key
+% %   case 'j'
+% %     % fake a call to GiveJuice callback()
+% %     GiveJuice_Callback(handles.GiveJuice,[],handles);
+% %     handles.reward.report()
+% %   case 'r'
+% %     % fake a call to RunTrial_callback()
+% %     if strcmp(get(handles.RunTrial,'Enable'),'on')
+% %       RunTrial_Callback(handles.RunTrial,[],handles);
+% %     end
+% %   case 'p'
+% %     % fake a call to PauseTrial_callback()
+% %     if strcmp(get(handles.PauseTrial,'Enable'),'on')
+% %       PauseTrial_Callback(handles.RunTrial,[],handles);
+% %     end
+% % end
 
 
 % --- Executes on button press in ShowBackground.
@@ -937,12 +779,12 @@ function ShowBackground_Callback(hObject, eventdata, handles)
     %   Screen('FillRect',handles.A.window,uint8(handles.P.bkgd));
     % end
     %******* insert image in middle texture
-    ImoScreen = Screen('MakeTexture',handles.A.window,imo);
+    ImoScreen = Screen('MakeTexture',handles.p.trial.display.ptr,imo);
     ImoRect = [0 0 size(imo,2) size(imo,1)];
     %***************
-    Screen('DrawTexture',handles.A.window,ImoScreen,ImoRect,handles.S.screenRect);
+    Screen('DrawTexture',handles.p.trial.display.ptr,ImoScreen,ImoRect,handles.p.trial.display.winRect);
     %**************************************
-    Screen('Flip',handles.A.window);
+    Screen('Flip',handles.p.trial.display.ptr);
   end
 
 
@@ -953,6 +795,114 @@ function ShowBlack_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % If a bkgd parameter exists, flip frame with background color value
-Screen('FillRect',handles.A.window,uint8(0));
-Screen('Flip',handles.A.window);
+Screen('FillRect',handles.p.trial.display.ptr,0);
+Screen('Flip',handles.p.trial.display.ptr);
 
+
+
+% --- Executes on button press in CalibrateButton.
+function CalibrateButton_Callback(hObject, eventdata, handles)
+% toggle options
+disp('pressed')
+if handles.calibratePressed
+   disp('switch off')
+    handles.CTargFix.Enable         = 'Off';
+    handles.CTargVert.Enable        = 'Off';
+    handles.CTargHoriz.Enable       = 'Off';
+    handles.CTargGrid.Enable        = 'Off';
+    handles.CTargCorners.Enable     = 'Off';
+    handles.CTargRandom.Enable      = 'Off';
+    handles.calibratePressed=0;
+else
+    disp('switch on')
+    handles.calibratePressed=1;
+    % calibration options
+    handles.CTargFix.Enable         = 'On';
+    handles.CTargVert.Enable        = 'On';
+    handles.CTargHoriz.Enable       = 'On';
+    handles.CTargGrid.Enable        = 'On';
+    handles.CTargCorners.Enable     = 'On';
+    handles.CTargRandom.Enable      = 'On';
+end
+guidata(hObject, handles)
+% hObject    handle to CalibrateButton (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+function eye=getEye(p)
+
+if p.trial.eyelink.use
+    eyeIdx=p.trial.eyelink.eyeIdx;
+    if p.trial.eyelink.useRawData
+        eyeIdx=eyeIdx - 10; %the raw data is 10 fields prior to calibrated data
+    end
+    eye = p.trial.eyelink.samples(eyeIdx+[13 15],1:50:p.trial.eyelink.sampleNum);
+else
+    [x,y]=GetMouse;
+    eye=[x; y];
+end
+
+
+% --- Executes on button press in CTargFix.
+function CTargFix_Callback(hObject, eventdata, handles)
+m=stimuli.MotionObject(handles.p,'speed', 0);
+m.setup
+m.xy=[0 0];
+% m.move;
+for k=1:100
+    eye=getEye(handles.p);
+    m.draw
+    Screen('DrawDots', handles.p.trial.display.ptr, eye, 2, handles.p.trial.display.clut.eyepos, [], 2)
+    Screen('Flip', handles.p.trial.display.ptr, 0)
+    
+end
+eye=getEye(handles.p);
+ah=handles.EyeTrace;
+h=plot(ah, eye(1,:), eye(2,:), 'o');
+% while handles.calibratePressed
+%     eye=getEye(handles.p);
+%     h.XData=eye(1);
+%     h.YData=eye(2);
+%     drawnow
+%     
+% end
+% hObject    handle to CTargFix (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes on button press in CTargHoriz.
+function CTargHoriz_Callback(hObject, eventdata, handles)
+m=stimuli.MotionObject(handles.p, 'speed', 0);
+m.setup
+m.xy=[0 0];
+m.move;
+m.draw
+eye=getEye(handles.p);
+ah=handles.EyeTrace;
+h=plot(ah, eye(1,:), eye(2,:), 'o');
+% hObject    handle to CTargHoriz (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes on button press in CTargVert.
+function CTargVert_Callback(hObject, eventdata, handles)
+% hObject    handle to CTargVert (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes on button press in CTargCorners.
+function CTargCorners_Callback(hObject, eventdata, handles)
+% hObject    handle to CTargCorners (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes on button press in CTargRandom.
+function CTargRandom_Callback(hObject, eventdata, handles)
+% hObject    handle to CTargRandom (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)

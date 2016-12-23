@@ -4,10 +4,11 @@ function p=faceForage(p, state, sn)
 % correlation. Based loosely on ProceduralGarborium.m
 
 if nargin<3
-    sn='faceForage';
+    sn='stimulus';
 end
 
 if nargin==1
+    sn='stimulus';
     Screen('Preference', 'TextRenderer', 1)
     
     p = pdsDefaultTrialStructure(p);
@@ -25,6 +26,8 @@ if nargin==1
     
     p.trial.(sn).rngs.randomNumberGenerater='mt19937ar';
     p.trial.(sn).rngs.trialSeeds = randi(2^32, [3e3 1]);
+%     p.trial.(sn).use=true;
+    p.trial.(sn).stateFunction.requestedStates.experimentAfterTrials=true;
     p.trial.exploded=0;
     
     return
@@ -32,11 +35,14 @@ end
 
 
 
-pldapsDefaultTrialFunction(p,state);
+marmoviewDefaultTrialFunction(p,state);
 switch state
     
     case p.trial.pldaps.trialStates.framePrepareDrawing
         
+        if p.trial.iFrame == p.trial.pldaps.maxFrames
+            p.trial.flagNextTrial=true;
+        end
         arrayfun(@(x) x.move, p.trial.(sn).m)
         
     case p.trial.pldaps.trialStates.frameDraw
