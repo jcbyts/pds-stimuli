@@ -155,6 +155,11 @@ p.run
 
 %%
 p=pldaps(@marmoview.faceForage, 'jnk');
+% p.trial.eyelink.custom_calibration=false;
+
+p.trial.pldaps.pause.preExperiment=false;
 p.run
 
-
+%%
+figure(1); clf
+plot(p.data{1}.timing.frameStateChangeTimes'*1000, '-')
