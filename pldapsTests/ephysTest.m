@@ -6,12 +6,12 @@
 % 4) natBackground
 % 5) hartleyGratings
 
-subject='test';
+subject='jnk';
 showGaussianBlobs=false;
-showNatBackground=false;
+showNatBackground=true;
 showHartleyStimuli=false;
 showHDmovie=false;
-showCSDFlash=true;
+showCSDFlash=false;
 
 behavior=@plain;
 % behavior=@TestDotMotion;
@@ -41,6 +41,8 @@ settingsStruct.display.viewdist=20;
 if strcmp(subject, 'test')
     settingsStruct.eyelink.use=false;
     settingsStruct.mouse.useAsEyepos=true;
+else
+    settingsStruct.eyelink.use=true;
 end
 
 %--------------------------------------------------------------------------
@@ -150,4 +152,9 @@ settingsStruct.pldaps.pause.preExperiment=false;
 p=pldaps(behavior, settingsStruct);
 p.trial.pldaps.pause.preExperiment=false;
 p.run
+
+%%
+p=pldaps(@marmoview.faceForage, 'jnk');
+p.run
+
 

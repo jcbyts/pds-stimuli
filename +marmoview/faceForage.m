@@ -35,7 +35,7 @@ end
 
 
 
-marmoviewDefaultTrialFunction(p,state);
+pldapsDefaultTrialFunction(p,state);
 switch state
     
     case p.trial.pldaps.trialStates.framePrepareDrawing
