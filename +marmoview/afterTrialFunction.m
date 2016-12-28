@@ -104,9 +104,9 @@ switch state
 %         
 %         plot(ah,eyeRad*[-1,1],[0,0],'--','Color',0.5*ones([1,3])); hold(ah,'all');
 %         plot(ah,[0 0],eyeRad*[-1,1],'--','Color',0.5*ones([1,3]));
-        xy=[p.trial.mouse.cursorSamples(1,:)-p.trial.display.ctr(1); p.trial.mouse.cursorSamples(2,:)-p.trial.display.ctr(2)];
-        xy=pds.px2deg(xy, p.trial.display.viewdist, p.trial.display.px2w);
-        plot(ah, xy(1,:), -xy(2,:), '.')
+
+        handles.A.eyexy=getEye(p);
+        handles.A.hplot=plot(ah, handles.A.eyexy(1,:), handles.A.eyexy(2,:), '.');
         grid(ah, 'on')
         guidata(hObj, handles)
         drawnow
@@ -120,3 +120,25 @@ switch state
         
 
 end
+
+
+function eye=getEye(p)
+
+% get eye position in pixels
+if p.trial.eyelink.use
+    eyeIdx=p.trial.eyelink.eyeIdx;
+    if p.trial.eyelink.useRawData
+        eyeIdx=eyeIdx - 10; %the raw data is 10 fields prior to calibrated data
+    end
+    eye = p.trial.eyelink.samples(eyeIdx+[13 15],1:50:p.trial.eyelink.sampleNum);
+    
+    if ~isempty(p.trial.eyelink.calibration_matrix)
+        eye = [eye; ones(1,size(eye,2))]'*p.trial.eyelink.calibration_matrix;
+    end
+else
+    eye=[p.trial.mouse.cursorSamples(1,:)-p.trial.display.ctr(1); p.trial.mouse.cursorSamples(2,:)-p.trial.display.ctr(2)];
+end
+
+% map from pixels to degrees
+eye=pds.px2deg(eye, p.trial.display.viewdist, p.trial.display.px2w);
+eye=bsxfun(@times, eye, [1; -1]);

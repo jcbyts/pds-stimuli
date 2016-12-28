@@ -49,6 +49,10 @@ else
 end
 % End initialization code - DO NOT EDIT
 
+
+% ------------------------------------------------------------------------
+% --- OPENING AND OUTPUT FUNCTIONS ---------------------------------------
+
 % --- Executes just before MarmoView is made visible.
 function MarmoView_OpeningFcn(hObject, eventdata, handles, varargin)
 % This function has no output args, see OutputFcn.
@@ -62,8 +66,6 @@ if nargin>3 && varargin{1}
     return
 end
 
-%%%%% IMPORTANT GROUNDWORK FOR THE GUI IS PLACED HERE %%%%%%%%%%%%%%%%%%%%%
-
 % GET SOME CRUCIAL DIRECTORIES -- THESE DIRECTORIES MUST EXIST!!
 % Present working directory, location of all GUIs
 handles.taskPath = sprintf('%s/',pwd);
@@ -72,67 +74,61 @@ handles.settingsPath= sprintf('%s/',pwd);
 % CREATE THE STRUCTURES USED BY ALL PROTOCOLS
 handles.p = pldaps; % pldaps object
 handles.S = struct; % Settings for the protocol, NOT changed while running
-handles.A = struct;
+handles.A = struct; % plot
 
 % Add in the plot handles to A in case handles isn't available
 % e.g. while running protocols)
-handles.A.EyeTrace = handles.EyeTrace;
+handles.A.EyeTrace  = handles.EyeTrace;
 handles.A.DataPlot1 = handles.DataPlot1;
 handles.A.DataPlot2 = handles.DataPlot2;
 handles.A.DataPlot3 = handles.DataPlot3;
 
 handles.calibratePressed=false;
 S=struct;
+
 % (re-)position the gui window...
-%
-% persistent settings are saved in handles.calibFile
-if exist('settings','var') && isstruct(settings)
-  if isfield(settings,'guiLocation')
-     S.guiLocation = settings.guiLocation; % <-- overrides rig settings!?
-  end
+Settings=getpref('marmoview');
+if isfield(Settings, 'gui')
+    if isfield(Settings.gui, 'Location')
+        S.guiLocation=Settings.gui.Location;
+    end
 end
 
 if isfield(S,'guiLocation')
   set(hObject,'Position',S.guiLocation);
 end
-  
 
-% WRITE THE CALIBRATION DATA INTO THE EYE TRACKER PANEL AND GET THE SIZES 
-% OF GAIN AND SHIFT CONTROLS FOR CALIBRATING EYE POSITION
-% FOR UPDATE EYE TEXT TO RUN PROPPERLY, CALBIRATION MUST ALREADY BE IN
-% STRUCTURE 'A'
-% UpdateEyeText(handles);
-
-% THESE VARIABLES CONTROL THE RUN LOOP
+% THESE VARIABLES CONTROL THE RUN LOOP - % TODO: do they still?
 handles.runTask = false;
 handles.stopTask = false;
 
-% SET ACCESS TO GUI CONTROLS
-handles.Initialize.Enable='Off';
-handles.ClearSettings.Enable='Off';
-set(handles.RunTrial,'Enable','Off');
-set(handles.PauseTrial,'Enable','Off');
-set(handles.FlipFrame,'Enable','Off');
-set(handles.ShowBackground,'Enable','Off');
-set(handles.ShowBlack,'Enable','Off');
-set(handles.ParameterPanel,'Visible','Off');
-set(handles.EyeTrackerPanel,'Visible','Off');
-set(handles.OutputPanel,'Visible','Off');
-set(handles.TaskPerformancePanel,'Visible','Off');
+% TURN OFF GUI CONTROLS EXCEPT FOR PROTOCOL MANAGEMENT
+handles.Initialize.Enable            = 'Off';
+handles.ClearSettings.Enable         = 'Off';
+handles.RunTrial.Enable              = 'Off';
+handles.PauseTrial.Enable            = 'Off';
+handles.FlipFrame.Enable             = 'Off';
+handles.ShowBackground.Enable        = 'Off';
+handles.ShowBlack.Enable             = 'Off';
+handles.ParameterPanel.Visible       = 'Off';
+handles.EyeTrackerPanel.Visible      = 'Off';
+handles.OutputPanel.Visible          = 'Off';
+handles.TaskPerformancePanel.Visible = 'Off';
+
 % Initialize is only available if the settings file exists
-handles.settingsFile = get(handles.SettingsFile,'String');
+handles.settingsFile = handles.SettingsFile.String;
+
 if ~exist([handles.settingsPath handles.settingsFile],'file')
-    set(handles.Initialize,'Enable','off');
+    handles.Initialize.Enable = 'off';
     tstring = 'Please select a settings file...';
 else
-    set(handles.Initialize,'Enable','on');
+    handles.Initialize.Enable = 'on';
     tstring = 'Ready to initialize protocol...';
 end
+
 % Update GUI status
-set(handles.StatusText,'String',tstring);
-% For the protocol title, note that no protocol has been loaded yet
-set(handles.ProtocolTitle,'String','No protocol is loaded.');
-% The task light is a neutral gray when no protocol is loaded
+handles.StatusText.String = tstring;
+handles.ProtocolTitle.String = 'No protocol is loaded.';
 ChangeLight(handles.TaskLight,[.5 .5 .5]);
 
 % Update handles structure
@@ -150,53 +146,52 @@ function varargout = MarmoView_OutputFcn(hObject, eventdata, handles)  %#ok<*INU
 varargout{1} = handles.output;
 
 
-%%%%% SETTINGS PANEL %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% CHOOSE A SETTINGS FILE
+% ------------------------------------------------------------------------
+% --- SETTINGS PANEL FUNCTIONS -------------------------------------------
+
+% --- CHOOSE A SETTINGS FILE
 function ChooseSettings_Callback(hObject, eventdata, handles) %#ok<*DEFNU>
 % Have user select the file
 [handles.settingsFile, handles.settingsPath] = uigetfile(handles.taskPath);
 % Show the selected outputfile
 if handles.settingsFile ~= 0
-    set(handles.SettingsFile,'String',handles.settingsFile);
+    handles.SettingsFile.String = handles.settingsFile;
 else
 % Or no outputfile if cancelled selection
-    set(handles.SettingsFile,'String','0');
+    handles.SettingsFile.String = '0';
     handles.settingsFile = '0';
 end
 
 % If file exists, then we can get the protocol initialized
 if exist(fullfile(handles.settingsPath,handles.settingsFile),'file')
-    set(handles.Initialize,'Enable','on');
+    handles.Initialize.Enable = 'on';
     tstring = 'Ready to initialize protocol...';
 else
-    set(handles.Initialize,'Enable','off');
+    handles.Initialize.Enable = 'off';
     tstring = 'Please select a settings file...';
 end
-% Regardless, update status
-set(handles.StatusText,'String',tstring);
 
-% Update handles structure
+% Update status
+handles.StatusText.String = tstring;
 guidata(hObject, handles);
 
 
-% INITIALIZE A PROTOCOL FROM THE SETTINGS SELECTED
+% --- INITIALIZE A PROTOCOL FROM THE SELECTED SETTINGS
 function Initialize_Callback(hObject, eventdata, handles)
 % PREPARE THE GUI FOR INITIALIZING THE PROTOCOL
-% Update GUI status
-set(handles.StatusText,'String','Initializing...');
-% The task light is blue only during protocol initialization
-ChangeLight(handles.TaskLight,[.2 .2 1]);
 
-% TURN OFF BUTTONS TO PREVENT FIDDLING DURING INITIALIZATION
-set(handles.ChooseSettings,'Enable','Off');
-set(handles.Initialize,'Enable','Off');
+% Update GUI status
+handles.StatusText.String = 'Initializing...';
+ChangeLight(handles.TaskLight,[.2 .2 1]); % blue task light
+
+% Turn off buttons during initialization
+handles.ChooseSettings.Enable   = 'Off';
+handles.Initialize.Enable       = 'Off';
+
 % Effect these changes on the GUI immediately
 guidata(hObject, handles); drawnow;
 
-% GET PROTOCOL SETTINGS
-addpath(handles.settingsPath)
-%%
-%% add target trace plot
+% Add Marmoview specific modules to PLDAPS settings struct
 settingsStruct.pldaps.trialMasterFunction='runModularTrial';
 settingsStruct.marmoview.stateFunction.name='marmoview.afterTrialFunction';
 settingsStruct.marmoview.use=true;
@@ -207,43 +202,56 @@ settingsStruct.marmoview.stateFunction.requestedStates.trialSetup=true;
 % settingsStruct.marmoview.stateFunction.requestedStates.frameUpdate=true;
 settingsStruct.marmoview.stateFunction.requestedStates.trialCleanUpandSave=true;
 
-%%
+% load PLDAPS opject
 fname=handles.settingsFile(1:end-2);
 [handles.p, handles.S]=eval([fname '(settingsStruct)']);
 
+% Show protocol title in the GUI
+handles.ProtocolTitle.String = handles.S.protocolTitle;
 
-% SHOW THE PROTOCOL TITLE
-set(handles.ProtocolTitle,'String',handles.S.protocolTitle);
-
-% INITIALIZE THE PROTOCOL
-set(handles.RunTrial,'Enable','On');
-set(handles.FlipFrame,'Enable','On');
-set(handles.ShowBackground,'Enable','On');
-set(handles.ShowBlack,'Enable','On');
-set(handles.ClearSettings,'Enable','On');
-set(handles.ParameterPanel,'Visible','On');
-set(handles.EyeTrackerPanel,'Visible','On');
-set(handles.OutputPanel,'Visible','On');
-set(handles.TaskPerformancePanel,'Visible','On')
+% Initialize the protocol
+handles.RunTrial.Enable              = 'On';
+handles.FlipFrame.Enable             = 'On';
+handles.ShowBackground.Enable        = 'On';
+handles.ShowBlack.Enable             = 'On';
+handles.ClearSettings.Enable         = 'On';
+handles.ParameterPanel.Visible       = 'On';
+handles.EyeTrackerPanel.Visible      = 'On';
+handles.OutputPanel.Visible          = 'On';
+handles.TaskPerformancePanel.Visible = 'On';
 
 % % UPDATE GUI STATUS
-set(handles.StatusText,'String','Protocol is ready to run trials.');
+handles.StatusText.String = 'Protocol is ready to run trials.';
 % % Now that a protocol is loaded (but not running), task light is red
 ChangeLight(handles.TaskLight,[1 0 0]);
 
 guidata(hObject, handles); drawnow;
 
-handles.p.trial.pldaps.pause.type=2;
-handles.p.trial.pldaps.pause.preExperiment=1;
-handles.p.run
+handles.p.trial.pldaps.pause.type=2; % pauseLoop mode
+handles.p.trial.pldaps.pause.preExperiment=1; % pause before experiment
+handles.p.run % open PTB window and pause
 
 % Show filename in the gui
 handles.OutputFile.String=handles.p.trial.session.experimentFile;
 
- 
+% EYE CALIBRATION STUFF HERE
+
+% get subject specific calibration matrix
+cm=getCalibrationPref(handles.p);
+% convert to marmoview style gains and offsets
+[g,r,c]=calibrationMatrixToGains(cm, handles.p.trial.display.ctr(1:2));
+
+% store calibration info in gui
+handles.A.dx=g(1);
+handles.A.dy=g(2);
+handles.A.c=c;
+handles.A.rxy=r;
+
+
 % % SET UP THE PARAMETERS PANEL
 % % Trial counting section of the parameters
 % handles.A.j = 1; handles.A.finish = handles.S.finish;
+
 % set(handles.TrialCountText,'String',['Trial ' num2str(handles.A.j-1)]);
 % set(handles.TrialMaxText,'String',num2str(handles.A.finish));
 % set(handles.TrialMaxEdit,'String','');
@@ -278,26 +286,27 @@ guidata(hObject,handles);
 function ClearSettings_Callback(hObject, eventdata, handles)
 
 % DISABLE RUNNING THINGS WHILE CLEARING
-set(handles.RunTrial,'Enable','Off');
-set(handles.FlipFrame,'Enable','Off');
-set(handles.ShowBackground,'Enable','Off');
-set(handles.ShowBlack,'Enable','On');
-set(handles.ClearSettings,'Enable','Off');
-set(handles.OutputPanel,'Visible','Off');
-set(handles.ParameterPanel,'Visible','Off');
-set(handles.EyeTrackerPanel,'Visible','Off');
-set(handles.OutputPanel,'Visible','Off');
-set(handles.TaskPerformancePanel,'Visible','Off');
+handles.RunTrial.Enable              = 'Off';
+handles.FlipFrame.Enable             = 'Off';
+handles.ShowBackground.Enable        = 'Off';
+handles.ShowBlack.Enable             = 'On';
+handles.ClearSettings.Enable         = 'Off';
+handles.OutputPanel.Visible          = 'Off';
+handles.ParameterPanel.Visible       = 'Off';
+handles.EyeTrackerPanel.Visible      = 'Off';
+handles.OutputPanel.Visible          = 'Off';
+handles.TaskPerformancePanel.Visible = 'Off';
 
 % Clear plots
 plot(handles.DataPlot1,0,0,'+k');
 plot(handles.DataPlot2,0,0,'+k');
 plot(handles.DataPlot3,0,0,'+k');
+
 % Eye trace needs to be treated differently to maintain important
 % properties
 plot(handles.EyeTrace,0,0,'+k');
-set(handles.EyeTrace,'ButtonDownFcn',@(hObject,eventdata)MarmoView('EyeTrace_ButtonDownFcn',hObject,eventdata,handles));
-set(handles.EyeTrace,'UserData',15); % 15 degrees of visual arc is default
+handles.EyeTrace.ButtonDownFcn = @(hObject,eventdata)MarmoView('EyeTrace_ButtonDownFcn',hObject,eventdata,handles);
+handles.EyeTrace.UserData = 15; % 15 degrees of visual arc is default
 
 % Close all screens from ptb
 sca;
@@ -336,24 +345,23 @@ handles.D = struct;
 % handles.reward.volume = handles.S.pumpDefVol; % milliliters
 handles.A.juiceVolume = handles.reward.volume;
 handles.A.juiceCounter = 0;
-% set(handles.JuiceVolumeText,'String',[num2str(1000*handles.S.pumpDefVol) ' ul']);
-set(handles.JuiceVolumeText,'String',sprintf('%3i ul',handles.A.juiceVolume*1e3));
+handles.JuiceVolumeText.String = sprintf('%3i ul',handles.A.juiceVolume*1e3);
 
 % RE-ENABLE CONTROLS
-set(handles.ChooseSettings,'Enable','On');
+handles.ChooseSettings.Enable = 'On';
 % Initialize is only available if the settings file exists
-handles.settingsFile = get(handles.SettingsFile,'String');
+handles.settingsFile = handles.SettingsFile.String;
 if ~exist([handles.settingsPath handles.settingsFile],'file')
-    set(handles.Initialize,'Enable','off');
+    handles.Initialize.Enable = 'off';
     tstring = 'Please select a settings file...';
 else
-    set(handles.Initialize,'Enable','on');
+    handles.Initialize.Enable = 'on';
     tstring = 'Ready to initialize protocol...';
 end
 % Update GUI status
-set(handles.StatusText,'String',tstring);
+handles.StatusText.String = tstring;
 % For the protocol title, note that no protocol is now loaded
-set(handles.ProtocolTitle,'String','No protocol is loaded.');
+handles.ProtocolTitle.String = 'No protocol is loaded.';
 % The task light is a neutral gray when no protocol is loaded
 ChangeLight(handles.TaskLight,[.5 .5 .5]);
 
@@ -366,14 +374,14 @@ guidata(hObject, handles);
 function RunTrial_Callback(hObject, eventdata, handles)
 
 % UPDATE ACCESS TO CONTROLS
-set(handles.RunTrial,'Enable','Off');
-set(handles.FlipFrame,'Enable','Off');
-set(handles.ShowBackground,'Enable','Off');
-set(handles.ShowBlack,'Enable','Off');
-set(handles.CloseGui,'Enable','Off');
-set(handles.ClearSettings,'Enable','Off')
-set(handles.PauseTrial,'Enable','On');
-set(handles.CenterEye,'Enable','Off');
+handles.RunTrial.Enable         = 'Off';
+handles.FlipFrame.Enable        = 'Off';
+handles.ShowBackground.Enable   = 'Off';
+handles.ShowBlack.Enable        = 'Off';
+handles.CloseGui.Enable         = 'Off';
+handles.ClearSettings.Enable    = 'Off';
+handles.PauseTrial.Enable       = 'On';
+handles.CenterEye.Enable        = 'Off';
 handles.CTargFix.Enable         = 'Off';
 handles.CTargVert.Enable        = 'Off';
 handles.CTargHoriz.Enable       = 'Off';
@@ -385,20 +393,19 @@ handles.CTargRandom.Enable      = 'Off';
 ChangeLight(handles.TaskLight,[0 1 0]);
 
 % UPDATE GUI STATUS
-set(handles.StatusText,'String','Press P to Pause.');
+handles.StatusText.String       = 'Press P to Pause.';
 
 guidata(hObject,handles); drawnow
 
-handles.p.trial.pldaps.quit=0;
-ShowCursor;
+handles.p.trial.pldaps.quit=0; % pldaps is running (quit = 0)
 
 
-% STOP THE TRIAL LOOP ONCE THE CURRENT TRIAL HAS COMPLETED
+%--- STOP THE TRIAL LOOP ONCE THE CURRENT TRIAL HAS COMPLETED
 function PauseTrial_Callback(hObject, eventdata, handles)
+% doesn't work while pldaps is running
 
 if handles.p.trial.pldaps.quit==0
     handles.p.trial.pldaps.quit=1;
-    ShowCursor;
     % UPDATE ACCESS TO CONTROLS
     handles.RunTrial.Enable         = 'On';
     handles.FlipFrame.Enable        = 'On';
@@ -415,7 +422,7 @@ if handles.p.trial.pldaps.quit==0
     handles.ShowBackground.Enable   = 'On';
     handles.ShowBlack.Enable        = 'On';
     handles.GiveJuice.Enable        = 'On';
-    handles.StatusText.String='PLDAPS Paused';
+    handles.StatusText.String       = 'PLDAPS Paused';
     
     % calibration options
     handles.CTargFix.Enable         = 'Off';
@@ -425,9 +432,6 @@ if handles.p.trial.pldaps.quit==0
     handles.CTargCorners.Enable     = 'Off';
     handles.CTargRandom.Enable      = 'Off';
     
-    
-    % UPDATE GUI STATUS
-    set(handles.StatusText,'String','Protocol is ready to run trials.');
     % SET TASK LIGHT TO RED
     ChangeLight(handles.TaskLight,[1 0 0]);
     
@@ -449,25 +453,28 @@ else
     handles.ShowBackground.Enable   = 'On';
     handles.ShowBlack.Enable        = 'On';
     handles.GiveJuice.Enable        = 'On';
-    handles.StatusText.String='PLDAPS Paused';
+    handles.StatusText.String       = 'PLDAPS Paused';
+    ChangeLight(handles.TaskLight,[1 0 0]);
+    
+    guidata(hObject,handles); drawnow
 end
 
 
 % GIVE A JUICE REWARD
 function GiveJuice_Callback(hObject, eventdata, handles)
-pds.behavior.reward.give(handles.p)
+pds.behavior.reward.give(handles.p);
 
 
 % CHANGE THE SIZE OF THE JUICE REWARD TO BE DELIVERED
 function JuiceVolumeEdit_CreateFcn(hObject, eventdata, handles) %#ok<*INUSD>
 function JuiceVolumeEdit_Callback(hObject, eventdata, handles)
-vol = get(hObject,'String'); % volume is entered in microliters!!
+vol = hObject.String; % volume is entered in microliters!!
 volML = str2double(vol)/1e3; % milliliters
 % fprintf(handles.A.pump,['0 VOL ' volML]);
 handles.p.trial.behavior.reward.defaultAmount=volML;
 handles.JuiceVolumeText.String=[vol ' ul']; % displayed in microliters!!
-% set(hObject,'String',''); % why?
-% guidata(hObject,handles); % is this necessary?
+hObject.String=''; % reset
+guidata(hObject,handles); % update gui data
 
 
 % RESETS THE DISPLAY SCREEN IF IT WAS INTERUPTED (BY E.G. ALT-TAB)
@@ -528,105 +535,6 @@ set(hObject,'String','');
 % Update handles structure
 guidata(hObject,handles);
 
-%%%%% SHIFT EYE POSITION CALLBACKS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function CenterEye_Callback(hObject, eventdata, handles)
-
-[x,y] = vpx_GetGazePoint();
-
-handles.A.c = [x,y];
-guidata(hObject,handles);
-UpdateEyeText(handles);
-UpdateEyePlot(handles);
-
-function GainSize_CreateFcn(hObject, eventdata, handles)
-function GainSize_Callback(hObject, eventdata, handles)
-gainSize = str2double(get(hObject,'String'));
-if ~isnan(gainSize)
-    handles.gainSize = gainSize;
-    guidata(hObject,handles);
-else
-    set(handles.GainSize,'String',num2str(handles.gainSize));
-end
-
-function GainUpX_Callback(hObject, eventdata, handles)
-% Note we divide by dx, so reducing dx increases gain
-handles.A.dx = (1-handles.gainSize)*handles.A.dx;
-guidata(hObject,handles);
-UpdateEyeText(handles);
-UpdateEyePlot(handles);
-
-function GainDownX_Callback(hObject, eventdata, handles)
-handles.A.dx = (1+handles.gainSize)*handles.A.dx;
-guidata(hObject,handles);
-UpdateEyeText(handles);
-UpdateEyePlot(handles);
-
-function GainUpY_Callback(hObject, eventdata, handles)
-handles.A.dy = (1-handles.gainSize)*handles.A.dy;
-guidata(hObject,handles);
-UpdateEyeText(handles);
-UpdateEyePlot(handles);
-
-function GainDownY_Callback(hObject, eventdata, handles)
-handles.A.dy = (1+handles.gainSize)*handles.A.dy;
-guidata(hObject,handles);
-UpdateEyeText(handles);
-UpdateEyePlot(handles);
-
-
-function ShiftSize_CreateFcn(hObject, eventdata, handles)
-function ShiftSize_Callback(hObject, eventdata, handles)
-shiftSize = str2double(get(hObject,'String'));
-if ~isnan(shiftSize)
-    handles.shiftSize = shiftSize;
-    guidata(hObject,handles);
-else
-    set(handles.ShiftSize,'String',num2str(handles.shiftSize));
-end
-
-function ShiftLeft_Callback(hObject, eventdata, handles)
-% handles.A.c(1) = handles.A.c(1) + ...
-%     handles.shiftSize*handles.A.dx*handles.S.pixPerDeg;
-handles.A.c(1) = handles.A.c(1) + ...
-    handles.shiftSize*handles.A.dx;
-guidata(hObject,handles);
-UpdateEyeText(handles);
-UpdateEyePlot(handles);
-
-function ShiftRight_Callback(hObject, eventdata, handles)
-% handles.A.c(1) = handles.A.c(1) - ...
-%     handles.shiftSize*handles.A.dx*handles.S.pixPerDeg;
-handles.A.c(1) = handles.A.c(1) - ...
-    handles.shiftSize*handles.A.dx;
-guidata(hObject,handles);
-UpdateEyeText(handles);
-UpdateEyePlot(handles);
-
-function ShiftDown_Callback(hObject, eventdata, handles)
-% handles.A.c(2) = handles.A.c(2) + ...
-%     handles.shiftSize*handles.A.dy*handles.S.pixPerDeg;
-handles.A.c(2) = handles.A.c(2) - ...
-    handles.shiftSize*handles.A.dy;
-guidata(hObject,handles);
-UpdateEyeText(handles);
-UpdateEyePlot(handles);
-
-function ShiftUp_Callback(hObject, eventdata, handles)
-% handles.A.c(2) = handles.A.c(2) - ...
-%     handles.shiftSize*handles.A.dy*handles.S.pixPerDeg;
-handles.A.c(2) = handles.A.c(2) + ...
-    handles.shiftSize*handles.A.dy;
-guidata(hObject,handles);
-UpdateEyeText(handles);
-UpdateEyePlot(handles);
-
-function ResetCalibration_Callback(hObject, eventdata, handles)
-handles.A.dx = handles.C.dx;
-handles.A.dy = handles.C.dy;
-handles.A.c = handles.C.c;
-guidata(hObject,handles);
-UpdateEyeText(handles);
-UpdateEyePlot(handles);
 
 %%%%% CLOSE THE GUI %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function CloseGui_Callback(hObject, eventdata, handles)
@@ -647,7 +555,6 @@ set(h,'XColor',bkgd,'YColor',bkgd,'Color',bkgd);
 % THIS FUNCTION UPDATES THE RAW EYE CALIBRATION NUMBERS IN THE GUI
 function UpdateEyeText(h)
 set(h.CenterText,'String',sprintf('[%.2g %.2g]',h.A.c(1),h.A.c(2)));
-% dx = 10000*h.A.dx; dy = 10000*h.A.dy; % A LARGE MAGNIFICATION IS USED TO EFFICIENTLY DISPLAY 2 DIGITS
 dx = h.A.dx; dy = h.A.dy;
 set(h.GainText,'String',sprintf('[%.2g %.2g]',dx,dy));
 
@@ -696,27 +603,13 @@ sca;
 handles.reward.report()
 delete(handles.reward); handles.reward = NaN;
 
-filename = fullfile(handles.supportPath,handles.calibFile);
-
-%%% SC: eye posn data
-if handles.S.viewpoint,
-  vpx_Unload(); % unloads the ViewPoint library
-
-  % Save any changes to the calibration
-  c = handles.A.c; %#ok<NASGU>    Supressing editor errors because theses
-  dx = handles.A.dx; %#ok<NASGU>  variables are being saved
-  dy = handles.A.dy; %#ok<NASGU>
-  
-  save(filename,'c','dx','dy');
-end
-%%%
+% filename = fullfile(handles.supportPath,handles.calibFile);
 
 % save gui window location... makes it persistent across sessions
-guiLocation = get(hObject,'Position');
-save(filename,'guiLocation','-append');
+gl.Location = hObject.Position;
+setpref('marmoview', 'gui', gl)
 
-% Hint: delete(hObject) closes the figure
-delete(hObject);
+delete(hObject); % delete(hObject) closes the figure
 
 
 % % % --- Executes on key press with focus on gui or any of its controls.
@@ -797,6 +690,10 @@ function ShowBlack_Callback(hObject, eventdata, handles)
 % If a bkgd parameter exists, flip frame with background color value
 Screen('FillRect',handles.p.trial.display.ptr,0);
 Screen('Flip',handles.p.trial.display.ptr);
+
+
+% ------------------------------------------------------------------------
+% --- FUNCTIONS THAT PERTAIN TO EYE CALIBRATION --------------------------
 
 
 
@@ -906,3 +803,166 @@ function CTargRandom_Callback(hObject, eventdata, handles)
 % hObject    handle to CTargRandom (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
+%%%%% SHIFT EYE POSITION CALLBACKS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function CenterEye_Callback(hObject, eventdata, handles)
+
+handles.A.c = getEye();
+guidata(hObject,handles);
+UpdateEyeText(handles);
+UpdateEyePlot(handles);
+
+function GainSize_CreateFcn(hObject, eventdata, handles)
+function GainSize_Callback(hObject, eventdata, handles)
+gainSize = str2double(get(hObject,'String'));
+if ~isnan(gainSize)
+    handles.gainSize = gainSize;
+    guidata(hObject,handles);
+else
+    set(handles.GainSize,'String',num2str(handles.gainSize));
+end
+
+function GainUpX_Callback(hObject, eventdata, handles)
+% Note we divide by dx, so reducing dx increases gain
+handles.A.dx = (1-handles.gainSize)*handles.A.dx;
+guidata(hObject,handles);
+UpdateEyeText(handles);
+UpdateEyePlot(handles);
+
+function GainDownX_Callback(hObject, eventdata, handles)
+handles.A.dx = (1+handles.gainSize)*handles.A.dx;
+guidata(hObject,handles);
+UpdateEyeText(handles);
+UpdateEyePlot(handles);
+
+function GainUpY_Callback(hObject, eventdata, handles)
+handles.A.dy = (1-handles.gainSize)*handles.A.dy;
+guidata(hObject,handles);
+UpdateEyeText(handles);
+UpdateEyePlot(handles);
+
+function GainDownY_Callback(hObject, eventdata, handles)
+handles.A.dy = (1+handles.gainSize)*handles.A.dy;
+guidata(hObject,handles);
+UpdateEyeText(handles);
+UpdateEyePlot(handles);
+
+
+function ShiftSize_CreateFcn(hObject, eventdata, handles)
+function ShiftSize_Callback(hObject, eventdata, handles)
+shiftSize = str2double(get(hObject,'String'));
+if ~isnan(shiftSize)
+    handles.shiftSize = shiftSize;
+    guidata(hObject,handles);
+else
+    set(handles.ShiftSize,'String',num2str(handles.shiftSize));
+end
+
+function ShiftLeft_Callback(hObject, eventdata, handles)
+% handles.A.c(1) = handles.A.c(1) + ...
+%     handles.shiftSize*handles.A.dx*handles.S.pixPerDeg;
+handles.A.c(1) = handles.A.c(1) + ...
+    handles.shiftSize*handles.A.dx;
+guidata(hObject,handles);
+UpdateEyeText(handles);
+UpdateEyePlot(handles);
+
+function ShiftRight_Callback(hObject, eventdata, handles)
+% handles.A.c(1) = handles.A.c(1) - ...
+%     handles.shiftSize*handles.A.dx*handles.S.pixPerDeg;
+handles.A.c(1) = handles.A.c(1) - ...
+    handles.shiftSize*handles.A.dx;
+guidata(hObject,handles);
+UpdateEyeText(handles);
+UpdateEyePlot(handles);
+
+function ShiftDown_Callback(hObject, eventdata, handles)
+% handles.A.c(2) = handles.A.c(2) + ...
+%     handles.shiftSize*handles.A.dy*handles.S.pixPerDeg;
+handles.A.c(2) = handles.A.c(2) - ...
+    handles.shiftSize*handles.A.dy;
+guidata(hObject,handles);
+UpdateEyeText(handles);
+UpdateEyePlot(handles);
+
+function ShiftUp_Callback(hObject, eventdata, handles)
+% handles.A.c(2) = handles.A.c(2) - ...
+%     handles.shiftSize*handles.A.dy*handles.S.pixPerDeg;
+handles.A.c(2) = handles.A.c(2) + ...
+    handles.shiftSize*handles.A.dy;
+guidata(hObject,handles);
+UpdateEyeText(handles);
+UpdateEyePlot(handles);
+
+function ResetCalibration_Callback(hObject, eventdata, handles)
+handles.A.dx = handles.C.dx;
+handles.A.dy = handles.C.dy;
+handles.A.c = handles.C.c;
+guidata(hObject,handles);
+UpdateEyeText(handles);
+UpdateEyePlot(handles);
+
+% --- Save the current eye calibration to rig preferences
+function saveCalibrationAsRigPref(p,c)
+
+    if p.trial.eyelink.use
+        a=getpref('pldaps','eyelink');
+        a.calibration_matrix = c;
+        setpref('pldaps','eyelink',a); %set new
+        disp('saved new calibration matrix.')
+    end
+    
+    subj=p.trial.session.subject;
+    setpref('marmoview_calibration', subj, c)
+
+% --- Get the current calibration from rig preferences
+function c=getCalibrationPref(p)
+
+    subj=p.trial.session.subject;
+    if ~ispref('marmoview_calibration')
+        c=[1 0; 0 1; 0 0]; % assume default calibration
+        return
+    end
+    
+    m=getpref('marmoview_calibration');
+    if isfield(m, subj)
+        c=m.(subj);
+    else
+        c=[1 0; 0 1; 0 0]; % assume default calibration
+    end
+    
+% --- Convert calibration matrix to Marmoview Gains and Offsets
+function [g,r,o]=calibrationMatrixToGains(c,ctr)
+
+% gains
+g(1)=c(1,1); % xx gain
+g(2)=c(2,2); % yy gain
+
+% rotations
+r(1)=c(2,1); % xy gain
+r(2)=c(1,2); % yx gain
+
+% calculate offset
+ox=c(3,1);
+oy=c(3,2);
+
+cx = ( -g(2)*(ox - ctr(1)) + r(1)*(oy-ctr(2) ) ) / (g(1)*g(2) - r(1)*r(2));
+cy = ( -g(1)*(oy - ctr(2)) + r(2)*(ox-ctr(1) ) ) / (g(1)*g(2) - r(1)*r(2));
+
+o(1)=cx;
+o(2)=cy;
+
+% --- Convert Marmoview Gains and Offsets to a Calibration Matrix
+function c=gainsToCalibrationMatrix(g,r,o,ctr)
+% convert to calibration matrix
+ox=-g(1)*o(1) - r(1)*o(2) + ctr(1);
+oy=-g(2)*o(2) - r(2)*o(1) + ctr(2);
+
+c(1,1)=g(1);
+c(2,2)=g(2);
+c(1,2)=r(2);
+c(2,1)=r(1);
+c=[c; ox oy];
+
+    
+
