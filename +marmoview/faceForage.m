@@ -45,6 +45,10 @@ switch state
         end
         
     case p.trial.pldaps.trialStates.frameDraw,
+        
+         if p.trial.iFrame == p.trial.pldaps.maxFrames
+             p.trial.flagNextTrial=true;
+         end
 
         %***************** wipe out surround **********
 %         hit = 0;
