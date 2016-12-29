@@ -3,7 +3,7 @@ function p=faceForage(p, state, sn)
 % Draws randomly scaled gaussians across the screen for reverse
 % correlation. Based loosely on ProceduralGarborium.m
 
-MotN = 1;  % number of face objects
+MotN = 30;  % number of face objects
 
 if nargin<3
     sn='faceForage';
@@ -69,9 +69,9 @@ switch state
 %            p.trial.(sn).m(i).draw; 
 %         end
         
-        p.trial.(sn).m(1).draw;
-%         arrayfun(@(x) x.draw, p.trial.(sn).m)
-%         Screen('DrawText', p.trial.display.ptr, num2str(p.trial.exploded), 50, 50, [1 1 1]);
+%         p.trial.(sn).m(1).draw;
+        arrayfun(@(x) x.draw, p.trial.(sn).m)
+        Screen('DrawText', p.trial.display.ptr, num2str(p.trial.exploded), 50, 50, [1 1 1]);
 %         
 %         DrawFormattedText(p.trial.display.overlayptr, num2str(p.trial.exploded), 50, 50,  p.trial.display.clut.redbg);
     case p.trial.pldaps.trialStates.trialSetup,

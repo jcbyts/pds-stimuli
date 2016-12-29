@@ -68,7 +68,12 @@ end
 
 % GET SOME CRUCIAL DIRECTORIES -- THESE DIRECTORIES MUST EXIST!!
 % Present working directory, location of all GUIs
-handles.taskPath = sprintf('%s/',pwd);
+mprefs=getpref('marmoview');
+if ~isempty(mprefs) && isfield(mprefs, 'taskPath')
+    handles.taskPath=mprefs.taskPath;
+else
+    handles.taskPath = sprintf('%s/',pwd);
+end
 handles.settingsPath= sprintf('%s/',pwd);
 
 % CREATE THE STRUCTURES USED BY ALL PROTOCOLS
@@ -188,6 +193,7 @@ ChangeLight(handles.TaskLight,[.2 .2 1]); % blue task light
 handles.ChooseSettings.Enable   = 'Off';
 handles.Initialize.Enable       = 'Off';
 
+setpref('marmoview', 'taskPath', handles.settingsPath)
 % Effect these changes on the GUI immediately
 guidata(hObject, handles); drawnow;
 
@@ -229,30 +235,31 @@ guidata(hObject, handles); drawnow;
 
 handles.p.trial.pldaps.pause.type=2; % pauseLoop mode
 handles.p.trial.pldaps.pause.preExperiment=1; % pause before experiment
-handles.p.run % open PTB window and pause
+
 
 % Show filename in the gui
 handles.OutputFile.String=handles.p.trial.session.experimentFile;
 
 % EYE CALIBRATION STUFF HERE
-
 % get subject specific calibration matrix
 cm=getCalibrationPref(handles.p);
-% convert to marmoview style gains and offsets
-[g,r,c]=calibrationMatrixToGains(cm, handles.p.trial.display.ctr(1:2));
+% marmoview specific preferences override pldaps
+if handles.p.trial.eyelink.use && handles.p.trial.eyelink.useAsEyepos
+    handles.p.trial.eyelink.useRawData=true;
+    handles.p.trial.eyelink.calibration_matrix=cm';
+end
 
-% store calibration info in gui
-handles.A.dx=g(1);
-handles.A.dy=g(2);
-handles.A.c=c;
-handles.A.rxy=r;
+handles.A.cm=cm;
+handles.shiftSize=10;
+handles.gainSize=.01;
+
 
 
 % % SET UP THE PARAMETERS PANEL
 % % Trial counting section of the parameters
 % handles.A.j = 1; handles.A.finish = handles.S.finish;
 
-% set(handles.TrialCountText,'String',['Trial ' num2str(handles.A.j-1)]);
+set(handles.TrialCountText,'String',sprintf('Trial %d', handles.p.trial.pldaps.iTrial));
 % set(handles.TrialMaxText,'String',num2str(handles.A.finish));
 % set(handles.TrialMaxEdit,'String','');
 % 
@@ -276,11 +283,11 @@ handles.A.rxy=r;
 
 % 
 % % FINALLY, RESET THE JUICE COUNTER WHENEVER A NEW PROTOCOL IS LOADED
-% handles.A.juiceCounter = 0;
+handles.A.juiceCounter = 0;
 
 % UPDATE HANDLES STRUCTURE
 guidata(hObject,handles);
-
+handles.p.run % open PTB window and pause
 
 % UNLOAD CURRENT PROTOCOL, RESET GUI TO INITIAL STATE
 function ClearSettings_Callback(hObject, eventdata, handles)
@@ -411,6 +418,7 @@ if handles.p.trial.pldaps.quit==0
     handles.FlipFrame.Enable        = 'On';
     handles.PauseTrial.Enable       = 'Off';
     handles.EyeTrackerPanel.Visible = 'On';
+    handles.CenterEye.Enable        = 'On';
     handles.GainDownX.Enable        = 'On';
     handles.GainDownY.Enable        = 'On';
     handles.GainUpX.Enable          = 'On';
@@ -442,6 +450,7 @@ else
     handles.FlipFrame.Enable        = 'On';
     handles.PauseTrial.Enable       = 'Off';
     handles.EyeTrackerPanel.Visible = 'On';
+    handles.CenterEye.Enable        = 'On';
     handles.GainDownX.Enable        = 'On';
     handles.GainDownY.Enable        = 'On';
     handles.GainUpX.Enable          = 'On';
@@ -539,11 +548,7 @@ guidata(hObject,handles);
 %%%%% CLOSE THE GUI %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function CloseGui_Callback(hObject, eventdata, handles)
 % close the gui window
-try
-    close(handles.gui); % see gui_CloseRequestFcn()
-catch
-    close(handles.gui, 'force');
-end
+close(handles.gui, 'force');
 
 %%%%% AUXILLIARY FUNCTIONS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function ChangeLight(h,col)
@@ -551,19 +556,6 @@ function ChangeLight(h,col)
 scatter(h,.5,.5,600,'o','MarkerEdgeColor','k','MarkerFaceColor',col);
 axis(h,[0 1 0 1]); bkgd = [.931 .931 .931];
 set(h,'XColor',bkgd,'YColor',bkgd,'Color',bkgd);
-
-% THIS FUNCTION UPDATES THE RAW EYE CALIBRATION NUMBERS IN THE GUI
-function UpdateEyeText(h)
-set(h.CenterText,'String',sprintf('[%.2g %.2g]',h.A.c(1),h.A.c(2)));
-dx = h.A.dx; dy = h.A.dy;
-set(h.GainText,'String',sprintf('[%.2g %.2g]',dx,dy));
-
-% THIS FUNCTION UPDATES PLOTS OF THE EYE TRACE
-function UpdateEyePlot(handles)
-if ~handles.runTask && handles.A.j > 1   % At least 1 trial must be complete in order to plot the trace
-    P = handles.D.P(handles.A.j-1); eyeData = handles.D.eyeData{handles.A.j-1}; %#ok<NASGU>
-    eval(handles.plotCmd);  % Suppressing editor catches because plotCmd calls P and eyeData
-end
 
 function handles = UpdateOutputFilename(handles)
 handles.OutputFile.String=handles.p.trial.session.experimentFile;
@@ -695,6 +687,24 @@ Screen('Flip',handles.p.trial.display.ptr);
 % ------------------------------------------------------------------------
 % --- FUNCTIONS THAT PERTAIN TO EYE CALIBRATION --------------------------
 
+% --- THIS FUNCTION UPDATES THE RAW EYE CALIBRATION NUMBERS IN THE GUI
+function UpdateEyeText(h)
+set(h.CenterText,'String',sprintf('[%.2g %.2g]',h.A.c(1),h.A.c(2)));
+dx = h.A.dx; dy = h.A.dy;
+set(h.GainText,'String',sprintf('[%.2g %.2g]',dx,dy));
+
+% --- THIS FUNCTION UPDATES PLOTS OF THE EYE TRACE
+function UpdateEyePlot(handles)
+handles.A.cm
+if handles.p.trial.pldaps.quit && handles.p.trial.pldaps.iTrial > 0  % At least 1 trial must be complete in order to plot the trace
+    eye=[handles.A.rawxy; ones(1,size(handles.A.rawxy,2))]'*handles.A.cm;
+    eye=eye';
+    eye=pds.px2deg(eye, handles.p.trial.display.viewdist, handles.p.trial.display.px2w);
+    eye=bsxfun(@times, eye, [1; -1]);
+    handles.A.hplot.XData=eye(1,:);
+    handles.A.hplot.YData=eye(2,:);
+    drawnow
+end
 
 
 % --- Executes on button press in CalibrateButton.
@@ -807,7 +817,10 @@ function CTargRandom_Callback(hObject, eventdata, handles)
 %%%%% SHIFT EYE POSITION CALLBACKS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function CenterEye_Callback(hObject, eventdata, handles)
 
-handles.A.c = getEye();
+cm=getCurrentCalibrationMatrix(handles.p);
+handles=updateGains(handles, cm);
+handles.A.c = mean(handles.A.rawxy,2)';
+updateCalibrationMatrix(handles);
 guidata(hObject,handles);
 UpdateEyeText(handles);
 UpdateEyePlot(handles);
@@ -823,26 +836,38 @@ else
 end
 
 function GainUpX_Callback(hObject, eventdata, handles)
+cm=getCurrentCalibrationMatrix(handles.p);
+handles=updateGains(handles, cm);
 % Note we divide by dx, so reducing dx increases gain
 handles.A.dx = (1-handles.gainSize)*handles.A.dx;
+handles=updateCalibrationMatrix(handles);
 guidata(hObject,handles);
 UpdateEyeText(handles);
 UpdateEyePlot(handles);
 
 function GainDownX_Callback(hObject, eventdata, handles)
+cm=getCurrentCalibrationMatrix(handles.p);
+handles=updateGains(handles, cm);
 handles.A.dx = (1+handles.gainSize)*handles.A.dx;
+handles=updateCalibrationMatrix(handles);
 guidata(hObject,handles);
 UpdateEyeText(handles);
 UpdateEyePlot(handles);
 
 function GainUpY_Callback(hObject, eventdata, handles)
+cm=getCurrentCalibrationMatrix(handles.p);
+handles=updateGains(handles, cm);
 handles.A.dy = (1-handles.gainSize)*handles.A.dy;
+handles=updateCalibrationMatrix(handles);
 guidata(hObject,handles);
 UpdateEyeText(handles);
 UpdateEyePlot(handles);
 
 function GainDownY_Callback(hObject, eventdata, handles)
+cm=getCurrentCalibrationMatrix(handles.p);
+handles=updateGains(handles, cm);
 handles.A.dy = (1+handles.gainSize)*handles.A.dy;
+handles=updateCalibrationMatrix(handles);
 guidata(hObject,handles);
 UpdateEyeText(handles);
 UpdateEyePlot(handles);
@@ -859,28 +884,37 @@ else
 end
 
 function ShiftLeft_Callback(hObject, eventdata, handles)
+cm=getCurrentCalibrationMatrix(handles.p);
+handles=updateGains(handles, cm);
 % handles.A.c(1) = handles.A.c(1) + ...
 %     handles.shiftSize*handles.A.dx*handles.S.pixPerDeg;
 handles.A.c(1) = handles.A.c(1) + ...
     handles.shiftSize*handles.A.dx;
+handles=updateCalibrationMatrix(handles);
 guidata(hObject,handles);
 UpdateEyeText(handles);
 UpdateEyePlot(handles);
 
 function ShiftRight_Callback(hObject, eventdata, handles)
+cm=getCurrentCalibrationMatrix(handles.p);
+handles=updateGains(handles,cm);
 % handles.A.c(1) = handles.A.c(1) - ...
 %     handles.shiftSize*handles.A.dx*handles.S.pixPerDeg;
 handles.A.c(1) = handles.A.c(1) - ...
     handles.shiftSize*handles.A.dx;
+handles=updateCalibrationMatrix(handles);
 guidata(hObject,handles);
 UpdateEyeText(handles);
 UpdateEyePlot(handles);
 
 function ShiftDown_Callback(hObject, eventdata, handles)
-% handles.A.c(2) = handles.A.c(2) + ...
-%     handles.shiftSize*handles.A.dy*handles.S.pixPerDeg;
+cm=getCurrentCalibrationMatrix(handles.p);
+handles=updateGains(handles,cm);
+
 handles.A.c(2) = handles.A.c(2) - ...
     handles.shiftSize*handles.A.dy;
+handles=updateCalibrationMatrix(handles);
+
 guidata(hObject,handles);
 UpdateEyeText(handles);
 UpdateEyePlot(handles);
@@ -888,48 +922,73 @@ UpdateEyePlot(handles);
 function ShiftUp_Callback(hObject, eventdata, handles)
 % handles.A.c(2) = handles.A.c(2) - ...
 %     handles.shiftSize*handles.A.dy*handles.S.pixPerDeg;
+cm=getCurrentCalibrationMatrix(handles.p);
+handles=updateGains(handles,cm);
+
 handles.A.c(2) = handles.A.c(2) + ...
     handles.shiftSize*handles.A.dy;
+
+handles=updateCalibrationMatrix(handles);
 guidata(hObject,handles);
 UpdateEyeText(handles);
 UpdateEyePlot(handles);
 
+function handles=updateGains(handles, cm)
+[g,r,c]=calibrationMatrixToGains(cm, handles.p.trial.display.ctr(1:2));
+handles.A.dx=g(1);
+handles.A.dy=g(2);
+handles.A.rx=r(1);
+handles.A.ry=r(2);
+handles.A.c=c;
+
+% --- Reset Calibration to current rig preferences
 function ResetCalibration_Callback(hObject, eventdata, handles)
-handles.A.dx = handles.C.dx;
-handles.A.dy = handles.C.dy;
-handles.A.c = handles.C.c;
+
+% pull calibration matrix from preferences
+cm=getCalibrationPref(p);
+
+% convert to marmoview style gains and offsets
+[g,r,c]=calibrationMatrixToGains(cm, handles.p.trial.display.ctr(1:2));
+
+% store calibration info in gui
+handles.A.dx=g(1);
+handles.A.dy=g(2);
+handles.A.c=c;
+handles.A.rxy=r;
+
 guidata(hObject,handles);
+updateCalibrationMatrix(handles)
 UpdateEyeText(handles);
 UpdateEyePlot(handles);
+
+% --- Get the current eye calibration matrix
+function cm=getCurrentCalibrationMatrix(p)
+cm=[];
+if p.trial.eyelink.use && p.trial.eyelink.useAsEyepos
+    cm=p.trial.eyelink.calibration_matrix';
+end
 
 % --- Save the current eye calibration to rig preferences
 function saveCalibrationAsRigPref(p,c)
-
-    if p.trial.eyelink.use
-        a=getpref('pldaps','eyelink');
-        a.calibration_matrix = c;
-        setpref('pldaps','eyelink',a); %set new
-        disp('saved new calibration matrix.')
-    end
-    
-    subj=p.trial.session.subject;
-    setpref('marmoview_calibration', subj, c)
+subj=p.trial.session.subject;
+setpref('marmoview_calibration', subj, c)
+disp('saved new calibration matrix.')
 
 % --- Get the current calibration from rig preferences
 function c=getCalibrationPref(p)
 
-    subj=p.trial.session.subject;
-    if ~ispref('marmoview_calibration')
-        c=[1 0; 0 1; 0 0]; % assume default calibration
-        return
-    end
-    
-    m=getpref('marmoview_calibration');
-    if isfield(m, subj)
-        c=m.(subj);
-    else
-        c=[1 0; 0 1; 0 0]; % assume default calibration
-    end
+subj=p.trial.session.subject;
+if ~ispref('marmoview_calibration')
+    c=[1 0; 0 1; 0 0]; % assume default calibration
+    return
+end
+
+m=getpref('marmoview_calibration');
+if isfield(m, subj)
+    c=m.(subj);
+else
+    c=[1 0; 0 1; 0 0]; % assume default calibration
+end
     
 % --- Convert calibration matrix to Marmoview Gains and Offsets
 function [g,r,o]=calibrationMatrixToGains(c,ctr)
@@ -965,4 +1024,11 @@ c(2,1)=r(1);
 c=[c; ox oy];
 
     
-
+function  handles=updateCalibrationMatrix(handles)
+ctr=handles.p.trial.display.ctr;
+cm=gainsToCalibrationMatrix([handles.A.dx handles.A.dy],[handles.A.rx handles.A.ry],handles.A.c,ctr(1:2));
+handles.A.cm=cm;
+    
+if handles.p.trial.eyelink.use && handles.p.trial.eyelink.useAsEyepos
+    handles.p.trial.eyelink.calibration_matrix=cm';
+end
