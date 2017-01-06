@@ -45,22 +45,22 @@ classdef dotMotionTrial < stimuli.trial
     showChoice = true; % FIXME: true?
     
     % task/trial parameters
-    fixWinRadius@double; % deg.
-    fixGracePeriod@double; % seconds
-    fixDuration@double; % seconds
-    fixFlashCnt@double; % frames
-    stimDuration@double; % seconds
-    holdDuration@double; % seconds
-    cueDelay@double; % seconds
-    choiceTargetDelay@double; % seconds
-    choiceWinMinRadius@double; % deg.
-    choiceWinMaxRadius@double; % deg.
-    choiceGracePeriod@double; % seconds
-    choiceDuration@double; % seconds
-    rewardWindow@double;% deg.
-    choiceTimeout@double; % seconds
-    trialTimeout@double; % seconds
-    iti@double; % inter-trial interval (seconds)
+    fixWinRadius@double;        % deg.
+    fixGracePeriod@double;      % seconds
+    fixDuration@double;         % seconds
+    fixFlashCnt@double;         % frames
+    stimDuration@double;        % seconds
+    holdDuration@double;        % seconds
+    cueDelay@double;            % seconds
+    choiceTargetDelay@double;   % seconds
+    choiceWinMinRadius@double;  % deg.
+    choiceWinMaxRadius@double;  % deg.
+    choiceGracePeriod@double;   % seconds
+    choiceDuration@double;      % seconds
+    rewardWindow@double;        % deg.
+    choiceTimeout@double;       % seconds
+    trialTimeout@double;        % seconds
+    iti@double;                 % inter-trial interval (seconds)
     maxRewardCnt@double;
     
     rewardCnt@double = 0;

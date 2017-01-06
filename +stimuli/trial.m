@@ -1,7 +1,6 @@
 % abstract class for stimulus paradigm trials
 
 % 07-06-2016 - Shaun L. Cloherty <s.cloherty@ieee.irg>
-% 10-08-2016 - Jacob L. Yates <jacoby8s@gmail.com> adapted for pldaps
   
 classdef (Abstract) trial < handle
   % Abstract class for a stimulus paradigm trial.
