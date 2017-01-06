@@ -20,23 +20,21 @@ classdef dots < handle
   
   % 14-06-2016 - Shaun L. Cloherty <s.cloherty@ieee.org>
   
-  properties (Access = public),
-      p=@pldaps
-    size@double; % pixels
-    speed@double; % pixels/s
-    direction@double; % radians (?)
+  properties (Access = public)
+    size@double;            % pixels
+    speed@double;           % pixels/s
+    direction@double;       % degrees
     numDots@double;
-    coherence@double; % pcnt coherence (0-1)
-    mode@double; % 0 = proportion, 1 = distribution
-    dist@double; % 0 = gaussian, 1 = uniform
-    bandwdth@double; % width of gaussian/uniform noise.
-    lifetime@double; % dot lifetime (frames)
-%     minRadius@double; % minimum radius (pixels)
+    coherence@double;       % pcnt coherence (0-1)
+    mode@double;            % 0 = proportion, 1 = distribution
+    dist@double;            % 0 = gaussian, 1 = uniform
+    bandwdth@double;        % width of gaussian/uniform noise.
+    lifetime@double;        % dot lifetime (frames)
     truncateGauss = -1;
-    maxRadius@double; % maximum radius (pixels)
-    position@double; % aperture position (x,y; pixels)
+    maxRadius@double;       % maximum radius (pixels)
+    position@double;        % aperture position (x,y; pixels)
     colour@double;
-    visible@logical=true; % is the stimulus visible
+    visible@logical = true; % are the dots visible
   end
     
   properties (Access = public) %private)
@@ -60,12 +58,14 @@ classdef dots < handle
     winPtr; % ptb window
   end
   
+  % --- Methods to be called from marmoview trial
   methods (Access = public)
-    function o = dots(p,varargin)
-      o.p=p;
-        o.winPtr = o.p.trial.display.ptr;
+
+    % --- Class constructor
+    function o = dots(winPtr,varargin) % marmoview's initCmd
+      o.winPtr = winPtr;
       
-      if nargin == 1,
+      if nargin == 1
         return
       end
 
@@ -78,7 +78,6 @@ classdef dots < handle
       p.addParameter('speed',0.2,@double); % deg./s
       p.addParameter('direction',0.0,@(x) isscalar(x) && isreal(x)); % deg.
       p.addParameter('numDots',50,@(x) ceil(x));
-
       p.addParameter('mode',0,@(x) any(ismember(x,[0, 1]))); % 0 = proportion, 1 = distribution      
 
       % mode = 0
@@ -88,16 +87,14 @@ classdef dots < handle
       p.addParameter('dist',0,@(x) any(ismember(x,[0, 1]))); % 0 = gaussian, 1 = uniform
       p.addParameter('bandwdth',20.0,@(x) isscalar(x) && isreal(x)); % bandwidth (deg.)
 
-      
       p.addParameter('lifetime',Inf,@double);
-
-%       p.addParamValue('minRadius',0.0,@double); % deg.?
       p.addParameter('maxRadius',10.0,@double);
 
       p.addParameter('position',[0.0,0.0],@(x) isvector(x) && isreal(x)); % [x,y] (pixels)
-                  
-      p.addParameter('colour',zeros(1,3),@double);
+      
+      p.addParameter('colour',[1,0,0],@double);
       p.addParameter('visible',true,@islogical)
+      
       try
         p.parse(args{:});
       catch
@@ -107,50 +104,55 @@ classdef dots < handle
       
       args = p.Results;
     
-      o.size = args.size;
-      o.speed = args.speed;
-      
-      o.direction = args.direction;
-      
-      o.numDots = args.numDots;
-
-      o.mode = args.mode;
-      o.coherence = args.coherence;
-      o.dist = args.dist;
-      o.bandwdth = args.bandwdth;
-      o.visible = args.visible;
+      o.size          = args.size;
+      o.speed         = args.speed;
+      o.direction     = args.direction;
+      o.numDots       = args.numDots;
+      o.mode          = args.mode;
+      o.coherence     = args.coherence;
+      o.dist          = args.dist;
+      o.bandwdth      = args.bandwdth;
       o.truncateGauss = -1; % multiples of std. dev. (i.e., o.bw)
-      
-      o.lifetime = args.lifetime;
-      
-      o.maxRadius = args.maxRadius;
-      
-      o.position = args.position;
-      o.colour=args.colour;
+      o.lifetime      = args.lifetime;
+      o.maxRadius     = args.maxRadius;
+      o.position      = args.position;
+      o.colour        = args.colour;
+      o.visible       = args.visible;
     end
-        
+    
+    % --- Before trial: Initialize dots    
     function beforeTrial(o)
-      o.initialize([1:o.numDots]); % all dots!
+      o.initDots(1:o.numDots); % all dots!
       
       % initialise dots' lifetime
-      if o.lifetime ~= Inf,
+      if o.lifetime ~= Inf
         o.frameCnt = randi(o.lifetime,o.numDots,1); % 1:numDots
       else
         o.frameCnt = inf(o.numDots,1);
       end
     end
     
-        
-    function update(o)
-      % decrement frame counters
-      o.frameCnt = o.frameCnt - 1;
-      o.move();
+    % --- Before screen flip: Draw dots
+    function beforeFrame(o)
+      o.drawDots();
     end
     
+    % --- Frame Update: Update dot position
+    function afterFrame(o)
+      % decrement frame counters
+      o.frameCnt = o.frameCnt - 1;
+      
+      o.moveDots();
+    end
+
   end % methods
-    
-  methods (Access = public)        
-    function initialize(o,idx)
+  
+  % -------------------------------------------------------------------------------
+  % --- Internal methods. Called by the methods above
+  methods (Access = private)        
+
+    % --- Initialize dots
+    function initDots(o,idx)
       % initialises dot positions
       n = length(idx); % the number of dots to (re-)place
       
@@ -161,14 +163,14 @@ classdef dots < handle
       th = rand(n,1).*360.0; % deg.
       
       % convert r and theta to x and y
-       [o.x(idx),o.y(idx)] = pol2cart(th.*(pi/180.0),r);
+      [o.x(idx),o.y(idx)] = pol2cart(th.*(pi/180.0),r);
                     
       % set displacements (dx and dy) for each dot
       [o.dx(idx),o.dy(idx)] = pol2cart(o.direction.*(pi/180),o.speed);
       
-      switch o.mode,
-        case 0, % proportion of dots
-          if o.coherence == 1.0,
+      switch o.mode
+        case 0 % proportion of dots
+          if o.coherence == 1.0
             return;
           end
           
@@ -176,33 +178,31 @@ classdef dots < handle
           
           % set displacements for the dots moving incoherently
           idx_ = idx(idx > nc);
-          if o.coherence == 0.0 || ~isempty(idx_),
-            tmpdirection = rand(sum(idx_)).*360.0; % deg.
+          if o.coherence == 0.0 || ~isempty(idx_)
+            direction_ = rand(size(idx_)).*360.0; % deg.
 
-            [o.dx(idx_),o.dy(idx_)] = pol2cart(tmpdirection*(pi/180),o.speed);
+            [o.dx(idx_),o.dy(idx_)] = pol2cart(direction_*(pi/180),o.speed);
           end
                             
-        case 1, % directions sampled from some distribution
-          switch o.dist,
-            case 0,  % gaussian
-              phi = o.bandwdth.*randn(n,1);
-              if o.truncateGauss ~= -1
-                a = abs(o.direction/o.bandwdth) > o.truncateGauss;
-                while max(a),
-                  phi(a) = o.bandwdth.*randn(sum(a),1);
-                  a = abs(phi(idx)/o.bandwdth) > o.truncateGauss;
-                end
-              end
-            case 1, % uniform
-              phi = o.bandwdth.*rand(n,1) - o.bandwdth/2;
-            otherwise
-              error('Unknown noiseDist');
-          end
+        case 1 % directions sampled from some distribution
+            switch o.dist
+                case 0  % gaussian
+                    phi = o.bandwdth.*randn(n,1);
+                    if o.truncateGauss ~= -1
+                        a = abs(direction_ /o.bandwdth) > o.truncateGauss;
+                        while max(a)
+                            phi(a) = o.bandwdth.*randn(sum(a),1);
+                            a = abs(phi(idx)/o.bandwdth) > o.truncateGauss;
+                        end
+                    end
+                case 1 % uniform
+                    phi = o.bandwdth.*rand(n,1) - o.bandwdth/2;
+                otherwise
+                    error('Unknown noiseDist');
+            end
           
-          tmpdirection = o.direction + phi;
-          [dx, dy] = pol2cart(tmpdirection.*(pi/180),o.speed);
-          o.dx(idx) = dx;
-          o.dy(idx) = dy;
+          direction_ = o.direction + phi;
+          [o.dx(idx), o.dy(idx)] = pol2cart(direction_ .*(pi/180),o.speed);
           
         otherwise
           error('Unknown noiseMode');    
@@ -210,19 +210,18 @@ classdef dots < handle
       
       
     end
-                
-    function move(o)
+       
+    % --- update dot positions            
+    function moveDots(o)
       % calculate future position
-      x = o.x + o.dx;
-      y = o.y + o.dy;
+      o.x = o.x + o.dx;
+      o.y = o.y + o.dy;
       
-      r = sqrt(x.^2 + y.^2);
+      r = sqrt(o.x.^2 + o.y.^2);
       idx = find(r > o.maxRadius); % dots that have exited the aperture
          
-      o.x = x;
-      o.y = y;
       
-      if ~isempty(idx),
+      if ~isempty(idx)
         % (re-)place the dots on the other side of the aperture
         [th,~] = cart2pol(o.dx(idx),o.dy(idx));
         [xx, yy] = o.rotate(o.x(idx),o.y(idx),-1*th);
@@ -233,38 +232,44 @@ classdef dots < handle
       
       idx = find(o.frameCnt == 0); % dots that have exceeded their lifetime
       
-      if ~isempty(idx),
+      if ~isempty(idx)
 %         fprintf(1,'%i dots expired\n',length(idx));
         % (re-)place dots randomly within the aperture
-        o.initialize(idx);
+        o.initDots(idx);
       end
     end
     
-    function draw(o)
+    % --- Screen call to draw dots
+    function drawDots(o)   
+      dotColour = o.colour; %zeros([1,3]); %repmat(0,1,3);
+      
       % dotType:
       %
       %   0 - square dots (default)
-      %   1 - round, anit0aliased dots (fvour performance)
+      %   1 - round, anit-aliased dots (fvour performance)
       %   2 - round, anti-aliased dots (favour quality)
       %   3 - round, anti-aliased dots (built-in shader)
       %   4 - square dots (built-in shader)
-      dotType =2;
+      dotType = 1;
+      
       if o.visible
-        Screen('DrawDots',o.winPtr,[o.x(:), -1*o.y(:)]', o.size, o.colour, o.position, dotType);
+        Screen('DrawDots',o.winPtr,[o.x(:), -1*o.y(:)]', o.size, dotColour, o.position, dotType);
       end
+      
 %       if 0,
 %         plot(o.x+o.position(1),o.y+o.position(2),'o');
 %         axis equal;
 %         axis([-1, 1, -1, 1]*20);
 %       end
     end
+    
   end % methods
   
   methods (Static)
     function [xx, yy] = rotate(x,y,th)
       % rotate (x,y) by angle th
 
-      for ii = 1:length(th),
+      for ii = length(th):-1:1 % preallocates full size
         % calculate rotation matrix
         R = [cos(th(ii)) -sin(th(ii)); ...
              sin(th(ii))  cos(th(ii))];

@@ -1,7 +1,6 @@
 % abstract class for stimulus paradigm trials
 
 % 07-06-2016 - Shaun L. Cloherty <s.cloherty@ieee.irg>
-% 10-08-2016 - Jacob L. Yates <jacoby8s@gmail.com> adapted for pldaps
   
 classdef (Abstract) trial < handle
   % Abstract class for a stimulus paradigm trial.
@@ -47,7 +46,7 @@ classdef (Abstract) trial < handle
   
   methods % get/set dependent properties
     % dependent property get methods
-    function value = get.stateId(o),
+    function value = get.stateId(o)
       value = o.hState.id;
     end
   end
@@ -57,17 +56,17 @@ classdef (Abstract) trial < handle
 %     end
 
     % called before each screen flip
-    function beforeFrame(o,varargin),
+    function beforeFrame(o,varargin)
       o.hState.beforeFrame(varargin{:});
     end
 
     % called after each screen flip
-    function err = afterFrame(o,t,varargin),
+    function err = afterFrame(o,t,varargin)
       o.hState.afterFrame(t,varargin{:});
     end
     
     % methods for manipulating the pool of @state objects
-    function addState(o,h),
+    function addState(o,h)
       assert(~any(ismember(o.stateIds,h.id)),'Duplicate state, id = %i',h.id);
       
       n = length(o.stateIds);
@@ -78,30 +77,30 @@ classdef (Abstract) trial < handle
       o.txTimes(n+1) = NaN;
     end
     
-    function setState(o,stateId), % FIXME; varargin?
+    function setState(o,stateId) % FIXME; varargin?
       % set the current state...
-      ii = find(o.stateIds == stateId);
+      ii = o.stateIds == stateId;
       o.hState = o.stateHandles{ii};
     end
     
     % get/set methods for the state transition times
-    function t = getTxTime(o,varargin),
+    function t = getTxTime(o,varargin)
       id = o.stateId; % default: current state...
-      if nargin == 2,
+      if nargin == 2
         id = varargin{1};
       end
       
-      ii = find(o.stateIds == id);
+      ii = o.stateIds == id;
       t = o.txTimes(ii);
     end
     
-    function setTxTime(o,t,varargin),
+    function setTxTime(o,t,varargin)
       id = o.stateId; % default: current state...
-      if nargin == 3,
+      if nargin == 3
         id = varargin{1};
       end
       
-      ii = find(o.stateIds == id);
+      ii = o.stateIds == id;
       o.txTimes(ii) = t;
     end
     

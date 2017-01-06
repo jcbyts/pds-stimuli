@@ -15,7 +15,8 @@ classdef dotMotionTrial < stimuli.trial
 %     scrWdth@double; % screen width in pixels
 %     scrHght@double; % screen height in pixels
     choice@double = NaN;    
-
+    choiceX@double = NaN;
+    choiceY@double = NaN;
     % 'error' describes the outcome of a trial:
     %
     %   0 = complete trial, correct response
@@ -32,12 +33,13 @@ classdef dotMotionTrial < stimuli.trial
     hDots@handle;
     hChoice@handle;
     hCue@handle;
+    hFbk@handle;
     hFace@handle;
     
     % trial objects
 %     hEye@handle; % FIXME: eye tracker?
     viewpoint@logical = false;
-    hReward@handle;
+    hPldaps%     hReward@handle;
     
     % flags...?
     showFix = true;
@@ -45,22 +47,22 @@ classdef dotMotionTrial < stimuli.trial
     showChoice = true; % FIXME: true?
     
     % task/trial parameters
-    fixWinRadius@double; % deg.
-    fixGracePeriod@double; % seconds
-    fixDuration@double; % seconds
-    fixFlashCnt@double; % frames
-    stimDuration@double; % seconds
-    holdDuration@double; % seconds
-    cueDelay@double; % seconds
-    choiceTargetDelay@double; % seconds
-    choiceWinMinRadius@double; % deg.
-    choiceWinMaxRadius@double; % deg.
-    choiceGracePeriod@double; % seconds
-    choiceDuration@double; % seconds
-    rewardWindow@double;% deg.
-    choiceTimeout@double; % seconds
-    trialTimeout@double; % seconds
-    iti@double; % inter-trial interval (seconds)
+    fixWinRadius@double;        % deg.
+    fixGracePeriod@double;      % seconds
+    fixDuration@double;         % seconds
+    fixFlashCnt@double;         % frames
+    stimDuration@double;        % seconds
+    holdDuration@double;        % seconds
+    cueDelay@double;            % seconds
+    choiceTargetDelay@double;   % seconds
+    choiceWinMinRadius@double;  % deg.
+    choiceWinMaxRadius@double;  % deg.
+    choiceGracePeriod@double;   % seconds
+    choiceDuration@double;      % seconds
+    rewardWindow@double;        % deg.
+    choiceTimeout@double;       % seconds
+    trialTimeout@double;        % seconds
+    iti@double;                 % inter-trial interval (seconds)
     maxRewardCnt@double;
     
     rewardCnt@double = 0;
@@ -77,34 +79,35 @@ classdef dotMotionTrial < stimuli.trial
 %   properties (Access = ?stimuli.state)
   properties (Access = public)
     reward@double = []; % look-up table for reward schedule
-    bonus@double = []; % look-up table for bonus schedule
+    bonus@double  = []; % look-up table for bonus schedule
   end
   
   methods (Access = public)
-    function o = dotMotionTrial(hFix,hDots,hChoice,hCue,hFace,hReward,varargin),
-      o.hFix = hFix;
-      o.hDots = hDots;
+    function o = dotMotionTrial(hFix,hDots,hChoice,hCue,hFbk,hFace,hPldaps,varargin),
+      o.hFix    = hFix;
+      o.hDots   = hDots;
       o.hChoice = hChoice;
-      o.hCue = hCue;
-      o.hFace = hFace;
+      o.hCue    = hCue;
+      o.hFbk    = hFbk;
+      o.hFace   = hFace;
       
-      o.hReward = hReward;
+      o.hPldaps = hPldaps;
       
       % initialise the @state object pool...
-      o.addState(stimuli.dotmotion.dotMotionState0(o));
-      o.addState(stimuli.dotmotion.dotMotionState1(o));
-      o.addState(stimuli.dotmotion.dotMotionState2(o));
-      o.addState(stimuli.dotmotion.dotMotionState3(o));
-      o.addState(stimuli.dotmotion.dotMotionState4(o));
-      o.addState(stimuli.dotmotion.dotMotionState5(o));
-      o.addState(stimuli.dotmotion.dotMotionState6(o));
-      o.addState(stimuli.dotmotion.dotMotionState7(o));
-      o.addState(stimuli.dotmotion.dotMotionState8(o));
+      o.addState(stimuli.dotmotion.state0_FixWait(o));
+      o.addState(stimuli.dotmotion.state1_FixGracePeriod(o));
+      o.addState(stimuli.dotmotion.state2_FixPreStim(o));
+      o.addState(stimuli.dotmotion.state3_ShowDots(o));
+      o.addState(stimuli.dotmotion.state4_WaitForGo(o));
+      o.addState(stimuli.dotmotion.state5_Choice(o));
+      o.addState(stimuli.dotmotion.state6_HoldChoice(o));
+      o.addState(stimuli.dotmotion.state7_BreakFixTimeout(o));
+      o.addState(stimuli.dotmotion.state8_InterTrialInterval(o));
       
       % set initial state
       o.setState(0);      
       
-      if nargin < 5,
+      if nargin < 5
         return
       end
       
@@ -113,64 +116,64 @@ classdef dotMotionTrial < stimuli.trial
       p = inputParser;
 %       p.KeepUnmatched = true;
       p.StructExpand = true;
-      p.addParamValue('fixWinRadius',NaN,@(x) isscalar(x) && isreal(x)); % deg.
-      p.addParamValue('fixGracePeriod',NaN,@(x) isscalar(x) && isreal(x)); % seconds
-      p.addParamValue('fixDuration',NaN,@(x) isscalar(x) && isreal(x)); % seconds
-      p.addParamValue('fixFlashCnt',NaN,@(x) isscalar(x) && isreal(x)); % frames
-      p.addParamValue('stimDuration',NaN,@(x) isscalar(x) && isreal(x)); % seconds
-      p.addParamValue('holdDuration',NaN,@(x) isscalar(x) && isreal(x)); % seconds
-      p.addParamValue('cueDelay',NaN,@(x) isscalar(x) && isreal(x)); % seconds
-      p.addParamValue('choiceTargetDelay',NaN,@(x) isscalar(x) && isreal(x)); % seconds
-      p.addParamValue('choiceWinMinRadius',NaN,@(x) isscalar(x) && isreal(x)); % deg.
-      p.addParamValue('choiceWinMaxRadius',NaN,@(x) isscalar(x) && isreal(x)); % deg.
-      p.addParamValue('choiceGracePeriod',NaN,@(x) isscalar(x) && isreal(x)); 
-      p.addParamValue('choiceDuration',NaN,@(x) isscalar(x) && isreal(x)); % seconds
-      p.addParamValue('rewardWindow',NaN,@(x) isscalar(x) && isreal(x)); % deg.
-      p.addParamValue('choiceTimeout',NaN,@(x) isscalar(x) && isreal(x)); % seconds
-      p.addParamValue('trialTimeout',NaN,@(x) isscalar(x) && isreal(x)); % seconds
-      p.addParamValue('iti',NaN,@(x) isscalar(x) && isreal(x)); % seconds
+      p.addParameter('fixWinRadius',NaN,@(x) isscalar(x) && isreal(x)); % deg.
+      p.addParameter('fixGracePeriod',NaN,@(x) isscalar(x) && isreal(x)); % seconds
+      p.addParameter('fixDuration',NaN,@(x) isscalar(x) && isreal(x)); % seconds
+      p.addParameter('fixFlashCnt',NaN,@(x) isscalar(x) && isreal(x)); % frames
+      p.addParameter('stimDuration',NaN,@(x) isscalar(x) && isreal(x)); % seconds
+      p.addParameter('holdDuration',NaN,@(x) isscalar(x) && isreal(x)); % seconds
+      p.addParameter('cueDelay',NaN,@(x) isscalar(x) && isreal(x)); % seconds
+      p.addParameter('choiceTargetDelay',NaN,@(x) isscalar(x) && isreal(x)); % seconds
+      p.addParameter('choiceWinMinRadius',NaN,@(x) isscalar(x) && isreal(x)); % deg.
+      p.addParameter('choiceWinMaxRadius',NaN,@(x) isscalar(x) && isreal(x)); % deg.
+      p.addParameter('choiceGracePeriod',NaN,@(x) isscalar(x) && isreal(x)); 
+      p.addParameter('choiceDuration',NaN,@(x) isscalar(x) && isreal(x)); % seconds
+      p.addParameter('rewardWindow',NaN,@(x) isscalar(x) && isreal(x)); % deg.
+      p.addParameter('choiceTimeout',NaN,@(x) isscalar(x) && isreal(x)); % seconds
+      p.addParameter('trialTimeout',NaN,@(x) isscalar(x) && isreal(x)); % seconds
+      p.addParameter('iti',NaN,@(x) isscalar(x) && isreal(x)); % seconds
       
-      p.addParamValue('maxRewardCnt',NaN,@(x) isscalar(x) && isreal(x));
+      p.addParameter('maxRewardCnt',NaN,@(x) isscalar(x) && isreal(x));
       
-      p.addParamValue('bonusDirection',NaN,@(x) isscalar(x) && isreal(x)); % deg
-      p.addParamValue('bonusWindow',NaN,@(x) isscalar(x) && isreal(x)); % deg.
-      p.addParamValue('bonusRewardCnt',o.bonusRewardCnt,@(x) isscalar(x) && isreal(x));
+      p.addParameter('bonusDirection',NaN,@(x) isscalar(x) && isreal(x)); % deg
+      p.addParameter('bonusWindow',NaN,@(x) isscalar(x) && isreal(x)); % deg.
+      p.addParameter('bonusRewardCnt',o.bonusRewardCnt,@(x) isscalar(x) && isreal(x));
       
-      p.addParamValue('viewpoint',false,@islogical);
+      p.addParameter('viewpoint',false,@islogical);
       
       try
         p.parse(args{:});
-      catch,
+      catch
         warning('Failed to parse name-value arguments.');
         return;
       end
       
       args = p.Results;
     
-      o.fixWinRadius = args.fixWinRadius;
-      o.fixGracePeriod = args.fixGracePeriod;
-      o.fixDuration = args.fixDuration;
-      o.fixFlashCnt = args.fixFlashCnt;
-      o.stimDuration = args.stimDuration;
-      o.holdDuration = args.holdDuration;
-      o.cueDelay = args.cueDelay;
-      o.choiceTargetDelay = args.choiceTargetDelay;
-      o.choiceWinMinRadius = args.choiceWinMinRadius;
-      o.choiceWinMaxRadius = args.choiceWinMaxRadius;
-      o.choiceGracePeriod = args.choiceGracePeriod;
-      o.choiceDuration = args.choiceDuration;
-      o.rewardWindow = args.rewardWindow;
-      o.choiceTimeout = args.choiceTimeout;
-      o.trialTimeout = args.trialTimeout;
-      o.iti = args.iti;
+      o.fixWinRadius        = args.fixWinRadius;
+      o.fixGracePeriod      = args.fixGracePeriod;
+      o.fixDuration         = args.fixDuration;
+      o.fixFlashCnt         = args.fixFlashCnt;
+      o.stimDuration        = args.stimDuration;
+      o.holdDuration        = args.holdDuration;
+      o.cueDelay            = args.cueDelay;
+      o.choiceTargetDelay   = args.choiceTargetDelay;
+      o.choiceWinMinRadius  = args.choiceWinMinRadius;
+      o.choiceWinMaxRadius  = args.choiceWinMaxRadius;
+      o.choiceGracePeriod   = args.choiceGracePeriod;
+      o.choiceDuration      = args.choiceDuration;
+      o.rewardWindow        = args.rewardWindow;
+      o.choiceTimeout       = args.choiceTimeout;
+      o.trialTimeout        = args.trialTimeout;
+      o.iti                 = args.iti;
             
-      o.maxRewardCnt = args.maxRewardCnt;
+      o.maxRewardCnt        = args.maxRewardCnt;
       
-      o.bonusDirection = args.bonusDirection;
-      o.bonusWindow = args.bonusWindow;
-      o.bonusRewardCnt = args.bonusRewardCnt;
+      o.bonusDirection      = args.bonusDirection;
+      o.bonusWindow         = args.bonusWindow;
+      o.bonusRewardCnt      = args.bonusRewardCnt;
       
-      o.viewpoint = args.viewpoint;
+      o.viewpoint           = args.viewpoint;
       
       %
       % calculate reward schedule... as a function of angular error
