@@ -14,45 +14,46 @@ classdef dotMotionState8 < stimuli.state
   end
   
   methods (Access = public)
-    function s = dotMotionState8(hTrial,varargin),
+    function s = dotMotionState8(hTrial,varargin)
       fprintf(1,'dotMotionState8()\n');
       
       s = s@stimuli.state(8,hTrial); % call the parent constructor
     end
     
-    function beforeFrame(s),
+    function beforeFrame(s)
 %       fprintf(1,'dotMotionState8.beforeFrame()\n');
       
       hTrial = s.hTrial;
 
-      if hTrial.rewardCnt > 0,
+      if hTrial.rewardCnt > 0
         s.showFace = true;
       end
 
-      if hTrial.showChoice,
+      if hTrial.showChoice
         hTrial.hChoice.beforeFrame();
       end
       
-      if s.showFace,
+      if s.showFace
         hTrial.hFace.beforeFrame(); % show face...
-      else,
-        hTrial.hCue(2).beforeFrame(); % draw the *correct* choice cue
+      else
+        hTrial.hCue.beforeFrame(); % draw the *correct* choice cue
       end
     end
     
-    function afterFrame(s,t),
+    function afterFrame(s,t)
 %       fprintf(1,'dotMotionState8.afterFrame()\n');
       
       hTrial = s.hTrial;
           
-      if isnan(s.tStart), % <-- first frame
+      if isnan(s.tStart) % <-- first frame
         s.tStart = t;
         hTrial.setTxTime(t);
       end
 
-      if (hTrial.rewardCnt > 0),
-        if t > (s.tStart + 0.2*s.rewardCnt),
-          hTrial.hReward.deliver();
+      if (hTrial.rewardCnt > 0)
+        if t > (s.tStart + 0.2*s.rewardCnt)
+%           hTrial.hReward.deliver();
+          pds.behavior.reward.give(hTrial.hPldaps)
 
           s.rewardCnt = s.rewardCnt + 1;
           
@@ -61,23 +62,23 @@ classdef dotMotionState8 < stimuli.state
         end
       end
       
-      if (hTrial.rewardCnt <= 0),
-        if (t > (s.tStart + hTrial.iti)),
+      if (hTrial.rewardCnt <= 0)
+        if (t > (s.tStart + hTrial.iti))
           % done...
           hTrial.done = true;
           return;
         end
       end
 
-      % FIXME: Urgh!
-      if ~s.plotFlag,
-%         eval(hTrial.A.plotCmd);
-        s.plotFlag = true;
-        
-        if hTrial.viewpoint,
-          vpx_SendCommandString(sprintf('dataFile_InsertString "TRIALEND:TRIALNO:%i"',hTrial.trialNum));
-        end
-      end
+%       % FIXME: Urgh!
+%       if ~s.plotFlag,
+% %         eval(hTrial.A.plotCmd);
+%         s.plotFlag = true;
+%         
+%         if hTrial.viewpoint,
+%           vpx_SendCommandString(sprintf('dataFile_InsertString "TRIALEND:TRIALNO:%i"',hTrial.trialNum));
+%         end
+%       end
     end
     
   end % methods

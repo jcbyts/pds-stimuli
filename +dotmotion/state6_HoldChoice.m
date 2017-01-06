@@ -11,41 +11,41 @@ classdef dotMotionState6 < stimuli.state
   end
   
   methods (Access = public)
-    function s = dotMotionState6(hTrial,varargin),
+    function s = dotMotionState6(hTrial,varargin)
       fprintf(1,'dotMotionState6()\n');
       
       s = s@stimuli.state(6,hTrial); % call the parent constructor
     end
     
-    function beforeFrame(s),
+    function beforeFrame(s)
 %       fprintf(1,'dotMotionState6.beforeFrame()\n');
       
       hTrial = s.hTrial;
       
-      if hTrial.showChoice,
+      if hTrial.showChoice
         hTrial.hChoice.beforeFrame();
       end
       
-      if hTrial.showCue,
+      if hTrial.showCue
         hTrial.hCue(1).beforeFrame(); % draw cue
       end
     end
     
-    function afterFrame(s,t),
+    function afterFrame(s,t)
 %       fprintf(1,'dotMotionState6.afterFrame()\n');
       
       hTrial = s.hTrial;
       
-      if isnan(s.tStart), % <-- first frame
+      if isnan(s.tStart) % <-- first frame
         s.tStart = t;
       end
       
 %       if t > (s.tStart + hTrial.choiceTargetDelay - max(hTrial.stimDuration,hTrial.holdDuration) - hTrial.gracePeriod),
-      if t > (hTrial.getTxTime(3) + hTrial.cueDelay),
+      if t > (hTrial.getTxTime(3) + hTrial.cueDelay)
         hTrial.showCue = true;
       end
       
-      if t > (s.tStart + hTrial.choiceDuration),
+      if t > (s.tStart + hTrial.choiceDuration)
         % trial complete... move to state 8 - reward/inter-trial interval
 
         % record the choice direction... circular mean
@@ -71,7 +71,7 @@ classdef dotMotionState6 < stimuli.state
       [th,r] = cart2pol(hTrial.x,hTrial.y);
 
       if (r < hTrial.choiceWinMinRadius) || ...
-         (r > hTrial.choiceWinMaxRadius),
+         (r > hTrial.choiceWinMaxRadius)
         % failed to hold choice... move to state 8 - inter-trial interval
         hTrial.error = 5;
         hTrial.setState(8);
