@@ -1,4 +1,4 @@
-classdef dotMotionState3 < stimuli.state
+classdef state3_ShowDots < stimuli.state
   % state 3 - show stimulus
   
   % 07-07-2016 - Shaun L. Cloherty <s.cloherty@ieee.org>
@@ -8,8 +8,8 @@ classdef dotMotionState3 < stimuli.state
   end
   
   methods (Access = public)
-    function s = dotMotionState3(hTrial,varargin)
-      fprintf(1,'dotMotionState3()\n');
+    function s = state3_ShowDots(hTrial,varargin)
+      fprintf(1,'%s\n',mfilename);
       
       s = s@stimuli.state(3,hTrial); % call the parent constructor      
     end

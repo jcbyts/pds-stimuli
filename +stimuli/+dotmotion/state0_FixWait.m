@@ -1,4 +1,4 @@
-classdef dotMotionState0 < stimuli.state
+classdef state0_FixWait < stimuli.state
   % state 0 - wait for fixation
 
   % 07-07-2016 - Shaun L. Cloherty <s.cloherty@ieee.org>
@@ -13,15 +13,14 @@ classdef dotMotionState0 < stimuli.state
   end
   
   methods (Access = public)
-    function s = dotMotionState0(hTrial,varargin)
-      fprintf(1,'dotMotionState0()\n');
+    function s = state0_FixWait(hTrial,varargin)
+      fprintf(1,'%s\n',mfilename);
       
       s = s@stimuli.state(0,hTrial); % call the parent constructor      
     end
     
    % --- Drawing commands
     function beforeFrame(s)
-      fprintf(1,'dotMotionState0.beforeFrame()\n');
       
       hTrial = s.hTrial;
 
@@ -32,7 +31,6 @@ classdef dotMotionState0 < stimuli.state
     
     % -- Evaluate states (prepare before drawing)
     function afterFrame(s,t)
-%       fprintf(1,'dotMotionState0.afterFrame()\n');
             
       hTrial = s.hTrial;
       
@@ -49,7 +47,6 @@ classdef dotMotionState0 < stimuli.state
       end
       
       r = norm([hTrial.x,hTrial.y]);
-      fprintf(1, 'Eye distance : %2.2f Window: %02.2f\n', r, hTrial.fixWinRadius)
       
       if (r < hTrial.fixWinRadius)
         % move to state 1 - fixation grace period

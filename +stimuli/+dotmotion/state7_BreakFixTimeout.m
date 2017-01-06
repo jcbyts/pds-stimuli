@@ -1,4 +1,4 @@
-classdef dotMotionState7 < stimuli.state
+classdef state7_BreakFixTimeout < stimuli.state
   % state 7 - timeout interval
   
   % 07-07-2016 - Shaun L. Cloherty <s.cloherty@ieee.org>
@@ -10,8 +10,8 @@ classdef dotMotionState7 < stimuli.state
   end
   
   methods (Access = public)
-    function s = dotMotionState7(hTrial,varargin)
-      fprintf(1,'dotMotionState7()\n');
+    function s = state7_BreakFixTimeout(hTrial,varargin)
+      fprintf(1,'%s\n',mfilename);
       
       s = s@stimuli.state(7,hTrial); % call the parent constructor
     end

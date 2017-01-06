@@ -15,7 +15,7 @@ defaultColors(p);
 p=stimuli.clutColors(p);
 p.trial.stimulus.eyeW=8;
 
-p.defaultParameters.pldaps.trialFunction='dotmotion.runTrial';
+p.defaultParameters.pldaps.trialFunction='stimuli.dotmotion.runTrial';
 
 % -------------------------------------------------------------------------
 % --- Parameters of the dot motion task
@@ -113,4 +113,4 @@ p.trial.(sn).hFbk  	 = stimuli.circles(p.trial.display.ptr); % big bold circle
 
 % -------------------------------------------------------------------------
 % --- Update Conditions
-dotmotion.updateConditions(p)
+stimuli.dotmotion.updateConditions(p)

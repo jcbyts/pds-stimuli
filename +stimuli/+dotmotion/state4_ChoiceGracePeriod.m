@@ -1,4 +1,4 @@
-classdef dotMotionState4 < stimuli.state
+classdef state4_ChoiceGracePeriod < stimuli.state
   % state 3 - hide stimulus/hold fixation
   
   % 07-07-2016 - Shaun L. Cloherty <s.cloherty@ieee.org>
@@ -8,8 +8,8 @@ classdef dotMotionState4 < stimuli.state
   end
   
   methods (Access = public)
-    function s = dotMotionState4(hTrial,varargin)
-      fprintf(1,'dotMotionState4()\n');
+    function s = state4_ChoiceGracePeriod(hTrial,varargin)
+      fprintf(1,'%s\n',mfilename);
       
       s = s@stimuli.state(4,hTrial); % call the parent constructor      
     end

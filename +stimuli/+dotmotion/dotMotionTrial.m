@@ -93,15 +93,15 @@ classdef dotMotionTrial < stimuli.trial
       o.hPldaps = hPldaps;
       
       % initialise the @state object pool...
-      o.addState(dotmotion.state0_ShowFixation(o));
-      o.addState(dotmotion.state1_FixWait(o));
-      o.addState(dotmotion.state2_FixPreStim(o));
-      o.addState(dotmotion.state3_ShowDots(o));
-      o.addState(dotmotion.state4_ChoiceGracePeriod(o));
-      o.addState(dotmotion.state5_Choice(o));
-      o.addState(dotmotion.state6_HoldChoice(o));
-      o.addState(dotmotion.state7_BreakFixTimeout(o));
-      o.addState(dotmotion.state8_InterTrialInterval(o));
+      o.addState(stimuli.dotmotion.state0_FixWait(o));
+      o.addState(stimuli.dotmotion.state1_FixGracePeriod(o));
+      o.addState(stimuli.dotmotion.state2_FixPreStim(o));
+      o.addState(stimuli.dotmotion.state3_ShowDots(o));
+      o.addState(stimuli.dotmotion.state4_ChoiceGracePeriod(o));
+      o.addState(stimuli.dotmotion.state5_Choice(o));
+      o.addState(stimuli.dotmotion.state6_HoldChoice(o));
+      o.addState(stimuli.dotmotion.state7_BreakFixTimeout(o));
+      o.addState(stimuli.dotmotion.state8_InterTrialInterval(o));
       
       % set initial state
       o.setState(0);      

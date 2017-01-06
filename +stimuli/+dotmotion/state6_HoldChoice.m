@@ -1,4 +1,4 @@
-classdef dotMotionState6 < stimuli.state
+classdef state6_HoldChoice < stimuli.state
   % state 5 - hold choice
   
   % 07-07-2016 - Shaun L. Cloherty <s.cloherty@ieee.org>
@@ -11,8 +11,8 @@ classdef dotMotionState6 < stimuli.state
   end
   
   methods (Access = public)
-    function s = dotMotionState6(hTrial,varargin)
-      fprintf(1,'dotMotionState6()\n');
+    function s = state6_HoldChoice(hTrial,varargin)
+      fprintf(1,'%s\n',mfilename);
       
       s = s@stimuli.state(6,hTrial); % call the parent constructor
     end

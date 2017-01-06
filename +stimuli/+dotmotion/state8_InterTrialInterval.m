@@ -1,4 +1,4 @@
-classdef dotMotionState8 < stimuli.state
+classdef state8_InterTrialInterval < stimuli.state
   % state 8 - inter-trial interval
   
   % 07-07-2016 - Shaun L. Cloherty <s.cloherty@ieee.org>
@@ -14,8 +14,8 @@ classdef dotMotionState8 < stimuli.state
   end
   
   methods (Access = public)
-    function s = dotMotionState8(hTrial,varargin)
-      fprintf(1,'dotMotionState8()\n');
+    function s = state8_InterTrialInterval(hTrial,varargin)
+      fprintf(1,'%s\n',mfilename);
       
       s = s@stimuli.state(8,hTrial); % call the parent constructor
     end

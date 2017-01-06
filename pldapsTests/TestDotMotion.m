@@ -9,7 +9,7 @@ defaultColors(p);
 p=stimuli.clutColors(p);
 p.trial.stimulus.eyeW=8;
 
-p.defaultParameters.pldaps.trialFunction='dotmotion.dotTrial';
+p.defaultParameters.pldaps.trialFunction='stimuli.dotmotion.dotTrial';
 
 sn='stimulus';
 %% Timing
@@ -78,7 +78,7 @@ end
 
 
 %%
-dotmotion.updateConditions(p);
+stimuli.dotmotion.updateConditions(p);
 % p.defaultParameters.(stimulusname).states
 p = defaultTrialVariables(p, sn);
-% dotmotion.updateConditions
+% stimuli.dotmotion.updateConditions

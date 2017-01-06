@@ -1,12 +1,12 @@
 function p=runTrial(p,state, sn)
 % RUNTRIAL run a trial of the dotmotion task
 %
-% dotmotion.runTrial is a PLDAPS trial function. PLDAPS trial functions switch
+% stimuli.dotmotion.runTrial is a PLDAPS trial function. PLDAPS trial functions switch
 % between different states that have to do with timing relative to the
 % frame refresh
 % 
 % all task/stimulus states are managed with a stimuli.trial object that is
-% constructed in dotmotion.trialSetup(). That object, hTrial, controls the
+% constructed in stimuli.dotmotion.trialSetup(). That object, hTrial, controls the
 % transitions through the following states:
 % 
 % state0_ShowFixation - turn on the fixation point and wait for fixation
@@ -50,7 +50,7 @@ switch state
 	% --- Called before the main trial loop. Sets up all parameters
     case p.trial.pldaps.trialStates.trialSetup
         
-        dotmotion.trialSetup(p, sn);
+        stimuli.dotmotion.trialSetup(p, sn);
         
 	% --- All Screen() calls go here
     case p.trial.pldaps.trialStates.frameDraw

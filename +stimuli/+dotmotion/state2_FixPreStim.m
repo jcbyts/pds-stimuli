@@ -1,5 +1,5 @@
-classdef dotMotionState2 < stimuli.state
-  % state 2 - hold fixation
+classdef state2_FixPreStim < stimuli.state
+  % state 2 - hold fixation before showing dots
   
   % 07-07-2016 - Shaun L. Cloherty <s.cloherty@ieee.org>
   
@@ -8,8 +8,8 @@ classdef dotMotionState2 < stimuli.state
   end
   
   methods (Access = public)
-    function s = dotMotionState2(hTrial,varargin)
-      fprintf(1,'dotMotionState2()\n');
+    function s = state2_FixPreStim(hTrial,varargin)
+      fprintf(1,'%s\n',mfilename);
       
       s = s@stimuli.state(2,hTrial); % call the parent constructor      
     end

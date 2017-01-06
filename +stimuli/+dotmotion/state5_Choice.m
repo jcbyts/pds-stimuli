@@ -1,4 +1,4 @@
-classdef dotMotionState5 < stimuli.state
+classdef state5_Choice < stimuli.state
   % state 5 - choice
   
   % 07-07-2016 - Shaun L. Cloherty <s.cloherty@ieee.org>
@@ -8,8 +8,8 @@ classdef dotMotionState5 < stimuli.state
   end
   
   methods (Access = public)
-    function s = dotMotionState5(hTrial,varargin)
-      fprintf(1,'dotMotionState5()\n');
+    function s = state5_Choice(hTrial,varargin)
+      fprintf(1,'%s\n',mfilename);
       
       s = s@stimuli.state(5,hTrial); % call the parent constructor
     end
