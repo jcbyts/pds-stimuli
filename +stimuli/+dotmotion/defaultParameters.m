@@ -1,4 +1,4 @@
-function setup(p, sn)
+function defaultParameters(p, sn)
 % SETUP create default values for running dotmotion paradigm
 %
 % 
@@ -9,6 +9,8 @@ end
 
 % -------------------------------------------------------------------------
 % --- PLDAPS setup
+p = defaultBitNames(p);
+
 p=stimuli.setupRandomSeed(p,sn);
 
 defaultColors(p);

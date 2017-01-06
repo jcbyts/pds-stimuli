@@ -24,6 +24,11 @@ plot(p.data{1}.timing.frameStateChangeTimes'*1000, '-')
 %%
 p=pldaps(@TestDotMotion, 'test', settingsStruct); p.run
 
+%% test dot motion
+p=pldaps(@stimuli.dotmotion.defaultParameters, 'test');
+p.trial.pldaps.pause.preExperiment=0;
+p.run
+
 figure(1); clf
 plot(p.data{1}.timing.frameStateChangeTimes'*1000, '-')
 %%
