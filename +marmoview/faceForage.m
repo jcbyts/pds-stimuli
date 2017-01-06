@@ -39,44 +39,34 @@ switch state
     
     case p.trial.pldaps.trialStates.framePrepareDrawing,
         
-        for i=1:MotN
-            p.trial.(sn).m(i).move;
-%         arrayfun(@(x) x.move, p.trial.(sn).m)
-        end
+        arrayfun(@(x) x.move, p.trial.(sn).m)
         
     case p.trial.pldaps.trialStates.frameDraw,
-        
-         if p.trial.iFrame == p.trial.pldaps.maxFrames
-             p.trial.flagNextTrial=true;
-         end
 
         %***************** wipe out surround **********
-%         hit = 0;
-%         itemhit = -1;
-%         for i = 1:MotN
-%              [hit,loc,rad] = p.trial.(sn).m(i).exploded();
-%              if (hit == 1)
-%                  itemhit = i;
-%                  break;
-%              end
-%         end
-%         if (hit)
-%             for i = 1:MotN
-%                if (i ~= itemhit) 
-%                   p.trial.(sn).m(i).wipeclear(loc,rad);
-%                end
-%             end
-%         end
+        hit = 0;
+        death = 0;
+        rad = 0;
+        itemhit = -1;
+        for i = 1:MotN
+             [hit,loc,rad,death] = p.trial.(sn).m(i).exploded();
+             if (hit == 1) 
+                 itemhit = i;
+                 break;
+             end
+        end
+        if (hit)
+            for i = 1:MotN
+               if (i ~= itemhit) 
+                  p.trial.(sn).m(i).wipeclear(loc,rad,death);
+               end
+            end
+        end
         %*****************************************
-            
-%         for i=1:MotN
-%            p.trial.(sn).m(i).draw; 
-%         end
         
-%         p.trial.(sn).m(1).draw;
         arrayfun(@(x) x.draw, p.trial.(sn).m)
         Screen('DrawText', p.trial.display.ptr, num2str(p.trial.exploded), 50, 50, [1 1 1]);
-%         
+        
 %         DrawFormattedText(p.trial.display.overlayptr, num2str(p.trial.exploded), 50, 50,  p.trial.display.clut.redbg);
     case p.trial.pldaps.trialStates.trialSetup,
         
