@@ -79,7 +79,7 @@ classdef (Abstract) trial < handle
     
     function setState(o,stateId) % FIXME; varargin?
       % set the current state...
-      ii = find(o.stateIds == stateId);
+      ii = o.stateIds == stateId;
       o.hState = o.stateHandles{ii};
     end
     
@@ -90,7 +90,7 @@ classdef (Abstract) trial < handle
         id = varargin{1};
       end
       
-      ii = find(o.stateIds == id);
+      ii = o.stateIds == id;
       t = o.txTimes(ii);
     end
     
@@ -100,7 +100,7 @@ classdef (Abstract) trial < handle
         id = varargin{1};
       end
       
-      ii = find(o.stateIds == id);
+      ii = o.stateIds == id;
       o.txTimes(ii) = t;
     end
     

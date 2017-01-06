@@ -31,8 +31,10 @@ classdef state1_FixGracePeriod < stimuli.state
       
       if isnan(s.tStart) % <-- first frame
         s.tStart = t;
+        hTrial.setTxTime(t); % save transition time
       end
       
+      % if during grace period, do nothing
       if t < (s.tStart + hTrial.fixGracePeriod)
         return;
       end

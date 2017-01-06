@@ -2,14 +2,14 @@ classdef state0_FixWait < stimuli.state
   % state 0 - wait for fixation
 
   % 07-07-2016 - Shaun L. Cloherty <s.cloherty@ieee.org>
-  % 01-05-2017 - Jake L. Yates <jacoby8s@gmail.com>
+  % 05-01-2017 - Jake L. Yates <jacoby8s@gmail.com>
 
   properties
-    tStart = 0; % keep trial time in PLDAPS trial time
+    tStart = NaN;
     
     % properties for flashing the fixation target
     showFix@logical = true;
-    frameCnt = 0; % frame counter
+    frameCnt = 0; % frame counter (for this state?)
   end
   
   methods (Access = public)
@@ -34,11 +34,19 @@ classdef state0_FixWait < stimuli.state
             
       hTrial = s.hTrial;
       
+      if isnan(s.tStart) % <-- first frame
+        s.tStart = t;
+        hTrial.setTxTime(t); % save transition time
+      end
+
+      % iterate frame counter
       s.frameCnt = mod(s.frameCnt+1,hTrial.fixFlashCnt);
+      % flash fixation until it is obtained
       if s.frameCnt == 0
         s.showFix = ~s.showFix; % toggle fixation target
       end
       
+      % Never obtained fixation
       if t > (s.tStart + hTrial.trialTimeout)
         % failed to initiate the trial... move to state 7 - timeout interval
         hTrial.error = 1;

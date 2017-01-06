@@ -1,10 +1,10 @@
 classdef state3_ShowDots < stimuli.state
-  % state 3 - show stimulus
+  % state 3 - show dots
   
   % 07-07-2016 - Shaun L. Cloherty <s.cloherty@ieee.org>
   
   properties
-    tStart = NaN;
+    tStart = NaN; % start of THIS state
   end
   
   methods (Access = public)

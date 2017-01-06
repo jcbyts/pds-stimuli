@@ -15,7 +15,8 @@ classdef dotMotionTrial < stimuli.trial
 %     scrWdth@double; % screen width in pixels
 %     scrHght@double; % screen height in pixels
     choice@double = NaN;    
-
+    choiceX@double = NaN;
+    choiceY@double = NaN;
     % 'error' describes the outcome of a trial:
     %
     %   0 = complete trial, correct response
@@ -97,7 +98,7 @@ classdef dotMotionTrial < stimuli.trial
       o.addState(stimuli.dotmotion.state1_FixGracePeriod(o));
       o.addState(stimuli.dotmotion.state2_FixPreStim(o));
       o.addState(stimuli.dotmotion.state3_ShowDots(o));
-      o.addState(stimuli.dotmotion.state4_ChoiceGracePeriod(o));
+      o.addState(stimuli.dotmotion.state4_WaitForGo(o));
       o.addState(stimuli.dotmotion.state5_Choice(o));
       o.addState(stimuli.dotmotion.state6_HoldChoice(o));
       o.addState(stimuli.dotmotion.state7_BreakFixTimeout(o));
@@ -106,7 +107,7 @@ classdef dotMotionTrial < stimuli.trial
       % set initial state
       o.setState(0);      
       
-      if nargin < 5,
+      if nargin < 5
         return
       end
       

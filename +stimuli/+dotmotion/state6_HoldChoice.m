@@ -7,6 +7,8 @@ classdef state6_HoldChoice < stimuli.state
     tStart = NaN;
     
     choice = 0;
+    choiceX = 0;
+    choiceY = 0;
     frameCnt = 0;
   end
   
@@ -50,7 +52,8 @@ classdef state6_HoldChoice < stimuli.state
 
         % record the choice direction... circular mean
         hTrial.choice = mod(angle(nansum(exp(1i*s.choice(:))))*(180/pi),360); % note: s.choice is in radians!
-
+        hTrial.choiceX = mean(s.choiceX);
+        hTrial.choiceY = mean(s.choiceY);
         % calculate reward...
         direction = hTrial.hDots.direction;
         
@@ -69,7 +72,7 @@ classdef state6_HoldChoice < stimuli.state
       
 %       r = norm([hTrial.x,hTrial.y]);
       [th,r] = cart2pol(hTrial.x,hTrial.y);
-
+      
       if (r < hTrial.choiceWinMinRadius) || ...
          (r > hTrial.choiceWinMaxRadius)
         % failed to hold choice... move to state 8 - inter-trial interval
@@ -80,7 +83,9 @@ classdef state6_HoldChoice < stimuli.state
            
       % record the choice direction (will average over all frames)
       s.frameCnt = s.frameCnt+1;
-      s.choice(s.frameCnt) = th; % note: radians!      
+      s.choice(s.frameCnt) = th; % note: radians!
+      s.choiceX(s.frameCnt)=hTrial.x;
+      s.choiceY(s.frameCnt)=hTrial.y;
     end
     
   end % methods

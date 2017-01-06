@@ -25,17 +25,16 @@ classdef state2_FixPreStim < stimuli.state
     end
     
     function afterFrame(s,t)
-%       fprintf(1,'dotMotionState2.afterFrame()\n');
             
       hTrial = s.hTrial;
       
       if isnan(s.tStart) % <-- first frame
         s.tStart = t;
+        hTrial.setTxTime(t); % save transition time
       end
       
       if t > (s.tStart + hTrial.fixDuration)
-        pds.behavior.reward.give(hTrial.hPldaps)
-%         hTrial.hReward.deliver(); % reward for fixation!
+        pds.behavior.reward.give(hTrial.hPldaps) % reward for fixation! (TODO: amount)
 
         % move to state 3 - show stimulus
         hTrial.setState(3);
