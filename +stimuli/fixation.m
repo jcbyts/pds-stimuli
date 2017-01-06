@@ -28,10 +28,10 @@ classdef fixation < handle
   end
   
   methods (Access = public)
-    function o = fixation(winPtr,varargin), % marmoview's initCmd?
+    function o = fixation(winPtr,varargin) % marmoview's initCmd?
       o.winPtr = winPtr;
       
-      if nargin == 1,
+      if nargin == 1
         return
       end
 
@@ -40,41 +40,41 @@ classdef fixation < handle
       p = inputParser;
 %       p.KeepUnmatched = true;
       p.StructExpand = true;
-      p.addParamValue('centreSize',o.cSize,@isfloat); % pixels
-      p.addParamValue('surroundSize',o.sSize,@isfloat);
-      p.addParamValue('centreColour',o.cColour,@isfloat); % clut index or [r,g,b]
-      p.addParamValue('surroundColour',o.sColour,@isfloat);
-      p.addParamValue('position',o.position,@isfloat); % [x,y] (pixels)
+      p.addParameter('centreSize',o.cSize,@isfloat); % pixels
+      p.addParameter('surroundSize',o.sSize,@isfloat);
+      p.addParameter('centreColour',o.cColour,@isfloat); % clut index or [r,g,b]
+      p.addParameter('surroundColour',o.sColour,@isfloat);
+      p.addParameter('position',o.position,@isfloat); % [x,y] (pixels)
                   
       try
         p.parse(args{:});
-      catch,
+      catch
         warning('Failed to parse name-value arguments.');
         return;
       end
       
       args = p.Results;
     
-      o.cSize = args.centreSize;
-      o.sSize = args.surroundSize;
-      o.cColour = args.centreColour;
-      o.sColour = args.surroundColour;
-      o.position = args.position;
+      o.cSize       = args.centreSize;
+      o.sSize       = args.surroundSize;
+      o.cColour     = args.centreColour;
+      o.sColour     = args.surroundColour;
+      o.position    = args.position;
     end
         
-    function beforeTrial(o),
+    function beforeTrial(o)
     end
     
-    function beforeFrame(o),
+    function beforeFrame(o)
       o.drawFixation();
     end
         
-    function afterFrame(o),
+    function afterFrame(o)
     end
   end % methods
     
   methods (Access = public)        
-    function drawFixation(o),
+    function drawFixation(o)
       r = floor(o.sSize./2); % radius in pixels
       
       rect = kron([1,1],o.position) + kron(r(:),[-1, -1, +1, +1]);
