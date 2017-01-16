@@ -283,13 +283,13 @@ for i = 1:size(handles.pNames,1);
     handles.pList{i,1} = tName;
 end
 
-handles.Parameters.String       = handles.pList;
-% For the highlighted parameter, provide a description and editable value
-handles.Parameters.Value        = 1;
-handles.ParameterText.String    = handles.S.paramDesc.(handles.pNames{1});
-handles.ParameterEdit.String    = num2str(handles.P.(handles.pNames{1}));
-% 
-% % UPDATE ACCESS TO CONTROLS
+% handles.Parameters.String       = handles.pList;
+% % For the highlighted parameter, provide a description and editable value
+% handles.Parameters.Value        = 1;
+% handles.ParameterText.String    = handles.S.paramDesc.(handles.pNames{1});
+% handles.ParameterEdit.String    = num2str(handles.P.(handles.pNames{1}));
+% % 
+% % % UPDATE ACCESS TO CONTROLS
 
 % 
 
