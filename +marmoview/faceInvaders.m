@@ -15,7 +15,7 @@ if nargin==1
     p = pdsDefaultTrialStructure(p);
     
 %     p.defaultParameters.pldaps.trialMasterFunction='runModularTrial';
-    p.defaultParameters.pldaps.trialFunction='marmoview.faceForage';
+    p.defaultParameters.pldaps.trialFunction='marmoview.faceInvaders';
     
     p.trial.pldaps.maxTrialLength = 5;
     p.trial.pldaps.maxFrames        = p.trial.pldaps.maxTrialLength*p.trial.display.frate;
@@ -50,11 +50,11 @@ switch state
     %----------------------------------------------------------------------
     % Update all behavior of the objects
     case p.trial.pldaps.trialStates.frameUpdate
-%         a=GetSecs;
+        a=GetSecs;
         p.trial.(sn).m.move()
         p.trial.(sn).m.isheld();
-%         b=GetSecs-a;
-%         disp(b)
+        b=GetSecs-a;
+        disp(b)
     case p.trial.pldaps.trialStates.frameDraw
 
 %         %***************** wipe out surround **********
