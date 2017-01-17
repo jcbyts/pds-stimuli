@@ -239,6 +239,10 @@ classdef MotionObjects < handle
             iiInvade    = m.invade > 1;
             
             if any(iiExploded)
+                % remove dots from being shown
+                for i = unique(find(iiExploded))
+                    m.dotx(m.dotI==i)=nan;
+                end
                 m.x(iiExploded) = randn(1, sum(iiExploded))*5; % reset position
                 m.y(iiExploded) = randn(1, sum(iiExploded))*5; % reset position
                 m.expRad(iiExploded & (m.stimtype < 3)) = 16 - m.stimtype(iiExploded & (m.stimtype < 3))*4;

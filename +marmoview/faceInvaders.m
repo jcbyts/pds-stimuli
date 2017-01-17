@@ -17,7 +17,7 @@ if nargin==1
 %     p.defaultParameters.pldaps.trialMasterFunction='runModularTrial';
     p.defaultParameters.pldaps.trialFunction='marmoview.faceInvaders';
     
-    p.trial.pldaps.maxTrialLength = 5;
+    p.trial.pldaps.maxTrialLength = 20;
     p.trial.pldaps.maxFrames        = p.trial.pldaps.maxTrialLength*p.trial.display.frate;
     
     c.Nr=1; %one condition;
@@ -50,34 +50,24 @@ switch state
     %----------------------------------------------------------------------
     % Update all behavior of the objects
     case p.trial.pldaps.trialStates.frameUpdate
-        a=GetSecs;
+        
         p.trial.(sn).m.move()
         p.trial.(sn).m.isheld();
-        b=GetSecs-a;
-        disp(b)
+        
+        
+        
+        p.trial.(sn).x(p.trial.iFrame, :) = p.trial.(sn).m.x;
+        p.trial.(sn).y(p.trial.iFrame, :) = p.trial.(sn).m.y;
+        p.trial.(sn).ctrExplode(p.trial.iFrame, :) = p.trial.(sn).m.ctrExplode;
+        p.trial.(sn).ctrHold(p.trial.iFrame, :) = p.trial.(sn).m.ctrHold;
+        
+        % flag end of trial (if time is greater than max trial length)
+        if p.trial.iFrame >= p.trial.(sn).maxFrames
+            p.trial.flagNextTrial=true;
+        end
+        
     case p.trial.pldaps.trialStates.frameDraw
 
-%         %***************** wipe out surround **********
-%         hit = 0;
-%         death = 0;
-%         rad = 0;
-%         itemhit = -1;
-%         for i = 1:MotN
-%              [hit,loc,rad,death] = p.trial.(sn).m(i).exploded();
-%              if (hit == 1) 
-%                  itemhit = i;
-%                  break;
-%              end
-%         end
-%         if (hit)
-%             for i = 1:MotN
-%                if (i ~= itemhit) 
-%                   p.trial.(sn).m(i).wipeclear(loc,rad,death);
-%                end
-%             end
-%         end
-%         %*****************************************
-        
         p.trial.(sn).m.draw()
 %         Screen('DrawText', p.trial.display.ptr, num2str(p.trial.exploded), 50, 50, [1 1 1]);
         
@@ -87,10 +77,29 @@ switch state
         p.trial.(sn).rngs.conditionerRNG=RandStream(p.trial.(sn).rngs.randomNumberGenerater, 'seed', p.trial.(sn).rngs.trialSeeds(p.trial.pldaps.iTrial));
         %         setupRNG=p.trial.(sn).rngs.conditionerRNG;
         
+        % TODO: motion object should take this RNG stream to save the seed
+        p.trial.(sn).maxFrames = p.trial.pldaps.maxTrialLength * p.trial.display.frate;
+        
         p.trial.(sn).m = stimuli.MotionObjects(p, p.trial.(sn).MotN);
         p.trial.(sn).m.setup;
         
+        p.trial.(sn).x = nan(p.trial.(sn).maxFrames, p.trial.(sn).MotN);
+        p.trial.(sn).y = nan(p.trial.(sn).maxFrames, p.trial.(sn).MotN);
+        p.trial.(sn).ctrExplode = nan(p.trial.(sn).maxFrames, p.trial.(sn).MotN);
+        p.trial.(sn).ctrHold    = nan(p.trial.(sn).maxFrames, p.trial.(sn).MotN);
+        
     case p.trial.pldaps.trialStates.trialCleanUpandSave
+        
+        figure(1); clf
+        plot(p.trial.(sn).x, p.trial.(sn).y, 'k.'); hold on
+        
+        for i=1:p.trial.(sn).MotN
+            ix=diff(p.trial.(sn).ctrHold(:,i))>0;
+            plot(p.trial.(sn).x(ix,i), p.trial.(sn).y(ix,i), 'r.');
+        end
+        
+        
+        drawnow
         
     otherwise    
         
