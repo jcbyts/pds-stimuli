@@ -84,7 +84,7 @@ classdef MotionObjects < handle
             %***** two kinds of objects, 
             %***** small and slow, low reward, (glow yellow)
             %***** and fast and big, higher reward (glow red)
-            m.stimtype      = 1+floor( rand(1,m.N) * 3.99999);
+            m.stimtype      = randi(3,1,m.N); %1+floor( rand(1,m.N) * 3.99999);
             m.invade        = ones(1,m.N);  % no expansion rate
             m.removed       = zeros(1,m.N);  % take out of game (allow to clear board)
             m.maxradius     = 8.0;
@@ -119,36 +119,36 @@ classdef MotionObjects < handle
                 
                 switch i
                     case 1
-                        m.radius(ix)        = 4;
+                        m.radius(ix)        = 1;
                         m.speed(ix)         = 12+rand(1,n)*4;
-                        m.expThresh(ix)  = 60;  % red
+                        m.expThresh(ix)     = 90;  % red
                         m.faceint(ix)       = randi(2,1,n); % two face options
                         m.expSpeed(ix)      = 15;
                         m.dotSize(ix)       = 3;
                         m.expDur(ix)        = 60;
                         m.expRad(ix)        = 12;
                     case 2
-                        m.radius(ix)        = 3;
+                        m.radius(ix)        = 1;
                         m.speed(ix)         = 8+rand(1,n)*4;
-                        m.expThresh(ix) = 40;  % red
+                        m.expThresh(ix)     = 60;  % red
                         m.faceint(ix)       = 2+randi(2,1,n); % two face options
                         m.expSpeed(ix)      = 10;
                         m.dotSize(ix)       = 2;
                         m.expDur(ix)        = 40;
                         m.expRad(ix)        = 8;
                     case 3
-                        m.radius(ix)        = 2;
+                        m.radius(ix)        = 1;
                         m.speed(ix)         = 4+rand(1,n)*4;
-                        m.expThresh(ix) = 20;  % red
+                        m.expThresh(ix)     = 30;  % red
                         m.faceint(ix)       = 4+randi(2,1,n); % two face options
                         m.expSpeed(ix)      = 5;
                         m.dotSize(ix)       = 2;
                         m.expDur(ix)        = 20;
                         m.expRad(ix)        = 4;
                     otherwise
-                        m.radius(ix)        = 2;
+                        m.radius(ix)        = 1;
                         m.speed(ix)         = 4+rand(1,n)*4;
-                        m.expThresh(ix) = 20;  % red
+                        m.expThresh(ix)     = 30;  % red
                         m.faceint(ix)       = 7+randi(2,1,n); % two face options
                         m.expSpeed(ix)      = 5;
                         m.dotSize(ix)       = 1;
@@ -269,7 +269,7 @@ classdef MotionObjects < handle
                 
             end
             
-            iiIntact  = m.ctrExplode == 0 & ~m.removed;
+            iiIntact  = m.ctrExplode == 0;% & ~m.removed;
             
             ii = iiIntact & iiInvade;
             if any(ii) % any intact invaders
@@ -314,8 +314,8 @@ classdef MotionObjects < handle
             m.dstRects = kron([-1; -1; 1; 1], m.radius*ppd) + kron([1; 1], [ppd*m.x + ctr(1); -ppd*m.y + ctr(2)]);
             
             
-            iiExplode = m.ctrHold>m.expThresh;
-            if any(iiExplode)    
+            iiExplode = m.ctrHold>m.expThresh & iiIntact;
+            if any(iiExplode)
                 m.ctrExplode(iiExplode)=1;
                 m.exploded=m.exploded+1;
                 
@@ -323,14 +323,15 @@ classdef MotionObjects < handle
                 m.removed(iiExplode & ( (m.stimtype > 1 & m.stimtype < 4) | rand(1, m.N) < (1/3)))=1;
             end
             
-            if any(m.deathExplode)
-                m.ctrExplode(m.deathExplode)=1;
-                m.expRad(m.deathExplode)=16;
-                m.exploded=m.exploded-sum(m.deathExplode);
-            end
+%             if any(m.deathExplode)
+% %                 m.ctrExplode(m.deathExplode)=1;
+%                 m.expRad(m.deathExplode)=16;
+%                 m.exploded=m.exploded-sum(m.deathExplode);
+%             end
             
-            iiExplode=m.ctrExplode==1; % first frame of explosion
+            iiExplode=(m.ctrExplode==1); % first frame of explosion
             if any(iiExplode)
+                pds.behavior.reward.give(m.p)
                 ppd=m.p.trial.display.ppd;
                 
                for i = find(iiExplode)

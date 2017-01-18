@@ -261,7 +261,7 @@ if handles.p.trial.eyelink.use && handles.p.trial.eyelink.useAsEyepos
 end
 
 handles.A.cm=cm;
-handles.shiftSize=10;
+handles.shiftSize=.5;
 handles.gainSize=.01;
 
 
@@ -779,7 +779,8 @@ end
 % --- Draw specified calibration targets
 function handles=drawCalibrationTargets(handles, xy, nFrames)
 % clear frame
-Screen('FillRect', handles.p.trial.display.ptr,handles.p.trial.display.bgColor);
+% Screen('FillRect', handles.p.trial.display.overlayptr,handles.p.trial.display.bgColor);
+Screen('FillRect', handles.p.trial.display.overlayptr,0);
 
 nTargs=size(xy,1);
 texids=handles.A.Marmotex(randi(numel(handles.A.Marmotex), nTargs,1));
@@ -795,6 +796,8 @@ szpx=pds.deg2px(sz, handles.p.trial.display.viewdist, handles.p.trial.display.w2
 dstRects=CenterRectOnPoint([0 0 szpx(1) szpx(2)], xypx(:,1), xypx(:,2))';
 handles.A.rawXY=nan(2,nFrames);
 
+pds.behavior.reward.give(handles.p);
+
 for k=1:nFrames
     [eye, raw]=getEye(handles.p);
     handles.A.rawxy(:,k)=raw;
@@ -804,6 +807,8 @@ for k=1:nFrames
 end
 Screen('Flip', handles.p.trial.display.ptr, 0);
 ah=handles.EyeTrace;
+hold(ah, 'off')
+plot(ah, 0, 0, 'w.');
 hold(ah, 'on')
 for i=1:nTargs
 plot(ah, xy(i,1), xy(i,2),'s', 'Color', .5*[1 1 1], 'MarkerSize', 20)
@@ -816,6 +821,18 @@ updateCalibrationMatrix(handles);
 
 UpdateEyePlot(handles)
 UpdateEyeText(handles)
+
+% --- Refine Calibration
+function RefineCalibrationButton_Callback(hObject, eventdata, handles)
+
+cm=marmoview.refineCalibration(handles);
+handles=updateGains(handles, cm);
+handles=updateCalibrationMatrix(handles);
+guidata(hObject,handles);
+
+% clear overlay pointer
+Screen('FillRect', handles.p.trial.display.overlayptr,0);
+Screen('Flip', handles.p.trial.display.ptr, 0);
 
 % --- Executes on button press in CTargFix.
 function CTargFix_Callback(hObject, eventdata, handles)
@@ -844,7 +861,7 @@ guidata(hObject, handles)
 % --- Executes on button press in CTargCorners.
 function CTargCorners_Callback(hObject, eventdata, handles)
 nFrames=400;
-xy=[0 0; 0 -5; 0 5];
+xy=[-8 5; -5 8; 5 8; 8 5];
 handles=drawCalibrationTargets(handles, xy, nFrames);
 guidata(hObject, handles)
 

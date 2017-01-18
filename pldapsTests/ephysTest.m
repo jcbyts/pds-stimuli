@@ -6,7 +6,7 @@
 % 4) natBackground
 % 5) hartleyGratings
 
-subject='Sawyer';
+subject='test';
 showGaussianBlobs=false;
 showNatBackground=true;
 showHartleyStimuli=false;
