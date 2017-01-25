@@ -6,7 +6,7 @@
 % 4) natBackground
 % 5) hartleyGratings
 
-subject='jnk';
+subject='test';
 showGaussianBlobs=false;
 showNatBackground=true;
 showHartleyStimuli=false;
