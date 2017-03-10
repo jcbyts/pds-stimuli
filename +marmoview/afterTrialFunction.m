@@ -146,7 +146,7 @@ if p.trial.eyelink.use
     eye = p.trial.eyelink.samples(eyeIdx+[13 15],1:50:p.trial.eyelink.sampleNum);
     
     if ~isempty(p.trial.eyelink.calibration_matrix)
-        eye = p.trial.eyelink.calibration_matrix*[eye; ones(1,size(eye,2))];
+        eye = p.trial.eyelink.calibration_matrix(:,:,p.trial.eyelink.eyeIdx)*[eye; ones(1,size(eye,2))];
     end
 else
     eye=[p.trial.mouse.cursorSamples(1,:)-p.trial.display.ctr(1); p.trial.mouse.cursorSamples(2,:)-p.trial.display.ctr(2)];

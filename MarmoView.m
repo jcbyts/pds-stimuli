@@ -26,7 +26,7 @@ function varargout = MarmoView(varargin)
 
 % Edit the above text to modify the response to help MarmoView
 
-% Last Modified by GUIDE v2.5 29-Dec-2016 13:33:55
+% Last Modified by GUIDE v2.5 19-Jan-2017 12:24:46
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -89,6 +89,8 @@ handles.A.DataPlot2 = handles.DataPlot2;
 handles.A.DataPlot3 = handles.DataPlot3;
 
 handles.A.hplot=plot(handles.EyeTrace,0,0,'.');
+handles.EyeTrace.ButtonDownFcn = @(hObject,eventdata)MarmoView('EyeTrace_ButtonDownFcn',hObject,eventdata,handles);
+handles.EyeTrace.UserData=25;
 
 handles.calibratePressed=false;
 S=struct;
@@ -252,17 +254,24 @@ handles.p.trial.pldaps.pause.preExperiment=1; % pause before experiment
 handles.OutputFile.String=handles.p.trial.session.experimentFile;
 
 % EYE CALIBRATION STUFF HERE
-% get subject specific calibration matrix
-cm=getCalibrationPref(handles.p);
+
 % marmoview specific preferences override pldaps
 if handles.p.trial.eyelink.use && handles.p.trial.eyelink.useAsEyepos
     handles.p.trial.eyelink.useRawData=true;
-    handles.p.trial.eyelink.calibration_matrix=cm';
+    handles.p.trial.eyelink.calibration_matrix=[];
+    for i = 1:2 % loop over eye index
+        % get subject specific calibration matrix
+        cm=getCalibrationPref(handles.p,1);
+        handles.p.trial.eyelink.calibration_matrix(:,:,i) = cm';
+    end
+        
 end
 
+% this is temporary, need to query eye index to get the right calibration
+% matrix
 handles.A.cm=cm;
-handles.shiftSize=.5;
-handles.gainSize=.01;
+handles.shiftSize = .5;
+handles.gainSize  = .01;
 
 
 
@@ -372,7 +381,7 @@ handles.RunTrial.Enable         = 'Off';
 handles.FlipFrame.Enable        = 'Off';
 handles.ShowBackground.Enable   = 'Off';
 handles.ShowBlack.Enable        = 'Off';
-handles.CloseGui.Enable         = 'Off';
+handles.CloseGui.Enable         = 'On';
 handles.ClearSettings.Enable    = 'Off';
 handles.PauseTrial.Enable       = 'On';
 handles.CenterEye.Enable        = 'Off';
@@ -535,6 +544,12 @@ guidata(hObject,handles);
 
 %%%%% CLOSE THE GUI %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function CloseGui_Callback(hObject, eventdata, handles)
+
+if isfield(handles, 'p')
+    if handles.p.trial.pldaps.quit~=2
+        handles.p.trial.pldaps.quit=2;
+    end
+end
 % close the gui window
 close(handles.gui, 'force');
 
@@ -684,6 +699,8 @@ if isfield(handles.A, 'hplot')
     eye=bsxfun(@times, eye, [1; -1]);
     handles.A.hplot.XData=eye(1,:);
     handles.A.hplot.YData=eye(2,:);
+    etr = get(handles.EyeTrace,'UserData');
+    axis(handles.EyeTrace,[-etr etr -etr etr]);
     drawnow
 end
 
@@ -699,6 +716,7 @@ if handles.calibratePressed
     handles.CTargHoriz.Enable       = 'Off';
     handles.CTargGrid.Enable        = 'Off';
     handles.CTargCorners.Enable     = 'Off';
+    handles.CTargCornersDown.Enable     = 'Off';
     handles.CTargRandom.Enable      = 'Off';
     handles.calibratePressed=0;
     
@@ -765,7 +783,7 @@ if p.trial.eyelink.use
     eyeIdx=p.trial.eyelink.eyeIdx;
     if p.trial.eyelink.useRawData
         raw=[sample.px(eyeIdx); sample.py(eyeIdx)];
-        eye=p.trial.eyelink.calibration_matrix*[raw; 1];
+        eye=p.trial.eyelink.calibration_matrix(:,:,eyeIdx)*[raw; 1];
     else
         eye=[p.trial.eyelink.gx(eyeIdx); p.trial.eyelink.gy(eyeIdx)];
         raw=eye;
@@ -785,13 +803,15 @@ Screen('FillRect', handles.p.trial.display.overlayptr,0);
 nTargs=size(xy,1);
 texids=handles.A.Marmotex(randi(numel(handles.A.Marmotex), nTargs,1));
 
-xypx=pds.deg2px(xy', handles.p.trial.display.viewdist, handles.p.trial.display.w2px);
+xypx=pds.deg2px(xy', handles.p.trial.display.viewdist, handles.p.trial.display.w2px, false);
 
 ctr=handles.p.trial.display.ctr;
+xypx=bsxfun(@times, xypx, [1; -1]);
 xypx=bsxfun(@plus, xypx, ctr(1:2)')';
 
+
 sz=3;
-szpx=pds.deg2px(sz, handles.p.trial.display.viewdist, handles.p.trial.display.w2px);
+szpx=pds.deg2px(sz, handles.p.trial.display.viewdist, handles.p.trial.display.w2px, false);
 
 dstRects=CenterRectOnPoint([0 0 szpx(1) szpx(2)], xypx(:,1), xypx(:,2))';
 handles.A.rawXY=nan(2,nFrames);
@@ -806,12 +826,16 @@ for k=1:nFrames
     Screen('Flip', handles.p.trial.display.ptr, 0);
 end
 Screen('Flip', handles.p.trial.display.ptr, 0);
+
+% update eye plot
 ah=handles.EyeTrace;
-hold(ah, 'off')
-plot(ah, 0, 0, 'w.');
 hold(ah, 'on')
-for i=1:nTargs
-plot(ah, xy(i,1), xy(i,2),'s', 'Color', .5*[1 1 1], 'MarkerSize', 20)
+
+if isfield(handles.A, 'htargs')
+    handles.A.htargs.XData=xy(:,1);
+    handles.A.htargs.YData=xy(:,2);
+else
+    handles.A.htargs = plot(ah, xy(:,1), xy(:,2), 's', 'Color', .5*[1 1 1], 'MarkerSize', 20);
 end
 grid(ah, 'on')
 
@@ -861,10 +885,16 @@ guidata(hObject, handles)
 % --- Executes on button press in CTargCorners.
 function CTargCorners_Callback(hObject, eventdata, handles)
 nFrames=400;
-xy=[-8 5; -5 8; 5 8; 8 5];
+xy=[5 8; 8 5];
 handles=drawCalibrationTargets(handles, xy, nFrames);
 guidata(hObject, handles)
 
+% --- Executes on button press in CTargCornersDown.
+function CTargCornersDown_Callback(hObject, eventdata, handles)
+nFrames=400;
+xy=[-8 -5; -5 -8];
+handles=drawCalibrationTargets(handles, xy, nFrames);
+guidata(hObject, handles)
 
 % --- Executes on button press in CTargRandom.
 function CTargRandom_Callback(hObject, eventdata, handles)
@@ -1048,27 +1078,66 @@ UpdateEyePlot(handles);
 function cm=getCurrentCalibrationMatrix(p)
 cm=[];
 if p.trial.eyelink.use && p.trial.eyelink.useAsEyepos
-    cm=p.trial.eyelink.calibration_matrix';
+	% marmoview only has one eye
+    cm=p.trial.eyelink.calibration_matrix(:,:,p.trial.eyelink.eyeIdx)';
 end
 
 % --- Save the current eye calibration to rig preferences
 function saveCalibrationAsRigPref(p,c)
 subj=p.trial.session.subject;
-setpref('marmoview_calibration', subj, c)
+
+% get previous calibration matrix
+cm = getpref('marmoview_calibration', subj);
+
+% update the calibration matrix depending on which eye is tracked
+if isempty(cm)
+    cm = c;
+    cm(:,:,2) = c;
+elseif p.trial.eyelink.use && p.trial.eyelink.useAsEyepos
+    cm(:,:,p.trial.eyelink.eyeIdx) = c;
+end
+
+setpref('marmoview_calibration', subj, cm)
 disp('saved new calibration matrix.')
 
 % --- Get the current calibration from rig preferences
-function c=getCalibrationPref(p)
+function c=getCalibrationPref(p, eyeIdx)
+% Get calibration matrix from rig preferences
+% cm = getCalibrationPref(p, eyeIdx)
+% Input:
+%   p     [pldaps] - pldaps object
+%   eyeIdx [1 x 1] - index for eye (1 or 2; optional)
+% Output:
+%   cm     [3 x 2] - calibration matrix
 
+% get subject name
 subj=p.trial.session.subject;
+
+% if no index is passed in, query the eyelink to get the proper index
+if nargin < 2
+    useEyelink = p.trial.eyelink.use & p.trial.eyelink.useAsEyepos;
+    if useEyelink
+        if isfield(p.trial.eyelink, 'eyeIdx')
+            eyeIdx = p.trial.eyelink.eyeIdx;
+        else
+            eyeIdx = 1;
+        end
+    else
+        eyeIdx = 1;
+    end
+end
+
+% if rig preferences do not exist, make the identity matrix
 if ~ispref('marmoview_calibration')
     c=[1 0; 0 1; 0 0]; % assume default calibration
     return
 end
 
+% check if this subject has a calibration matrix already
 m=getpref('marmoview_calibration');
 if isfield(m, subj)
-    c=m.(subj);
+    c = m.(subj);
+    c = c(:,:,eyeIdx);
 else
     c=[1 0; 0 1; 0 0]; % assume default calibration
 end
@@ -1113,7 +1182,7 @@ cm=gainsToCalibrationMatrix([handles.A.dx handles.A.dy],[handles.A.rx handles.A.
 handles.A.cm=cm;
     
 if handles.p.trial.eyelink.use && handles.p.trial.eyelink.useAsEyepos
-    handles.p.trial.eyelink.calibration_matrix=cm';
+    handles.p.trial.eyelink.calibration_matrix(:,:,handles.p.trial.eyelink.eyeIdx)=cm';
 end
 
 
