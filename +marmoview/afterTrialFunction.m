@@ -97,6 +97,7 @@ switch state
                 handles.StatusText.String='Trial Complete. Press P to pause';
         end
         
+        handles.TrialCountText.String = sprintf('Trial %d', handles.p.trial.pldaps.iTrial);
         ah=handles.EyeTrace;
 %         eyeRad=ah.UserData;
         

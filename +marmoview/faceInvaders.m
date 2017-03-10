@@ -17,9 +17,6 @@ if nargin==1
 %     p.defaultParameters.pldaps.trialMasterFunction='runModularTrial';
     p.defaultParameters.pldaps.trialFunction='marmoview.faceInvaders';
     
-    p.trial.pldaps.maxTrialLength = 20;
-    p.trial.pldaps.maxFrames        = p.trial.pldaps.maxTrialLength*p.trial.display.frate;
-    
     c.Nr=1; %one condition;
     p.conditions=repmat({c},1,200);
     
@@ -31,13 +28,35 @@ if nargin==1
     
     %----------------------------------------------------------------------
     % Default Conditions
-    p.trial.(sn).MotN       = 30;  % number of face objects
-    p.trial.(sn).minSpeed   = 5;
-    p.trial.(sn).maxSpeed   = 15;
-    p.trial.(sn).motionType = 'linear';
-    p.trial.(sn).forcefield = false;
-    p.trial.(sn).type       = 'face';
+    if ~isfield(p.trial.(sn), 'maxTrialLength')
+        p.trial.pldaps.maxTrialLength = 20;
+    end
+    p.trial.pldaps.maxFrames        = p.trial.pldaps.maxTrialLength*p.trial.display.frate;
     
+    
+    if ~isfield(p.trial.(sn), 'MotN')
+        p.trial.(sn).MotN       = 30;  % number of face objects
+    end
+    
+    if ~isfield(p.trial.(sn), 'minSpeed')
+        p.trial.(sn).minSpeed   = 5;
+    end
+    
+    if ~isfield(p.trial.(sn), 'maxSpeed')
+        p.trial.(sn).maxSpeed   = 15;
+    end
+    
+    if ~isfield(p.trial.(sn), 'motionType')
+        p.trial.(sn).motionType = 'linear';
+    end
+    
+    if ~isfield(p.trial.(sn), 'forcefield')
+        p.trial.(sn).forcefield = false;
+    end
+    
+    if ~isfield(p.trial.(sn), 'type')
+        p.trial.(sn).type       = 'face';
+    end
     
     return
 end

@@ -237,6 +237,7 @@ handles.CTargHoriz.Enable       = 'Off';
 handles.CTargGrid.Enable        = 'Off';
 handles.CTargCorners.Enable     = 'Off';
 handles.CTargRandom.Enable      = 'Off';
+handles.CTargCornersDown.Enable = 'Off';
 handles.calibratePressed=0;
 
 % % UPDATE GUI STATUS
@@ -254,7 +255,7 @@ handles.p.trial.pldaps.pause.preExperiment=1; % pause before experiment
 handles.OutputFile.String=handles.p.trial.session.experimentFile;
 
 % EYE CALIBRATION STUFF HERE
-
+cm=getCalibrationPref(handles.p,1);
 % marmoview specific preferences override pldaps
 if handles.p.trial.eyelink.use && handles.p.trial.eyelink.useAsEyepos
     handles.p.trial.eyelink.useRawData=true;
@@ -286,25 +287,36 @@ handles.TrialCountText.String = sprintf('Trial %d', handles.p.trial.pldaps.iTria
 % % Get strings for the parameters list
 handles.pNames = fieldnames(handles.S.paramValues);         % pNames are the actual parameter names
 handles.pList = cell(size(handles.pNames,1),1); % pList is the list of parameter names with values
-for i = 1:size(handles.pNames,1);
+for i = 1:size(handles.pNames,1)
     pName = handles.pNames{i};
     tName = sprintf('%s = %2g',pName,handles.S.paramValues.(pName));
-    handles.pList{i,1} = tName;
+    handles.pList{i} = tName;
 end
 
-% handles.Parameters.String       = handles.pList;
+handles.Parameters.String       = handles.pList;
 % % For the highlighted parameter, provide a description and editable value
-% handles.Parameters.Value        = 1;
-% handles.ParameterText.String    = handles.S.paramDesc.(handles.pNames{1});
-% handles.ParameterEdit.String    = num2str(handles.P.(handles.pNames{1}));
-% % 
-% % % UPDATE ACCESS TO CONTROLS
+handles.Parameters.Value        = 1;
+handles.ParameterText.String    = handles.S.paramDesc.(handles.pNames{1});
+handles.ParameterEdit.String    = num2str(evalc(sprintf('handles.p.%s',handles.S.paramPldaps.(handles.pNames{1}))));
 
-% 
+% Update parameters
+for iParam = 1:numel(handles.pNames(:))
+    pName = handles.pNames{iParam};
+    pValue = handles.S.paramValues.(pName);
+    if isnumeric(pValue)
+        evalc(sprintf('handles.p.%s = %d', handles.S.paramPldaps.(pName), pValue));
+    elseif ischar(pValue)
+        evalc(sprintf('handles.p.%s = %s', handles.S.paramPldaps.(pName), pValue));
+    end
+end
 
-% 
-% % FINALLY, RESET THE JUICE COUNTER WHENEVER A NEW PROTOCOL IS LOADED
+
+% FINALLY, RESET THE JUICE COUNTER WHENEVER A NEW PROTOCOL IS LOADED
 handles.A.juiceCounter = 0;
+
+% --- juice volume set to default pldaps amount
+vol = handles.p.trial.behavior.reward.defaultAmount*1e3;
+handles.JuiceVolumeText.String=[vol ' ul']; % displayed in microliters!!
 
 % UPDATE HANDLES STRUCTURE
 guidata(hObject,handles);
@@ -509,10 +521,11 @@ pName = handles.pNames{get(handles.Parameters,'Value')};
 % If the parameter value is a number
 if ~isnan(pValue)
     % Change the parameter value
-    handles.P.(pName) = pValue;
+    evalc(sprintf('handles.p.%s = %d', handles.S.paramPldaps.(pName), pValue));
+%     handles.P.(pName) = pValue;
     % Update the parameter list immediately if not in the run loop
-    if ~handles.runTask
-        tName = sprintf('%s = %2g',pName,handles.P.(pName));
+    if handles.p.trial.pldaps.quit ~= 0
+        tName = sprintf('%s = %2g',pName,pValue);
         handles.pList{get(handles.Parameters,'Value')} = tName;
         set(handles.Parameters,'String',handles.pList);
     end
@@ -531,7 +544,7 @@ newFinal = round(str2double(get(hObject,'String')));
 % Make sure the new final trial is a positive integer
 if newFinal > 0
     % Update the final trial
-    handles.A.finish = newFinal;
+    handles.p.trial.pldaps.finish = newFinal;
     % Set the count
     set(handles.TrialMaxText,'String',get(hObject,'String'));
 end
@@ -619,23 +632,6 @@ function gui_WindowKeyPressFcn(hObject, eventdata, handles)
 if isempty(eventdata.Modifier)
   return
 end
-% % 
-% % switch eventdata.Key
-% %   case 'j'
-% %     % fake a call to GiveJuice callback()
-% %     GiveJuice_Callback(handles.GiveJuice,[],handles);
-% %     handles.reward.report()
-% %   case 'r'
-% %     % fake a call to RunTrial_callback()
-% %     if strcmp(get(handles.RunTrial,'Enable'),'on')
-% %       RunTrial_Callback(handles.RunTrial,[],handles);
-% %     end
-% %   case 'p'
-% %     % fake a call to PauseTrial_callback()
-% %     if strcmp(get(handles.PauseTrial,'Enable'),'on')
-% %       PauseTrial_Callback(handles.RunTrial,[],handles);
-% %     end
-% % end
 
 
 % --- Executes on button press in ShowBackground.
@@ -759,7 +755,7 @@ MFL=load(fullfile(marmoview.supportDataDir,'MarmosetFaceLibrary.mat'));
 MFL = struct2cell(MFL);
 MFL = MFL([7,10,13,17:20,24,25,27]); % these faces seem most centered
 
-for id = 1:length(MFL),
+for id = 1:length(MFL)
   img = MFL{id};
   
   sz = size(img);

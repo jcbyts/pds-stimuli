@@ -173,7 +173,7 @@ classdef MotionObjects < handle
             m.dotdx   = nan(1,maxDots);
             m.dotdy   = nan(1,maxDots);
             m.dotS    = nan(1,maxDots);
-            m.dotI    = reshape(ones(100,1)*(1:30), 1, maxDots);
+            m.dotI    = reshape(ones(100,1)*(1:m.N), 1, maxDots);
             m.dotC    = zeros(3, maxDots);
             m.dotCtr  = zeros(1, maxDots);
             
