@@ -43,6 +43,8 @@ if strcmp(subject, 'test')
     settingsStruct.mouse.useAsEyepos=true;
 else
     settingsStruct.eyelink.use=true;
+    settingsStruct.eyelink.useRawData= true;
+    settingsStruct.eyelink.calibration_matrix= getpref('marmoview_calibration', subject)';
 end
 
 %--------------------------------------------------------------------------

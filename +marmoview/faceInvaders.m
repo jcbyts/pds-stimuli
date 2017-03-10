@@ -88,6 +88,8 @@ switch state
         p.trial.(sn).ctrExplode = nan(p.trial.(sn).maxFrames, p.trial.(sn).MotN);
         p.trial.(sn).ctrHold    = nan(p.trial.(sn).maxFrames, p.trial.(sn).MotN);
         
+        p.trial.(sn).rngs.trialStateRNG = rng();
+        
     case p.trial.pldaps.trialStates.trialCleanUpandSave
         
         figure(1); clf
