@@ -394,7 +394,7 @@ handles.FlipFrame.Enable        = 'Off';
 handles.ShowBackground.Enable   = 'Off';
 handles.ShowBlack.Enable        = 'Off';
 handles.CloseGui.Enable         = 'On';
-handles.ClearSettings.Enable    = 'Off';
+handles.ClearSettings.Enable    = 'On';
 handles.PauseTrial.Enable       = 'On';
 handles.CenterEye.Enable        = 'Off';
 handles.CTargFix.Enable         = 'Off';
@@ -408,7 +408,7 @@ handles.CTargRandom.Enable      = 'Off';
 ChangeLight(handles.TaskLight,[0 1 0]);
 
 % UPDATE GUI STATUS
-handles.StatusText.String       = 'Press P to Pause.';
+handles.StatusText.String       = 'Press P to Pause. Q to quit.';
 
 guidata(hObject,handles); drawnow
 
