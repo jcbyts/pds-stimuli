@@ -8,17 +8,18 @@
 
 subject='test';
 showGaussianBlobs=false;
-showNatBackground=true;
+showNatBackground=false;
 showHartleyStimuli=false;
 showHDmovie=false;
 showCSDFlash=false;
+showSparseNoise=true;
 
 behavior=@plain;
 % behavior=@TestDotMotion;
 % behavior=@fixationTrainingNoise;
 
 %% Run experiment
-assert(sum([showGaussianBlobs showCSDFlash showNatBackground showHartleyStimuli showHDmovie])==1, 'You must have one (and only one) stimulus module turned on')
+assert(sum([showSparseNoise showGaussianBlobs showCSDFlash showNatBackground showHartleyStimuli showHDmovie])==1, 'You must have one (and only one) stimulus module turned on')
 
 sca
 clear settingsStruct
@@ -132,7 +133,23 @@ settingsStruct.(sn).stateFunction.requestedStates.trialPrepare=true;
 settingsStruct.(sn).stateFunction.requestedStates.framePrepareDrawing=true;
 settingsStruct.(sn).stateFunction.requestedStates.frameDraw=true;
 settingsStruct.(sn).stateFunction.requestedStates.trialCleanUpandSave=true;
+settingsStruct.(sn).moviefilename='/home/marmorig/Videos/HeadPokeTraining001.MP4';
 
+
+%--------------------------------------------------------------------------
+% Sparse noise
+sn='sparseNoise';
+settingsStruct.(sn).stateFunction.name='v1mapping.sparseNoise';
+settingsStruct.(sn).use=showSparseNoise;
+settingsStruct.(sn).stateFunction.acceptsLocationInput=false;
+settingsStruct.(sn).stateFunction.order=1;
+settingsStruct.(sn).stateFunction.requestedStates.experimentPostOpenScreen=true;
+% settingsStruct.eyemarker.stateFunction.requestedStates.experimentCleanUp=true;
+settingsStruct.(sn).stateFunction.requestedStates.trialSetup=true;
+settingsStruct.(sn).stateFunction.requestedStates.trialPrepare=true;
+settingsStruct.(sn).stateFunction.requestedStates.framePrepareDrawing=true;
+settingsStruct.(sn).stateFunction.requestedStates.frameDraw=true;
+settingsStruct.(sn).stateFunction.requestedStates.trialCleanUpandSave=true;
 
 
 if settingsStruct.gaussianNoiseBlobs.use || settingsStruct.hartley.use

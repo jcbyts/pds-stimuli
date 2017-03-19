@@ -48,20 +48,14 @@ switch state
     case p.trial.pldaps.trialStates.framePrepareDrawing
         
         % overlay pointer drawing
-        ctr=p.trial.display.ctr(1:2);
+%         ctr=p.trial.display.ctr(1:2);
         switch p.trial.(sn).hTrial.stateId
             case 0 % FixWait
                 fixClr = p.trial.display.clut.bg_white;
-            case {1,2,3,4} % FixHold
+            case {1,2,3,4,8} % FixHold
                 fixClr = p.trial.display.clut.bg_green;
-            case {5,6}
-                fixClr = p.trial.display.clut.bg;
             case 7
                 fixClr = p.trial.display.clut.bg_red;
-            case 8
-                fixClr = p.trial.display.clut.bg;
-                choXY=[p.trial.(sn).hTrial.choiceX -p.trial.(sn).hTrial.choiceY]*p.trial.display.ppd + ctr;
-                Screen('DrawDots', p.trial.display.overlayptr, choXY, 15, p.trial.display.clut.bg_red, [], 2);
         end
 
     % TODO: add fixation position

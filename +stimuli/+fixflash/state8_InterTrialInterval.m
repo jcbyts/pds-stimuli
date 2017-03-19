@@ -49,7 +49,7 @@ classdef state8_InterTrialInterval < stimuli.state
             if (hTrial.rewardCnt > 0)
                 if t > (s.tStart + 0.2*s.rewardCnt)
                     %           hTrial.hReward.deliver();
-                    pds.behavior.reward.give(hTrial.hPldaps)
+                    pds.behavior.reward.give(hTrial.hPldaps);
                     
                     s.rewardCnt = s.rewardCnt + 1;
                     

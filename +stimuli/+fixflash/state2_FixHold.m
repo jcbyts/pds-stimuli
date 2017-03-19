@@ -36,6 +36,7 @@ classdef state2_FixHold < stimuli.state
       if t > (s.tStart + hTrial.fixDuration)
         pds.behavior.reward.give(hTrial.hPldaps) % reward for fixation! (TODO: amount)
 
+        hTrial.rewardCnt=hTrial.reward;
         % move to state 8 - inter-trial interval
         hTrial.setState(8);
         return;

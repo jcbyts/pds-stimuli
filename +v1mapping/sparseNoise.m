@@ -9,19 +9,16 @@ end
 
 switch state
     case p.trial.pldaps.trialStates.framePrepareDrawing
+        p.trial.(sn).n.update
+%     case p.trial.pldaps.trialStates.frameUpdate
         
-    case p.trial.pldaps.trialStates.frameUpdate
-        if p.trial.(sn).on
-            p.trial.(sn).n.update
-            p.trial.(sn).xpos(p.trial.iFrame, :)=p.trial.(sn).n.x;
-            p.trial.(sn).ypos(p.trial.iFrame, :)=p.trial.(sn).n.y;
-            p.trial.(sn).scale(p.trial.iFrame, :)=p.trial.(sn).n.scale;
-            p.trial.(sn).contrast(p.trial.iFrame, :)=p.trial.(sn).n.getContrast;
-        end
         
     case p.trial.pldaps.trialStates.frameDraw
         
         if p.trial.(sn).on
+            if p.trial.(sn).gazeContingent
+                p.trial.(sn).n.xy = [p.trial.eyeX p.trial.eyeY]+p.trial.(sn).xy;
+            end
             p.trial.(sn).n.draw
         end
         
@@ -31,45 +28,60 @@ switch state
         p.trial.(sn).rngs.conditionerRNG=RandStream(p.trial.(sn).rngs.randomNumberGenerater, 'seed', p.trial.(sn).rngs.trialSeeds(p.trial.pldaps.iTrial));
         setupRNG=p.trial.(sn).rngs.conditionerRNG;
         
-        if p.trial.(sn).on
-            p.trial.(sn).n=stimuli.gaussianNoise(p.trial.display.ptr, 'contrast', p.trial.(sn).contrast, ...
-                'sc', p.trial.(sn).spatialScale, 'count', p.trial.(sn).count, 'rng', setupRNG);
-            p.trial.(sn).n.setup;
-            p.trial.(sn).n.update;
-            p.trial.(sn).xpos=randi(10e3, p.trial.(sn).n.count);
-            p.trial.(sn).ypos=nan(10e3, p.trial.(sn).n.count);
-            p.trial.(sn).scale=nan(10e3, p.trial.(sn).n.count);
-            p.trial.(sn).contrast=nan(10e3, p.trial.(sn).n.count);
+        
+        p.trial.(sn).n=stimuli.pixelNoise(p.trial.display.ptr, 'rng', setupRNG);
+        
+        for fields = {'xy', 'size', 'pxsize', 'sigma', 'dc', 'contrast'}
+            field = fields{1};
+            p.trial.(sn).n.(field) = p.trial.(sn).(field);
         end
+        
+        p.trial.(sn).n.type = p.trial.(sn).type;
+        
+        p.trial.(sn).n.setup;
+        p.trial.(sn).n.update;
+        
         
         
     case p.trial.pldaps.trialStates.experimentPostOpenScreen
         
-        if ~isfield(p.trial.(sn), 'ctrXY')
-            p.trial.(sn).ctrXY=[0 0];
+        if ~isfield(p.trial.(sn), 'size')
+            p.trial.(sn).size=[10 10];
         end
         
-        if ~isfield(p.trial.(sn), 'dim')
-            p.trial.(sn).dim=[10 10];
-        end
-        
-        if ~isfield(p.trial.(sn), 'sparsity')
-            p.trial.(sn).sparsity=.1;
+        if ~isfield(p.trial.(sn), 'pxsize')
+            p.trial.(sn).pxsize=2;
         end
         
         if ~isfield(p.trial.(sn), 'gazeContingent')
             p.trial.(sn).gazeContingent=0;
         end
         
+        if ~isfield(p.trial.(sn), 'contrast')
+            p.trial.(sn).contrast = .5;
+        end
+        
+        if ~isfield(p.trial.(sn), 'dc')
+            p.trial.(sn).dc = .5;
+        end
+        
+        if ~isfield(p.trial.(sn), 'sigma')
+            p.trial.(sn).sigma = .1;
+        end
+        
+        if ~isfield(p.trial.(sn), 'xy')
+            p.trial.(sn).xy = p.trial.display.ctr(1:2);
+        end
+        
+        if ~isfield(p.trial.(sn), 'type')
+            p.trial.(sn).type = 'sparse';
+        end
+        
+        p.trial.(sn).on = true;
+        
         p.trial.(sn).rngs.randomNumberGenerater='mt19937ar';
         p.trial.(sn).rngs.trialSeeds = randi(2^32, [3e3 1]);
         
     case p.trial.pldaps.trialStates.trialCleanUpandSave
-        if p.trial.(sn).on
-            ix=p.trial.iFrame+1:size(p.trial.(sn).xpos,1);
-            p.trial.(sn).xpos(ix,:)=[];
-            p.trial.(sn).ypos(ix,:)=[];
-            p.trial.(sn).scale(ix,:)=[];
-        end
         
 end

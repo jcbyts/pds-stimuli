@@ -12,7 +12,11 @@ classdef pixelNoise < handle
         rect
         pxsize
         sigma
+        contrast
         dc
+        rng
+        seed
+        
     end
     
     properties(Access = private)
@@ -29,20 +33,33 @@ classdef pixelNoise < handle
             ip.addParameter('pxsize', 10)
             ip.addParameter('sigma', .1)
             ip.addParameter('dc', .5)
+            ip.addParameter('contrast', 1)
+            ip.addParameter('rng', nan)
             ip.parse(varargin{:})
             
-            n.ptr=ptr;
-            n.type=ip.Results.type;
-            n.size=ip.Results.dim;
-            n.xy=ip.Results.xy;
-            n.pxsize=ip.Results.pxsize;
-            n.dc=ip.Results.dc;
-            n.sigma=ip.Results.sigma;
+            n.ptr    = ptr;
+            n.type   = ip.Results.type;
+            n.size   = ip.Results.dim;
+            n.xy     = ip.Results.xy;
+            n.pxsize = ip.Results.pxsize;
+            n.dc     = ip.Results.dc;
+            n.sigma  = ip.Results.sigma;
+            n.rng    = ip.Results.rng;
+            n.contrast = ip.Results.contrast;
+            
+            if ~isa(n.rng, 'RandStream')
+                n.rng  = RandStream('mt19937ar', 'Seed', 'shuffle');
+            end
+            n.seed = n.rng.Seed;
             
         end
         
         function update(n)
             n.updateFun(n)
+            
+            if ~isempty(n.tex) % cleanup existing texture
+                Screen('Close', n.tex);
+            end
             
             if ~isempty(n.ptr)
                 n.tex=Screen('MakeTexture', n.ptr, n.img*255);
@@ -75,7 +92,7 @@ classdef pixelNoise < handle
             %             Screen('DrawTexture', p.trial.display.ptr, aperture, [], dstRect(i,:), [], 0);
             
             % After drawing, we can discard the noise texture.
-            Screen('Close', n.tex);
+            
         end
         
         
@@ -83,18 +100,20 @@ classdef pixelNoise < handle
     
     methods(Access = private)
         function updateGaussianNoise(n)
-            n.img=n.dc+randn(n.size(1), n.size(2))*n.sigma;
+            n.img=n.dc+randn(n.rng, n.size(1), n.size(2))*n.sigma;
             n.img=min(n.img, 1);
             n.img=max(n.img, 0);
+            n.img = (n.img - n.dc)*n.contrast + n.dc;
         end
         
         function updateTernarySparseNoise(n)
-            tmp=randn(n.size(1), n.size(2))*n.sigma;
+            tmp=randn(n.rng, n.size(1), n.size(2))*n.sigma;
             tmp(abs(tmp)<.1)=0;
             tmp=sign(tmp);
             n.img=tmp+n.dc;
             n.img=min(n.img, 1);
             n.img=max(n.img, 0);
+            n.img = (n.img - n.dc)*n.contrast + n.dc;
         end
     end
     
