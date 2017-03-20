@@ -70,7 +70,7 @@ switch state
         end
         
         if ~isfield(p.trial.(sn), 'xy')
-            p.trial.(sn).xy = p.trial.display.ctr(1:2);
+            p.trial.(sn).xy = [500 500];
         end
         
         if ~isfield(p.trial.(sn), 'type')

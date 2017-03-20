@@ -23,7 +23,7 @@ assert(sum([showSparseNoise showGaussianBlobs showCSDFlash showNatBackground sho
 
 sca
 clear settingsStruct
-Screen('Preference','ScreenToHead', 1,0,0);
+% Screen('Preference','ScreenToHead', 1,0,0);
 
 % add modular trial functions
 settingsStruct.eyemarker.use=false;
