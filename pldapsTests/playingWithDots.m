@@ -27,6 +27,9 @@ end
 %%
 
 n=stimuli.pixelNoise(p.trial.display.ptr, 'type', 'sparse', 'sigma', .05);
+n.xy = [400 400];
+    n.pxsize=1;
+    n.contrast = 1;
 n.setup
 
 iter=10;
@@ -38,6 +41,32 @@ while iter > 0
     pause(.1)
     iter=iter-1;
 end
+
+
+%% test random seeds
+n=stimuli.pixelNoise(p.trial.display.ptr, 'type', 'sparse', 'sigma', .05);
+n.setup
+
+for i = 1:10
+n.update;
+end
+im1 = n.img;
+
+figure(1); clf
+subplot(131)
+imagesc(im1)
+
+n.rng.reset %(n.seed)
+n.setup
+for i = 1:10
+n.update;
+end
+im2 = n.img;
+
+subplot(132)
+imagesc(im2)
+
+im1==im2
 
 %% test gaussian noise
 
