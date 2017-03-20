@@ -54,7 +54,7 @@ switch state
         end
         
         if ~isfield(p.trial.(sn), 'gazeContingent')
-            p.trial.(sn).gazeContingent=0;
+            p.trial.(sn).gazeContingent=1;
         end
         
         if ~isfield(p.trial.(sn), 'contrast')
@@ -70,7 +70,7 @@ switch state
         end
         
         if ~isfield(p.trial.(sn), 'xy')
-            p.trial.(sn).xy = [500 500];
+            p.trial.(sn).xy = [0 0];
         end
         
         if ~isfield(p.trial.(sn), 'type')

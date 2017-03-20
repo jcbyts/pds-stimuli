@@ -25,7 +25,7 @@ switch state
 %         setupRNG=p.trial.(sn).rngs.conditionerRNG;
         
         if ~isfield(p.trial.(sn), 'moviefilename')
-            p.trial.(sn).moviefilename='/home/marmorig/HeadPokeTraining001.MP4';
+            p.trial.(sn).moviefilename='/home/marmorig/Videos/HeadPokeTraining001.MP4';
         end
         
         if ~isfield(p.trial.(sn), 'frameIndex')
