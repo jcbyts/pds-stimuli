@@ -46,6 +46,7 @@ classdef fixFlashTrial < stimuli.trial
     trialTimeout@double;        % seconds
     iti@double;                 % inter-trial interval (seconds)
     maxRewardCnt@double;
+    holdXY
     
     rewardCnt@double = 0;
 
@@ -115,7 +116,7 @@ classdef fixFlashTrial < stimuli.trial
            
       o.viewpoint           = args.viewpoint;
       
-
+      o.holdXY = nan(1,2);
       o.reward = o.maxRewardCnt;
 
     end

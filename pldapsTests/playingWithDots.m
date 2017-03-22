@@ -1,17 +1,23 @@
 sca
 % clear settingsStruct
+settingsStruct.display.colorclamp     = 0;
+settingsStruct.display.normalizeColor = 1;
 settingsStruct.display.destinationFactorNew=GL_ONE_MINUS_SRC_ALPHA;
 settingsStruct.display.sourceFactorNew=GL_SRC_ALPHA;
 
+% settingsStruct.display.destinationFactorNew=GL_ONE;
+% settingsStruct.display.sourceFactorNew=GL_ONE;
+
 p=pldaps(@plain, 'test', settingsStruct);
 
+% p.trial.display.gamma.table= linspace(0,1,256)'*[1, 1, 1];
 p=openScreen(p);
 % p.trial.display.switchOverlayCLUTs=0;
-p.trial.display.useOverlay=2;
-p=pds.datapixx.init(p);
+% p.trial.display.useOverlay=2;
+% p=pds.datapixx.init(p);
 
 
-%% test pixel noise
+%% flash screen
 iter=1;
 while iter < 1e3
    
@@ -24,13 +30,13 @@ while iter < 1e3
     iter=iter+1;
 end
 
-%%
-
+%% test pixel noise
 n=stimuli.pixelNoise(p.trial.display.ptr, 'type', 'sparse', 'sigma', .05);
 n.xy = [400 400];
-    n.pxsize=1;
-    n.contrast = 1;
+n.pxsize=10;
+n.contrast = 1;
 n.setup
+n.dc = .5;
 
 iter=10;
 while iter > 0
@@ -41,7 +47,12 @@ while iter > 0
     pause(.1)
     iter=iter-1;
 end
-
+%% texture test
+Screen('Close', n.tex);
+n.img = meshgrid(0:255);
+n.tex=Screen('MakeTexture', n.ptr, n.img);
+n.draw
+Screen('Flip', p.trial.display.ptr, 0);
 
 %% test random seeds
 n=stimuli.pixelNoise(p.trial.display.ptr, 'type', 'sparse', 'sigma', .05);
@@ -99,11 +110,21 @@ plot(img(i,:,1)); hold on; plot(im(i,:))
 
 
 %%
-tex = CreateProceduralGaussBlob(p.trial.display.ptr, 150, 150, [0 0 0 0], 1, -.5);
+tex = CreateProceduralGabor(p.trial.display.ptr, 150, 150); %, 0, [1 1 1 0], 1, .5);
 %             n.tex2 = CreateProceduralGaussBlob(n.ptr, 150, 150, [1 1 1 0], 0, .5);
-            
-Screen('DrawTexture', p.trial.display.ptr, tex, [], [400 400 800 800], [], [], [], 0, [], kPsychDontDoRotation, [-.5, 10, 1, 0]);
-Screen('DrawTexture', p.trial.display.ptr, tex, [], [400 400 800 800], [], [], [], 0, [], kPsychDontDoRotation, [.5, 10, 1, 0]);
+rotAngles = 0;
+modulateColor = [];
+phase = 0;
+freq = 10; % cycles/pixel
+sc = 10; % sigma
+contrast = 1;
+aspectratio = 1.0;
+dstRects = CenterRectOnPoint([0 0 500 500], 400,400);
+
+mypars = [phase, freq, sc, contrast, aspectratio, 0 0 0]';
+Screen('DrawTextures', p.trial.display.ptr, tex, [], dstRects, rotAngles, [], [], modulateColor, [], kPsychDontDoRotation, mypars);
+
+% Screen('DrawTexture', p.trial.display.ptr, tex, [], [400 400 800 800], [], [], [], 0, [], kPsychDontDoRotation, [-.5, 10, 1, 0]);
 
 Screen('Flip', p.trial.display.ptr, 0);
 

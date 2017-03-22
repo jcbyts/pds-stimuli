@@ -7,6 +7,10 @@ kx=xx(:); ky=yy(:); l=0; m=1;
 ppd=35;
 % sy=sy;
 
+nOctaves = 3;
+freq0 = .25;
+
+steps = sort([0 2.^(0:nOctaves)*freq0]);
 % steps=-pi:pi/4:pi;
 % steps=[-8 -4 -2 -1 -.5 -.25 0 .25 .5 1 2 4 8];
 % steps=-1:.2:1;
@@ -14,7 +18,7 @@ ppd=35;
 % steps=sort([-logspace(-1,0,5) 0 logspace(-1,0,5)]);
 % steps=sort([-2.^(0:5)*.25 0 2.^(0:5)*.25]);
 
-steps=[0 2 4 8];
+% steps=[0 2 4 8];
 sx=numel(steps);
 M=ppd;
 MaxSF=1;

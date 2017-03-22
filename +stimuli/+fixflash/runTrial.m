@@ -77,6 +77,8 @@ switch state
 	% --- Cleanup and save all parameters
     case p.trial.pldaps.trialStates.trialCleanUpandSave
         
+        stimuli.fixflash.cleanUpandSave(p, sn);
+        
 end % switch
 
 end % function

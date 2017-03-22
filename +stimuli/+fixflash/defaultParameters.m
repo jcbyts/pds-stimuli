@@ -87,6 +87,17 @@ if ~isfield(p.trial.(sn), 'trialTimeout')
     p.trial.(sn).trialTimeout 		= 4.0;  % seconds
 end
 
+if ~isfield(p.trial.(sn), 'staircaseOn')
+    p.trial.(sn).staircaseOn = true;
+end
+
+if ~isfield(p.trial.(sn), 'staircaseMax')
+    p.trial.(sn).staircaseMax = 1;
+end
+
+if ~isfield(p.trial.(sn), 'staircaseStep')
+    p.trial.(sn).staircaseStep = .1; % seconds
+end
 
 % -------------------------------------------------------------------------
 % --- setup stimuli and prepare to run
@@ -121,6 +132,33 @@ p.trial.(sn).hFace = hFace;
 
 % --- Choice Targets
 p.trial.(sn).hFbk  	 = stimuli.circles(p.trial.display.ptr); % big bold circle
+
+% -------------------------------------------------------------------------
+% --- Plotting
+p.functionHandles.fixFlashPlot = stimuli.fixflash.fixFlashPlot;
+% p.trial.(sn).gui = stimuli.fixflash.fixFlashPlot;
+% p.trial.(sn).gui = figure(1); clf
+% p.functionHandles.fixFlashPlotstimuli.fixflash.fixFlashPlot(p);
+% p.trial.(sn).hPlot = figure(100); clf(p.trial.(sn).hPlot)
+% p.trial.(sn).hPlot.Name = 'Fix Flash';
+% p.trial.(sn).hAxes(1) = axes(p.trial.(sn).hPlot, 'Position', [.15 .75 .8 .2]);
+% p.trial.(sn).hAxes(2) = axes(p.trial.(sn).hPlot, 'Position', [.15 .4 .8 .2]);
+% p.trial.(sn).hAxes(3) = axes(p.trial.(sn).hPlot, 'Position', [.15 .1 .8 .2]);
+% 
+% title(p.trial.(sn).hAxes(1), 'Trial Outcomes');
+% title(p.trial.(sn).hAxes(2), 'Fixation hold time');
+% title(p.trial.(sn).hAxes(3), 'Spatial error distribution');
+% 
+% % --- Trial Outcome plot
+% p.trial.(sn).hOutcomes = bar(p.trial.(sn).hAxes(1), [0 1 2], [0 0 0], 'FaceColor', .5*[1 1 1]);
+% p.trial.(sn).hAxes(1).XTick = [0 1 2];
+% p.trial.(sn).hAxes(1).XTickLabel = {'Good', 'No Fix', 'Break Fix'};
+% p.trial.(sn).hAxes(1).XTickLabelRotation = -45;
+% p.trial.(sn).hAxes(1).XLim  = [-.5 2.5];
+% p.trial.(sn).hAxes(1).YLim  = [0 1];
+% ylabel(p.trial.(sn).hAxes(1), 'Number Trials');
+
+
 
 % -------------------------------------------------------------------------
 % --- Update Conditions

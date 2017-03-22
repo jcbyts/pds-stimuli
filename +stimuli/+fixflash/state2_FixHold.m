@@ -5,6 +5,7 @@ classdef state2_FixHold < stimuli.state
   
   properties
     tStart = NaN;
+    eyeXY
   end
   
   methods (Access = public)
@@ -30,12 +31,13 @@ classdef state2_FixHold < stimuli.state
       
       if isnan(s.tStart) % <-- first frame
         s.tStart = t;
+        s.eyeXY = [hTrial.x,hTrial.y];
         hTrial.setTxTime(t); % save transition time
       end
       
       if t > (s.tStart + hTrial.fixDuration)
         pds.behavior.reward.give(hTrial.hPldaps) % reward for fixation! (TODO: amount)
-
+        hTrial.holdXY = mean(s.eyeXY);
         hTrial.rewardCnt=hTrial.reward;
         % move to state 8 - inter-trial interval
         hTrial.setState(8);
@@ -44,8 +46,11 @@ classdef state2_FixHold < stimuli.state
       
       r = norm([hTrial.x,hTrial.y]);
       
+      s.eyeXY = [s.eyeXY; [hTrial.x hTrial.y]];
+      
       if (r > hTrial.fixWinRadius)
         % broke fixation... move to state 7 - timeout
+        hTrial.holdXY = mean(s.eyeXY);
         hTrial.error = 2;
         hTrial.setState(7)
         return;

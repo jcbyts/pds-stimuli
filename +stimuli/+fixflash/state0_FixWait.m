@@ -10,6 +10,8 @@ classdef state0_FixWait < stimuli.state
     % properties for flashing the fixation target
     showFix@logical = true;
     frameCnt = 0; % frame counter (for this state?)
+    faceFlash = 0;
+    showFace = 0;
   end
   
   methods (Access = public)
@@ -25,7 +27,11 @@ classdef state0_FixWait < stimuli.state
       hTrial = s.hTrial;
 
       if hTrial.showFix && s.showFix
-        hTrial.hFix(1).beforeFrame(); % draw fixation target
+          if s.showFace
+              hTrial.hFace.beforeFrame();
+          else
+            hTrial.hFix(1).beforeFrame(); % draw fixation target
+          end
       end
     end
     
@@ -43,7 +49,14 @@ classdef state0_FixWait < stimuli.state
       s.frameCnt = mod(s.frameCnt+1,hTrial.fixFlashCnt);
       % flash fixation until it is obtained
       if s.frameCnt == 0
-        s.showFix = ~s.showFix; % toggle fixation target
+          s.showFix  = ~s.showFix; % toggle fixation target
+          if s.showFix
+              s.faceFlash = s.faceFlash + 1; % count flashes
+          end
+      end
+      
+      if mod(s.faceFlash, 3)==0
+          s.showFace = s.showFix;
       end
       
       % Never obtained fixation

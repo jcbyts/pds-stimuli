@@ -10,6 +10,39 @@ ppd   = p.trial.display.ppd;        % pixels per degree (linear approximation)
 % fps   = p.trial.display.frate;      % frames per second
 ctr   = p.trial.display.ctr(1:2);   % center of the screen
 
+% % --- Staircase parameters
+% if p.trial.(sn).staircaseOn
+%     if p.trial.pldaps.iTrial > 1
+%         lastError = p.data{p.trial.pldaps.iTrial - 1}.(sn).hTrial.error;
+%         staircased = isfield(q, 'minFixDuration');
+%         
+%         switch lastError
+%             case 0 % held the whole way
+%                 if staircased
+%                     p.trial.(sn).minFixDuration = p.data{p.trial.pldaps.iTrial-1}.(sn).minFixDuration + p.trial.(sn).staircaseStep;
+%                     p.trial.(sn).maxFixDuration = p.data{p.trial.pldaps.iTrial-1}.(sn).maxFixDuration + p.trial.(sn).staircaseStep;
+%                 else
+%                     p.trial.(sn).minFixDuration = p.trial.(sn).minFixDuration + p.trial.(sn).staircaseStep;
+%                     p.trial.(sn).maxFixDuration = p.trial.(sn).maxFixDuration + p.trial.(sn).staircaseStep;
+%                 end
+%                     
+%             case 2 % broke fixation after obtaining
+%                 if staircased
+%                     p.trial.(sn).minFixDuration = p.data{p.trial.pldaps.iTrial-1}.(sn).minFixDuration - p.trial.(sn).staircaseStep;
+%                     p.trial.(sn).maxFixDuration = p.data{p.trial.pldaps.iTrial-1}.(sn).maxFixDuration - p.trial.(sn).staircaseStep;
+%                 else
+%                     p.trial.(sn).minFixDuration = p.trial.(sn).minFixDuration - p.trial.(sn).staircaseStep;
+%                     p.trial.(sn).maxFixDuration = p.trial.(sn).maxFixDuration - p.trial.(sn).staircaseStep;
+%                 end
+%             otherwise % never obtained fixation -- Do nothing
+%                 
+%         end
+%         
+%     end % trial number
+%     
+%     
+% end % staircase on
+
 % --- Set Fixation Point Properties    
 sz = p.trial.(sn).fixPointRadius * ppd;
 p.trial.(sn).hFix(1).cSize      = sz;

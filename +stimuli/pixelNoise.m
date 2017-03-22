@@ -21,6 +21,9 @@ classdef pixelNoise < handle
     
     properties(Access = private)
         updateFun
+        maxVal
+        minVal
+        dcOffset
     end
     
     methods
@@ -51,6 +54,17 @@ classdef pixelNoise < handle
                 n.rng  = RandStream('mt19937ar', 'Seed', 'shuffle');
             end
             n.seed = n.rng.Seed;
+            
+            [sourceFactorOld, destinationFactorOld]=Screen('BlendFunction', n.ptr);
+            if strcmp(sourceFactorOld, 'GL_ONE') && strcmp(destinationFactorOld, 'GL_ONE')
+                n.dcOffset=.5;
+                n.maxVal = .5;
+                n.minVal = -.5;
+            else
+                n.dcOffset=0;
+                n.maxVal = 1;
+                n.minVal = 0;
+            end
             
         end
         
@@ -100,20 +114,24 @@ classdef pixelNoise < handle
     
     methods(Access = private)
         function updateGaussianNoise(n)
-            n.img=n.dc+randn(n.rng, n.size(1), n.size(2))*n.sigma;
-            n.img=min(n.img, 1);
-            n.img=max(n.img, 0);
-            n.img = (n.img - n.dc)*n.contrast + n.dc;
+            dc0 = n.dc - n.dcOffset;
+            n.img=dc0 + randn(n.rng, n.size(1), n.size(2)) * n.sigma;
+            n.img=min(n.img, n.maxVal);
+            n.img=max(n.img, n.minVal);
+            n.img = (n.img - dc0) * n.contrast + dc0;
         end
         
         function updateTernarySparseNoise(n)
-            tmp=randn(n.rng, n.size(1), n.size(2))*n.sigma;
+            tmp = randn(n.rng, n.size(1), n.size(2)) * n.sigma;
             tmp(abs(tmp)<.1)=0;
             tmp=sign(tmp);
-            n.img=tmp+n.dc;
-            n.img=min(n.img, 1);
-            n.img=max(n.img, 0);
-            n.img = (n.img - n.dc)*n.contrast + n.dc;
+            dc0 = n.dc - n.dcOffset;
+            
+            n.img=tmp+dc0;
+            n.img=min(n.img, n.maxVal);
+            n.img=max(n.img, n.minVal);
+            
+            n.img = (n.img - dc0) * n.contrast + dc0;
         end
     end
     
