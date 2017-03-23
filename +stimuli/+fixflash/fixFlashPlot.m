@@ -59,7 +59,10 @@ if nargin>3 && varargin{1}
     return
 end
 
-% handles.p      = varargin{1};
+% --- Plot
+handles.plots.outcomeBar  = bar(handles.TrialOutcomes, [0 1 2], [0 0 0], 'FaceColor', .5*[1 1 1]);
+handles.plots.holdDurHist = histogram(handles.HoldTime, 1, 'BinMethod', 'auto', 'FaceColor', .5*[1 1 1]);
+handles.plots.fixScatter  = plot(handles.Space, 0, 0, '.');
 
 % --- Axes Titles and labels
 handles.text.spacexlabel = xlabel(handles.Space, 'Degrees');
@@ -78,9 +81,6 @@ handles.text.holdTitle  = title(handles.HoldTime, 'Hold Duration');
 handles.text.holdylabel = ylabel(handles.HoldTime, '# Trials');
 handles.text.holdxlabel = xlabel(handles.HoldTime, 'Seconds');
 
-handles.plots.outcomeBar  = bar(handles.TrialOutcomes, [0 1 2], [0 0 0], 'FaceColor', .5*[1 1 1]);
-handles.plots.holdDurHist = histogram(handles.HoldTime, 1, 'BinMethod', 'auto', 'FaceColor', .5*[1 1 1]);
-handles.plots.fixScatter  = plot(handles.Space, 0, 0, '.');
 % Update handles structure
 guidata(hObject, handles);
 

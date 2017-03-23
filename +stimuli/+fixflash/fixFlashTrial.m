@@ -26,7 +26,7 @@ classdef fixFlashTrial < stimuli.trial
     hFix@handle;
     hFbk@handle;
     hFace@handle;
-    hPldaps@handle;
+    hReward@handle;
     
     % trial objects
     viewpoint@logical = false;
@@ -58,11 +58,11 @@ classdef fixFlashTrial < stimuli.trial
   end
   
   methods (Access = public)
-    function o = fixFlashTrial(hFix,hFbk,hFace,hPldaps,varargin)
+    function o = fixFlashTrial(hFix,hFbk,hFace,hReward,varargin)
       o.hFix    = hFix;
       o.hFbk    = hFbk;
       o.hFace   = hFace;
-      o.hPldaps = hPldaps;
+      o.hReward = hReward;
       
       % initialise the @state object pool...
       o.addState(stimuli.fixflash.state0_FixWait(o));

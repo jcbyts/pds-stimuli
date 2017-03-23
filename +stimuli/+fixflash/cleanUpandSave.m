@@ -27,6 +27,8 @@ function p = cleanUpandSave(p, sn)
         Screen('Flip', p.trial.display.ptr);
         
         % --- Plotting
+%         figNum = 999;
+%         figure(999)
 %         outcomes = cellfun(@(x) x.stimulus.hTrial.error, p.data);
 %         errs = get(p.trial.(sn).hOutcomes, 'XData');
 %         n = numel(errs);

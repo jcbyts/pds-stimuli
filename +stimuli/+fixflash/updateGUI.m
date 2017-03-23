@@ -25,3 +25,5 @@ handles.plots.fixScatter.XData = cellfun(@(x) x.stimulus.hTrial.holdXY(1), p.dat
 handles.plots.fixScatter.YData = cellfun(@(x) x.stimulus.hTrial.holdXY(2), p.data);
 
 guidata(hObj, handles)
+
+drawnow

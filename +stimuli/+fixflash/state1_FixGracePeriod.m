@@ -49,7 +49,7 @@ classdef state1_FixGracePeriod < stimuli.state
       end
       
       % move to state 2 - hold fixation
-      pds.behavior.reward.give(hTrial.hPldaps) % reward for obtaining fixation! (TODO: amount)
+      hTrial.hReward.give();
       
       hTrial.setState(2);
     end
