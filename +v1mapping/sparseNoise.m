@@ -50,7 +50,7 @@ switch state
         end
         
         if ~isfield(p.trial.(sn), 'pxsize')
-            p.trial.(sn).pxsize=2;
+            p.trial.(sn).pxsize=20;
         end
         
         if ~isfield(p.trial.(sn), 'gazeContingent')

@@ -22,7 +22,7 @@ function varargout = calibrationGUI(varargin)
 
 % Edit the above text to modify the response to help calibrationGUI
 
-% Last Modified by GUIDE v2.5 22-Mar-2017 17:56:30
+% Last Modified by GUIDE v2.5 23-Mar-2017 11:21:33
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -125,7 +125,7 @@ handles.A.c(1) = handles.A.c(1) - ...
 
 handles=updateCalibrationMatrix(handles);
 guidata(hObject,handles);
-UpdateEyeText(handles);
+% UpdateEyeText(handles);
 UpdateEyePlot(handles);
 
 
@@ -140,7 +140,7 @@ handles.A.c(1) = handles.A.c(1) + ...
 
 handles=updateCalibrationMatrix(handles);
 guidata(hObject,handles);
-UpdateEyeText(handles);
+% UpdateEyeText(handles);
 UpdateEyePlot(handles);
 
 
@@ -154,7 +154,7 @@ handles.A.c(2) = handles.A.c(2) - ...
 
 handles=updateCalibrationMatrix(handles);
 guidata(hObject,handles);
-UpdateEyeText(handles);
+% UpdateEyeText(handles);
 UpdateEyePlot(handles);
 
 
@@ -169,22 +169,19 @@ handles.A.c(2) = handles.A.c(2) + ...
 handles=updateCalibrationMatrix(handles);
 
 guidata(hObject,handles);
-UpdateEyeText(handles);
+% UpdateEyeText(handles);
 UpdateEyePlot(handles);
 
 
-
-function OffsetStep_Callback(hObject, eventdata, handles)
-% --- Executes during object creation, after setting all properties.
+% --- Shift Eye Adjustment size
 function OffsetStep_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to OffsetStep (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
+function OffsetStep_Callback(hObject, eventdata, handles)
+shiftSize = str2double(get(hObject,'String'));
+if ~isnan(shiftSize)
+    handles.shiftSize = shiftSize;
+    guidata(hObject,handles);
+else
+    set(handles.ShiftSize,'String',num2str(handles.shiftSize));
 end
 
 
@@ -196,7 +193,7 @@ handles=updateGains(handles, cm);
 handles.A.dx = handles.A.dx-handles.gainSize;
 handles=updateCalibrationMatrix(handles);
 guidata(hObject,handles);
-UpdateEyeText(handles);
+% UpdateEyeText(handles);
 UpdateEyePlot(handles);
 
 
@@ -209,7 +206,7 @@ handles=updateGains(handles, cm);
 handles.A.dx = handles.A.dx+handles.gainSize;
 handles=updateCalibrationMatrix(handles);
 guidata(hObject,handles);
-UpdateEyeText(handles);
+% UpdateEyeText(handles);
 UpdateEyePlot(handles);
 
 
@@ -221,7 +218,7 @@ handles=updateGains(handles, cm);
 handles.A.dy = handles.A.dy+handles.gainSize;
 handles=updateCalibrationMatrix(handles);
 guidata(hObject,handles);
-UpdateEyeText(handles);
+% UpdateEyeText(handles);
 UpdateEyePlot(handles);
 
 
@@ -233,30 +230,19 @@ handles=updateGains(handles, cm);
 handles.A.dy = handles.A.dy-handles.gainSize;
 handles=updateCalibrationMatrix(handles);
 guidata(hObject,handles);
-UpdateEyeText(handles);
+% UpdateEyeText(handles);
 UpdateEyePlot(handles);
 
 
-
-function GainStep_Callback(hObject, eventdata, handles)
-% hObject    handle to GainStep (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of GainStep as text
-%        str2double(get(hObject,'String')) returns contents of GainStep as a double
-
-
-% --- Executes during object creation, after setting all properties.
+% --- Enter Gain adjustment step size
 function GainStep_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to GainStep (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
+function GainStep_Callback(hObject, eventdata, handles)
+gainSize = str2double(get(hObject,'String'));
+if ~isnan(gainSize)
+    handles.gainSize = gainSize;
+    guidata(hObject,handles);
+else
+    set(handles.GainSize,'String',num2str(handles.gainSize));
 end
 
 
@@ -323,6 +309,19 @@ xy=[5 8; 8 5];
 handles=drawCalibrationTargets(handles, xy, nFrames);
 guidata(hObject, handles)
 
+
+% --- Executes on button press in CenterButton.
+function CenterButton_Callback(hObject, eventdata, handles)
+
+cm=getCurrentCalibrationMatrix(handles.p);
+handles=updateGains(handles, cm);
+handles.A.c = median(handles.A.rawxy,2)';
+handles=updateCalibrationMatrix(handles);
+guidata(hObject,handles);
+% UpdateEyeText(handles);
+UpdateEyePlot(handles);
+
+
 % ------------------------------------------------------------------------
 % --- Drawing / Calibration Support Functions
 % --- Draw specified calibration targets
@@ -375,19 +374,7 @@ handles=updateGains(handles, cm);
 updateCalibrationMatrix(handles);
 
 UpdateEyePlot(handles)
-UpdateEyeText(handles)
-
-% --- Refine Calibration
-function RefineCalibrationButton_Callback(hObject, eventdata, handles)
-
-cm=marmoview.refineCalibration(handles);
-handles=updateGains(handles, cm);
-handles=updateCalibrationMatrix(handles);
-guidata(hObject,handles);
-
-% clear overlay pointer
-Screen('FillRect', handles.p.trial.display.overlayptr,0);
-Screen('Flip', handles.p.trial.display.ptr, 0);
+% UpdateEyeText(handles)
 
 % --- Executes on button press in saveButton.
 function saveButton_Callback(hObject, eventdata, handles)
@@ -404,9 +391,15 @@ close(handles.figure1, 'force');
 
 % --- Executes on button press in refineButton.
 function refineButton_Callback(hObject, eventdata, handles)
-% hObject    handle to refineButton (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+
+cm=marmoview.refineCalibration(handles);
+handles=updateGains(handles, cm);
+handles=updateCalibrationMatrix(handles);
+guidata(hObject,handles);
+
+% clear overlay pointer
+Screen('FillRect', handles.p.trial.display.overlayptr,0);
+Screen('Flip', handles.p.trial.display.ptr, 0);
 
 
 % --- Executes on button press in marmosetFaceCheckbox.
@@ -489,8 +482,24 @@ if isfield(handles.A, 'hplot')
     drawnow
 end
 
+% --- Updates text in gui
+function UpdateEyeText(h)
+set(h.CenterText,'String',sprintf('[%.2g %.2g]',h.A.c(1),h.A.c(2)));
+dx = h.A.dx; dy = h.A.dy;
+set(h.GainText,'String',sprintf('[%.2g %.2g]',dx,dy));
+
 % -------------------------------------------------------------------------
 % Support functions for calibration
+% --- update calibraiton matrix using current Gains    
+function  handles=updateCalibrationMatrix(handles)
+ctr=handles.p.trial.display.ctr;
+cm=gainsToCalibrationMatrix([handles.A.dx handles.A.dy],[handles.A.rx handles.A.ry],handles.A.c,ctr(1:2));
+handles.A.cm=cm;
+    
+if handles.p.trial.eyelink.use && handles.p.trial.eyelink.useAsEyepos
+    handles.p.trial.eyelink.calibration_matrix(:,:,handles.p.trial.eyelink.eyeIdx)=cm';
+end
+
 
 % --- get recent eye position values
 function [eye, raw]=getEye(p)
@@ -583,8 +592,12 @@ m=getpref('marmoview_calibration');
 if isfield(m, subj)
     c = m.(subj);
     c = c(:,:,eyeIdx);
-else
+else % if not
     c=[1 0; 0 1; 0 0]; % assume default calibration
+    % initialize a calibration matrix
+    cm = c;
+    cm(:,:,2)=c;
+    setpref('marmoview_calibration', subj, cm);
 end
 
 % --- Save the current eye calibration to rig preferences

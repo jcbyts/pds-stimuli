@@ -66,7 +66,6 @@ handles.plots.fixScatter  = plot(handles.Space, 0, 0, '.');
 handles.plots.textOutcome0 = text(handles.TrialOutcomes,0,0,'');
 handles.plots.textOutcome1 = text(handles.TrialOutcomes,0,0,'');
 handles.plots.textOutcome2 = text(handles.TrialOutcomes,0,0,'');
-cla(handles.StairCasePlot)
 handles.plots.staircaseMax    = plot(handles.StairCasePlot, 0,0,'-k');
 hold(handles.StairCasePlot, 'on')
 handles.plots.staircaseMin    = plot(handles.StairCasePlot, 0,0,':k');
@@ -92,9 +91,9 @@ handles.text.holdTitle  = title(handles.HoldTime, 'Hold Duration');
 handles.text.holdylabel = ylabel(handles.HoldTime, '# Trials');
 handles.text.holdxlabel = xlabel(handles.HoldTime, 'Seconds');
 
-handles.text.StaircaseTitle  = title(handles.StairCasePlot, 'Staircase');
-handles.text.Staircaseylabel = ylabel(handles.StairCasePlot, 'Trial');
-handles.text.Staircasexlabel = xlabel(handles.StairCasePlot, 'Seconds');
+handles.text.StaircaseTitle  = title(handles.HoldTime, 'Hold Duration');
+handles.text.Staircaseylabel = ylabel(handles.HoldTime, '# Trials');
+handles.text.holdxlabel = xlabel(handles.HoldTime, 'Seconds');
 
 handles.TrialOutcomes.XTick = [0 1 2];
 handles.TrialOutcomes.XTickLabel = {'Good', 'No Fix', 'Break Fix'};

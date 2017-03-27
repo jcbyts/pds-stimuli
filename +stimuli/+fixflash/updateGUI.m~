@@ -20,7 +20,7 @@ end
 
 handles.plots.outcomeBar.YData = num;
 handles.plots.holdDurHist.Data = [cellfun(@(x) x.(sn).hTrial.holdDuration, p.data) p.trial.stimulus.hTrial.holdDuration];
-handles.text.holdTitle.String = sprintf('Hold Duration (%02.2f, %02.2f, %02.2f)', min(handles.plots.holdDurHist.Data(outcomes==0)), mean(handles.plots.holdDurHist.Data(outcomes==0)), max(handles.plots.holdDurHist.Data));
+handles.text.holdTitle.String = sprintf('Hold Duration (%02.2f, 02.2f)', mean(handles.plots.holdDurHist.Data(outcomes), max(handles.plots.holdDurHist.Data));
 handles.plots.holdDurHist.BinMethod = 'auto';
 handles.plots.holdDurHist.NumBins = 30;
 handles.plots.textOutcome0.Position = [handles.plots.outcomeBar.XData(1) handles.plots.outcomeBar.YData(1) 0];
@@ -35,10 +35,6 @@ handles.plots.textOutcome2.String   = num2str(handles.plots.outcomeBar.YData(3))
 handles.plots.fixScatter.XData = [cellfun(@(x) x.stimulus.hTrial.holdXY(1), p.data) p.trial.stimulus.hTrial.holdXY(1)];
 handles.plots.fixScatter.YData = [cellfun(@(x) x.stimulus.hTrial.holdXY(2), p.data) p.trial.stimulus.hTrial.holdXY(2)];
 
-handles.plots.staircaseMin.XData = 1:p.trial.pldaps.iTrial;
-handles.plots.staircaseMax.XData = 1:p.trial.pldaps.iTrial;
-handles.plots.staircaseMax.YData = [cellfun(@(x) x.(sn).hTrial.maxFixation, p.data) p.trial.(sn).maxFixDuration];
-handles.plots.staircaseMin.YData = [cellfun(@(x) x.(sn).hTrial.minFixation, p.data) p.trial.(sn).minFixDuration];
 
 if p.trial.eyelink.use
     if p.trial.eyelink.useRawData

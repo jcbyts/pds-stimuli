@@ -40,15 +40,24 @@ classdef fixFlashTrial < stimuli.trial
     % task/trial parameters
     fixWinRadius@double;        % deg.
     fixGracePeriod@double;      % seconds
+    
+    minFixation@double
+    maxFixation@double
+    
     fixDuration@double;         % seconds
     fixFlashCnt@double;         % frames
     holdDuration@double;        % seconds
     trialTimeout@double;        % seconds
     iti@double;                 % inter-trial interval (seconds)
+    rewardForObtainFixation     % flag (reward for obtaining fixation)
+    rewardFaceDuration
+    
     maxRewardCnt@double;
+    
     holdXY
     
     rewardCnt@double = 0;
+    rewardAmount@double;
 
   end
 
@@ -85,12 +94,15 @@ classdef fixFlashTrial < stimuli.trial
       p.StructExpand = true;
       p.addParameter('fixWinRadius',NaN,@(x) isscalar(x) && isreal(x)); % deg.
       p.addParameter('fixGracePeriod',NaN,@(x) isscalar(x) && isreal(x)); % seconds
-      p.addParameter('fixDuration',NaN,@(x) isscalar(x) && isreal(x)); % seconds
+%       p.addParameter('fixDuration',NaN,@(x) isscalar(x) && isreal(x)); % seconds
+      p.addParameter('minFixation',NaN,@(x) isscalar(x) && isreal(x)); % seconds
+      p.addParameter('maxFixation',NaN,@(x) isscalar(x) && isreal(x)); % seconds
       p.addParameter('fixFlashCnt',NaN,@(x) isscalar(x) && isreal(x)); % frames
       p.addParameter('holdDuration',NaN,@(x) isscalar(x) && isreal(x)); % seconds
       p.addParameter('trialTimeout',NaN,@(x) isscalar(x) && isreal(x)); % seconds
       p.addParameter('iti',NaN,@(x) isscalar(x) && isreal(x)); % seconds
-      
+      p.addParameter('rewardForObtainFixation', false)
+      p.addParameter('rewardFaceDuration', .5)
       p.addParameter('maxRewardCnt',NaN,@(x) isscalar(x) && isreal(x));
       
       p.addParameter('viewpoint',false,@islogical);
@@ -106,13 +118,17 @@ classdef fixFlashTrial < stimuli.trial
     
       o.fixWinRadius        = args.fixWinRadius;
       o.fixGracePeriod      = args.fixGracePeriod;
-      o.fixDuration         = args.fixDuration;
+%       o.fixDuration         = args.fixDuration;
+      o.minFixation         = args.minFixation;
+      o.maxFixation         = args.maxFixation;
       o.fixFlashCnt         = args.fixFlashCnt;
       o.holdDuration        = args.holdDuration;
       o.trialTimeout        = args.trialTimeout;
       o.iti                 = args.iti;
+      o.rewardFaceDuration  = args.rewardFaceDuration;
             
       o.maxRewardCnt        = args.maxRewardCnt;
+      o.rewardForObtainFixation = args.rewardForObtainFixation;
            
       o.viewpoint           = args.viewpoint;
       

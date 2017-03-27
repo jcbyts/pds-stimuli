@@ -40,8 +40,8 @@ classdef state2_FixHold < stimuli.state
             % --- If held to maximum duration --> move to next state
             if t > (s.tStart + hTrial.maxFixation)
                 
-                hTrial.holdXY       = mean(s.eyeXY);
-                hTrial.holdDuration = t - s.tStart;
+                hTrial.holdXY = mean(s.eyeXY);
+                hTrial.holdDuration = t;
                 
                 % move to state 8 - inter-trial interval
                 hTrial.setState(8);
@@ -51,9 +51,10 @@ classdef state2_FixHold < stimuli.state
             % --- Check status of fixation
             r = norm([hTrial.x,hTrial.y]);
             
+            
             if (r > hTrial.fixWinRadius) % left fixation window
-                hTrial.holdDuration = t - s.tStart;
-                hTrial.holdXY       = mean(s.eyeXY,1);
+                hTrial.holdDuration = t;
+                hTrial.holdXY = mean(s.eyeXY);
                 
                 if t > hTrial.minFixation
                     hTrial.error = 0;
@@ -64,9 +65,6 @@ classdef state2_FixHold < stimuli.state
                 end
                 return;
             end
-            
-            % keep track of fixated position
-            s.eyeXY = [s.eyeXY; [hTrial.x hTrial.y]];
         end
         
     end % methods

@@ -67,21 +67,7 @@ if ~isfield(p.trial.(sn), 'iti')
     p.trial.(sn).iti               = 1;
 end
 
-if ~isfield(p.trial.(sn), 'fixationJitter')
-    p.trial.(sn).fixationJitter = false;
-end
-
-if ~isfield(p.trial.(sn), 'fixationJitterSize')
-    p.trial.(sn).fixationJitterSize = 1;
-end
-
-if ~isfield(p.trial.(sn), 'fixationX')
-    p.trial.(sn).fixationX = 0;
-end
-
-if ~isfield(p.trial.(sn), 'fixationY')
-    p.trial.(sn).fixationY = 0;
-end
+if ~isfield(p.trial
 
 % --- Timing
 if ~isfield(p.trial.(sn), 'fixGracePeriod')

@@ -4,9 +4,7 @@ classdef state7_BreakFixTimeout < stimuli.state
   % 07-07-2016 - Shaun L. Cloherty <s.cloherty@ieee.org>
   
   properties
-    tStart = NaN; % 'start' time
-        
-    plotFlag = false; % urgh! true after we've updated the gui
+    tStart = NaN; % 'start' time        
   end
   
   methods (Access = public)
@@ -38,16 +36,7 @@ classdef state7_BreakFixTimeout < stimuli.state
         return;
       end
       
-%       % FIXME: Urgh!
-%       if ~s.plotFlag
-% %         eval(hTrial.A.plotCmd);
-%         s.plotFlag = true;
-%         
-%         if hTrial.viewpoint,
-%           vpx_SendCommandString(sprintf('dataFile_InsertString "TRIALEND:TRIALNO:%i"',hTrial.trialNum));
-%         end
-%       end
-    end
+    end % after frame
     
   end % methods
   

@@ -28,7 +28,7 @@ pldapsDefaultTrialFunction(p,state)
 
 % --- switch PLDAPS trial states
 switch state
-
+    
     % --- Prepare drawing (All behavior action happens here)
     case p.trial.pldaps.trialStates.frameUpdate
         
@@ -37,9 +37,10 @@ switch state
             p.trial.flagNextTrial=true;
         end
         
-        ctr = p.trial.display.ctr(1:2);
-        p.trial.(sn).hTrial.x = (p.trial.eyeX - ctr(1)) / p.trial.display.ppd;
-        p.trial.(sn).hTrial.y = -(p.trial.eyeY - ctr(2)) / p.trial.display.ppd;
+        pos = p.trial.(sn).hFix(1).position;
+%         pos = p.trial.display.ctr(1:2);
+        p.trial.(sn).hTrial.x = (p.trial.eyeX - pos(1)) / p.trial.display.ppd;
+        p.trial.(sn).hTrial.y = -(p.trial.eyeY - pos(2)) / p.trial.display.ppd;
 
         % --- @dotMotionTrial/afterFrame handles all task state transitions
         p.trial.(sn).hTrial.afterFrame(p.trial.ttime);
@@ -60,7 +61,9 @@ switch state
 
     % TODO: add fixation position
         if p.trial.(sn).hTrial.showFix
-            fixRect = p.trial.display.ctr + kron(p.trial.(sn).fixWinRadius * p.trial.display.ppd,[-1, -1, +1, +1]);
+            pos = [p.trial.stimulus.hFix(:).position];
+%             pos = p.trial.display.ctr;
+            fixRect = pos + kron(p.trial.(sn).fixWinRadius * p.trial.display.ppd,[-1, -1, +1, +1]);
             Screen('FrameOval', p.trial.display.overlayptr, fixClr, fixRect);
         end
     
@@ -78,6 +81,13 @@ switch state
     case p.trial.pldaps.trialStates.trialCleanUpandSave
         
         stimuli.fixflash.cleanUpandSave(p, sn);
+    
+    % --- handles that depend on pldaps being totally set up
+    case p.trial.pldaps.trialStates.experimentPostOpenScreen
+        
+        % --- Reward
+        p.trial.(sn).hReward    = stimuli.reward(p);
+
         
 end % switch
 

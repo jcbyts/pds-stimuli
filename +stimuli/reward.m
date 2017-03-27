@@ -26,10 +26,11 @@ classdef reward < handle
             r.datapixx.rewardBit    = p.trial.event.REWARD;
             
             % --- control for sound
-            r.sound.use             = p.trial.sound.use;
-            r.sound.useForReward    = p.trial.sound.useForReward;
+            s = p.trial.sound;
+            r.sound.use             = s.use;
+            r.sound.useForReward    = s.useForReward;
             if r.sound.use
-                r.sound.reward      = p.trial.sound.reward;
+                r.sound.reward      = s.reward;
             else
                 r.sound.reward      = [];
             end
@@ -39,6 +40,7 @@ classdef reward < handle
             
             r.defaultAmount     = p.trial.behavior.reward.defaultAmount;
             r.iReward           = 1;
+            r.iTrial            = 1;
         end
         
         function give(r, amount)
