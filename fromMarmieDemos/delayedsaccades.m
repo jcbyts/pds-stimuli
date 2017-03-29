@@ -41,7 +41,7 @@ target(kTarg).motionstates.speeds=[0 0];
 target(kTarg).motionstates.duration=[-1*frate, -3*frate]; %negative means number of frame fixating
 target(kTarg).motionstates.fixationBreakConsequence=[2,3];%0: no consequence, %1 reset fixcounter,%2 increase abort elvel 3 :increase level and stop stimulus
 target(kTarg).motionstates.fixationTimeout=[8,0]*frate; %how long until fixation has to get acquired
-target(kTarg).motionstates.fixationWindow=[2,2];
+target(kTarg).motionstates.fixationWindow=[1,1]*2;
 target(kTarg).motionstates.fixationType=[2,2];
 target(kTarg).motionstates.proportionAbort=[1,0];%when a fixbreak is detected %normalize by number of targets of fixating any is succicient
 target(kTarg).motionstates.proportionReward=[0,0]; %when end of state reached
@@ -56,7 +56,7 @@ target(kTarg).motionstates.speeds=[0 5 0 0 0];
 target(kTarg).motionstates.duration=[-1*frate, 1,1, -.1*frate 1*frate]; %negative means number of frame fixating
 target(kTarg).motionstates.fixationBreakConsequence=[2,0,0,3,0];%0: no consequence, %1 reset fixcounter,%2 increase abort elvel 3 :increase level and stop stimulus
 target(kTarg).motionstates.fixationTimeout=[8,0,0,2,0]*frate; %how long until fixation has to get acquired
-target(kTarg).motionstates.fixationWindow=[2,2,2,2,0];
+target(kTarg).motionstates.fixationWindow=[1,1,1,1,0]*2;
 target(kTarg).motionstates.fixationType=[2,2,2,2,0];
 target(kTarg).motionstates.proportionAbort=[1,0,0,1,0];%when a fixbreak is detected %normalize by number of targets of fixating any is succicient
 target(kTarg).motionstates.proportionReward=[0,0,0,1,0]; %when end of state reached
@@ -177,14 +177,14 @@ maxSaccadeSize=6;
 minSaccadeSize=2;
 directions=rand(length(p.conditions),1)*360;
 sacSize=minSaccadeSize+ (maxSaccadeSize-minSaccadeSize)* rand(length(p.conditions),1);
-
+sacSize=6*ones(numel(p.conditions),1);
 for i=1:length(p.conditions)
-    p.conditions{i}.(sn).target=target;
+%     p.conditions{i}.(sn).target=target;
     
     %         p.conditions{i}.(sn).target(end).initialXY = rXY{i};
     p.conditions{i}.(sn).target(2).motionstates.directions(2)=directions(i);
     p.conditions{i}.(sn).target(2).motionstates.speeds(2)=sacSize(i);
-    p.conditions{i}.(sn).target(end).motionstates.drawObjectNr(end) = rd1(i);
+%     p.conditions{i}.(sn).target(end).motionstates.drawObjectNr(end) = rd1(i);
     %         p.conditions{i}.(sn).target(2).motionstates.drawObjectNr(2) = rd2(i);
 end
 

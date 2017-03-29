@@ -8,11 +8,11 @@
 
 subject='test';
 showGaussianBlobs=false;
-showNatBackground=false;
+showNatBackground=true;
 showHartleyStimuli=false;
 showHDmovie=false;
 showCSDFlash=false;
-showSparseNoise=true;
+showSparseNoise=false;
 
 behavior=@plain;
 % behavior=@TestDotMotion;

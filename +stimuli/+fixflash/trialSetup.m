@@ -43,6 +43,23 @@ ctr   = p.trial.display.ctr(1:2);   % center of the screen
 %     
 % end % staircase on
 
+% EYE CALIBRATION STUFF HERE
+
+% % marmoview specific preferences override pldaps
+% if p.trial.eyelink.use && p.trial.eyelink.useAsEyepos
+%     p.trial.eyelink.useRawData=true;
+%     p.trial.eyelink.calibration_matrix=[];
+%     for i = 1:2 % loop over eye index
+%         % get subject specific calibration matrix
+%         cm=getCalibrationPref(p,1);
+%         p.trial.eyelink.calibration_matrix(:,:,i) = cm';
+%     end
+%         
+% end
+
+
+
+
 % --- Fixation position
 if p.trial.(sn).fixationJitter
     xpos = p.trial.(sn).fixationJitterSize * randn + p.trial.(sn).fixationX;
@@ -107,5 +124,31 @@ p.trial.(sn).hTrial = stimuli.fixflash.fixFlashTrial( ...
   'iti',p.trial.(sn).iti, ...
   'maxRewardCnt',p.trial.(sn).maxRewardCnt, ...
   'viewpoint',false);
+end
 
-%   'fixDuration',p.trial.(sn).fixDuration, ...
+% function c=getCalibrationPref(p, eyeIdx)
+% % Get calibration matrix from rig preferences
+% % cm = getCalibrationPref(p, eyeIdx)
+% % Input:
+% %   p     [pldaps] - pldaps object
+% %   eyeIdx [1 x 1] - index for eye (1 or 2; optional)
+% % Output:
+% %   cm     [3 x 2] - calibration matrix
+% 
+% % get subject name
+% subj=p.trial.session.subject;
+% 
+% % if no index is passed in, query the eyelink to get the proper index
+% if nargin < 2
+%     useEyelink = p.trial.eyelink.use & p.trial.eyelink.useAsEyepos;
+%     if useEyelink
+%         if isfield(p.trial.eyelink, 'eyeIdx')
+%             eyeIdx = p.trial.eyelink.eyeIdx;
+%         else
+%             eyeIdx = 1;
+%         end
+%     else
+%         eyeIdx = 1;
+%     end
+% end
+% end

@@ -4,13 +4,14 @@ function p = cleanUpandSave(p, sn)
         if p.trial.(sn).staircaseOn
             
             
-%             lastError = p.trial.(sn).hTrial.error;
+            lastError = p.trial.(sn).hTrial.error;
             
             if p.trial.pldaps.iTrial < numel(p.conditions)
-                if p.trial.(sn).hTrial.holdDuration > p.trial.(sn).maxFixDuration;
+                
+                if lastError~=1 && p.trial.(sn).hTrial.holdDuration > p.trial.(sn).maxFixDuration;
                         p.conditions{p.trial.pldaps.iTrial + 1}.(sn).maxFixDuration =  p.trial.(sn).maxFixDuration + p.trial.(sn).staircaseStep;
                         p.conditions{p.trial.pldaps.iTrial + 1}.(sn).minFixDuration =  p.trial.(sn).minFixDuration + p.trial.(sn).staircaseStep;
-                elseif p.trial.(sn).hTrial.holdDuration < p.trial.(sn).minFixDuration;
+                elseif lastError~=1 && p.trial.(sn).hTrial.holdDuration < p.trial.(sn).minFixDuration;
                         p.conditions{p.trial.pldaps.iTrial + 1}.(sn).maxFixDuration =  p.trial.(sn).maxFixDuration - p.trial.(sn).staircaseStep;
                         p.conditions{p.trial.pldaps.iTrial + 1}.(sn).minFixDuration =  p.trial.(sn).minFixDuration - p.trial.(sn).staircaseStep;
                 else
