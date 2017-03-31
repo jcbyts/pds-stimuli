@@ -117,7 +117,7 @@ if ~isfield(p.trial.(sn), 'staircaseMax')
 end
 
 if ~isfield(p.trial.(sn), 'staircaseStep')
-    p.trial.(sn).staircaseStep = .1; % seconds
+    p.trial.(sn).staircaseStep = .05; % seconds
 end
 
 % -------------------------------------------------------------------------

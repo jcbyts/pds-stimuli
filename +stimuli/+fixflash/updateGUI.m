@@ -37,8 +37,8 @@ handles.plots.fixScatter.YData = [cellfun(@(x) x.stimulus.hTrial.holdXY(2), p.da
 
 handles.plots.staircaseMin.XData = 1:p.trial.pldaps.iTrial;
 handles.plots.staircaseMax.XData = 1:p.trial.pldaps.iTrial;
-handles.plots.staircaseMax.YData = [cellfun(@(x) x.(sn).hTrial.maxFixation, p.data) p.trial.(sn).maxFixDuration];
-handles.plots.staircaseMin.YData = [cellfun(@(x) x.(sn).hTrial.minFixation, p.data) p.trial.(sn).minFixDuration];
+handles.plots.staircaseMin.YData = [cellfun(@(x) x.(sn).hTrial.fixDuration, p.data) p.trial.(sn).minFixDuration];
+handles.plots.staircaseMax.YData = [cellfun(@(x) x.(sn).hTrial.holdDuration, p.data) p.trial.(sn).hTrial.holdDuration];
 
 if p.trial.eyelink.use
     if p.trial.eyelink.useRawData

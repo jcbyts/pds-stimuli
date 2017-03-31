@@ -38,7 +38,7 @@ classdef state8_InterTrialInterval < stimuli.state
             if isnan(s.tStart) % <-- first frame
                 s.tStart = t;
                 hTrial.setTxTime(t);
-                hTrial.rewardAmount = round( (hTrial.maxRewardCnt - 1) ./ (1+exp(- 4*(hTrial.holdDuration - (hTrial.minFixation + hTrial.maxFixation)/2 ))));
+                hTrial.rewardAmount = 1+round(2*hTrial.holdDuration.^.5);
                 fprintf('Reward amount: %d\n', hTrial.rewardAmount)
             end
             

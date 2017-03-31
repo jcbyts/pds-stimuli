@@ -41,9 +41,6 @@ classdef fixFlashTrial < stimuli.trial
     fixWinRadius@double;        % deg.
     fixGracePeriod@double;      % seconds
     
-    minFixation@double
-    maxFixation@double
-    
     fixDuration@double;         % seconds
     fixFlashCnt@double;         % frames
     holdDuration@double;        % seconds
@@ -95,8 +92,7 @@ classdef fixFlashTrial < stimuli.trial
       p.addParameter('fixWinRadius',NaN,@(x) isscalar(x) && isreal(x)); % deg.
       p.addParameter('fixGracePeriod',NaN,@(x) isscalar(x) && isreal(x)); % seconds
 %       p.addParameter('fixDuration',NaN,@(x) isscalar(x) && isreal(x)); % seconds
-      p.addParameter('minFixation',NaN,@(x) isscalar(x) && isreal(x)); % seconds
-      p.addParameter('maxFixation',NaN,@(x) isscalar(x) && isreal(x)); % seconds
+      p.addParameter('fixDuration',NaN,@(x) isscalar(x) && isreal(x)); % seconds
       p.addParameter('fixFlashCnt',NaN,@(x) isscalar(x) && isreal(x)); % frames
       p.addParameter('holdDuration',NaN,@(x) isscalar(x) && isreal(x)); % seconds
       p.addParameter('trialTimeout',NaN,@(x) isscalar(x) && isreal(x)); % seconds
@@ -118,9 +114,7 @@ classdef fixFlashTrial < stimuli.trial
     
       o.fixWinRadius        = args.fixWinRadius;
       o.fixGracePeriod      = args.fixGracePeriod;
-%       o.fixDuration         = args.fixDuration;
-      o.minFixation         = args.minFixation;
-      o.maxFixation         = args.maxFixation;
+      o.fixDuration         = args.fixDuration;
       o.fixFlashCnt         = args.fixFlashCnt;
       o.holdDuration        = args.holdDuration;
       o.trialTimeout        = args.trialTimeout;

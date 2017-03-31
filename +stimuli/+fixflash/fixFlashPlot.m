@@ -67,9 +67,9 @@ handles.plots.textOutcome0 = text(handles.TrialOutcomes,0,0,'');
 handles.plots.textOutcome1 = text(handles.TrialOutcomes,0,0,'');
 handles.plots.textOutcome2 = text(handles.TrialOutcomes,0,0,'');
 cla(handles.StairCasePlot)
-handles.plots.staircaseMax    = plot(handles.StairCasePlot, 0,0,'-k');
+handles.plots.staircaseMax    = plot(handles.StairCasePlot, 0,0,'.r');
 hold(handles.StairCasePlot, 'on')
-handles.plots.staircaseMin    = plot(handles.StairCasePlot, 0,0,':k');
+handles.plots.staircaseMin    = plot(handles.StairCasePlot, 0,0,'--k');
 
 handles.plots.textOutcome0.HorizontalAlignment = 'center';
 handles.plots.textOutcome1.HorizontalAlignment = 'center';
