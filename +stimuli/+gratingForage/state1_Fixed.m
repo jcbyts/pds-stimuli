@@ -16,7 +16,7 @@ classdef state1_Fixed < stimuli.state
         function s = state1_Fixed(hTrial,varargin)
             fprintf(1,'%s\n',mfilename);
             
-            s = s@stimuli.state(0,hTrial); % call the parent constructor
+            s = s@stimuli.state(1,hTrial); % call the parent constructor
         end
         
         % --- Drawing commands
@@ -26,6 +26,9 @@ classdef state1_Fixed < stimuli.state
             
             % draw gratings
             hTrial.hGratings.beforeFrame();
+            
+            hTrial.hFace.position = [hTrial.x hTrial.y]; %hTrial.hGratings.position(randi(size(hTrial.hGratings.position,1)),:);
+            hTrial.hFace.beforeFrame();
             
         end % before frame
         
@@ -39,23 +42,21 @@ classdef state1_Fixed < stimuli.state
                 s.tStart = t;
                 hTrial.setTxTime(t); % save transition time
             end
-                       
-
-            % --- End trial
-            if t > (s.tStart + hTrial.trialTimeout)
-                hTrial.error = 0;
-                hTrial.setState(8);
+               
+            if t > (s.tStart + .5)
+            % back to forage
+                hTrial.setState(0);
                 return
             end
             
-            % --- check if fixating
-            r = sqrt((hTrial.x - hTrial.hGratings.position(:,1)).^2 + (hTrial.y - hTrial.hGratings.position(:,2)).^2);
-            
-            if any(r < hTrial.fixWinRadius)
-                % move to state 1 - fixation grace period
-                hTrial.setState(1);
-                return
-            end
+%             % --- check if fixating
+%             r = sqrt((hTrial.x - hTrial.hGratings.position(:,1)).^2 + (hTrial.y - hTrial.hGratings.position(:,2)).^2);
+%             
+%             if any(r < hTrial.fixWinRadius)
+%                 % move to state 1 - fixation grace period
+%                 hTrial.setState(0);
+%                 return
+%             end
             
         end % after frame
         

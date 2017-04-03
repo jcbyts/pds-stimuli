@@ -16,7 +16,7 @@ classdef state8_ITI < stimuli.state
         function s = state8_ITI(hTrial,varargin)
             fprintf(1,'%s\n',mfilename);
             
-            s = s@stimuli.state(0,hTrial); % call the parent constructor
+            s = s@stimuli.state(8,hTrial); % call the parent constructor
         end
         
         % --- Drawing commands

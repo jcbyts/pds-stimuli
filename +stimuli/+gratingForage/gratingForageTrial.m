@@ -26,6 +26,7 @@ classdef gratingForageTrial < stimuli.trial
     hGratings@handle;
     hFace@handle;
     hReward@handle;
+    hNoise@handle;
     
     % flags
     showGratings = true;
@@ -41,6 +42,8 @@ classdef gratingForageTrial < stimuli.trial
     
     rewardCnt@double = 0;
     rewardAmount@double;
+    
+    rng@RandStream;
 
   end
 
@@ -50,10 +53,12 @@ classdef gratingForageTrial < stimuli.trial
   end
   
   methods (Access = public)
-    function o = gratingForageTrial(hGratings,hFace,hReward,varargin)
+    function o = gratingForageTrial(setupRNG,hGratings,hNoise,hFace,hReward,varargin)
+      o.rng         = setupRNG;
       o.hGratings   = hGratings;
       o.hFace       = hFace;
       o.hReward     = hReward;
+      o.hNoise      = hNoise;
       
       % initialise the @state object pool...
       o.addState(stimuli.gratingForage.state0_Forage(o));
@@ -92,8 +97,6 @@ classdef gratingForageTrial < stimuli.trial
       o.fixWinRadius        = args.fixWinRadius;
       o.fixGracePeriod      = args.fixGracePeriod;
       o.fixDuration         = args.fixDuration;
-      o.fixFlashCnt         = args.fixFlashCnt;
-      o.holdDuration        = args.holdDuration;
       o.trialTimeout        = args.trialTimeout;
       o.iti                 = args.iti;
       

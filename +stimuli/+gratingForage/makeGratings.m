@@ -49,9 +49,16 @@ for k = 1:n
       mask = sqrt(xx.^2 + yy.^2) < sigma;
   end
   
-  G = sinecarrier .* mask;
-  G = G.*contrast;
-  G = round(G*128 + 128); % round to pixel values (is this necessary?)
+  img = sinecarrier*255/2 + 255/2;
+%   img = img.*contrast;
+  mask = mask - min(mask(:));
+  mask = mask./max(mask(:));
+  img(:,:,2) = img(:,:,1);
+  img(:,:,3) = img(:,:,1);
+  img(:,:,4) = uint8(255.*mask);
   
-  hGratings.addTexture(k, G);
+  
+  %   G = round(G*128 + 128); % round to pixel values (is this necessary?)
+  
+  hGratings.addTexture(k, img);
 end

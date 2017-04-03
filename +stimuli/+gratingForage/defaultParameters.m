@@ -39,7 +39,15 @@ p.trial.(sn).holdDuration    = .1; % seconds;
 p.trial.(sn).rewardRate      = .2;
 p.trial.(sn).trialDuration   = 20; % seconds
 
+p.trial.(sn).faceRadius = 1; % degree
 p.trial.(sn).hGratings = stimuli.gratingForage.makeGratings(p);
+p.trial.(sn).hNoise    = stimuli.gratingForage.makeGratings(p);
+
+p.trial.(sn).fixWinRadius = 1.5;
+p.trial.(sn).fixGracePeriod = .05;
+p.trial.(sn).fixDuration = .1;
+p.trial.(sn).trialTimeout = 10;
+p.trial.(sn).iti = 1;
 
 % -------------------------------------------------------------------------
 % --- setup stimuli and prepare to run
@@ -68,7 +76,7 @@ for id = 1:length(MFL)
 end
 
 p.trial.(sn).hFace = hFace;
-
+p.trial.pldaps.draw.eyepos.use = false;
 
 % -------------------------------------------------------------------------
 % --- Plotting

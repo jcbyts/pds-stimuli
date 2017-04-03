@@ -27,11 +27,12 @@ classdef state0_Forage < stimuli.state
             % draw gratings
             hTrial.hGratings.beforeFrame();
             
+            hTrial.hNoise.beforeFrame();
+            
         end % before frame
         
         % -- Evaluate states (prepare before drawing)
         function afterFrame(s,t)
-            
             hTrial = s.hTrial;
             
             % --- Save start of state
@@ -39,7 +40,10 @@ classdef state0_Forage < stimuli.state
                 s.tStart = t;
                 hTrial.setTxTime(t); % save transition time
             end
-                       
+            hTrial.hNoise.position = [hTrial.x hTrial.y];
+            if rand < .3
+                hTrial.hNoise.id = randi(numel(hTrial.hNoise.texIds));
+            end
 
             % --- End trial
             if t > (s.tStart + hTrial.trialTimeout)
@@ -53,7 +57,7 @@ classdef state0_Forage < stimuli.state
             
             if any(r < hTrial.fixWinRadius)
                 % move to state 1 - fixation grace period
-                hTrial.setState(8);
+                hTrial.setState(1);
                 return
             end
             
