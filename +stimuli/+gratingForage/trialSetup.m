@@ -15,9 +15,9 @@ setupRNG=p.trial.(sn).rngs.conditionerRNG;
 
 % --- Necessary parameters for fixation noise
 p.trial.(sn).hNoise.position = [0 0];
-p.trial.(sn).hNoise.alpha = .1;
+p.trial.(sn).hNoise.alpha = .2;
 p.trial.(sn).hNoise.id = randi(p.trial.(sn).nOrientations);
-p.trial.(sn).hNoise.size = ceil(2*p.trial.(sn).gratingRadius*p.trial.display.ppd)*[1 1];
+p.trial.(sn).hNoise.size = ceil(3*p.trial.(sn).gratingRadius*p.trial.display.ppd)*[1 1];
 
 % --- Setup gratings
 p.trial.(sn).hGratings.id = randi(p.trial.(sn).nOrientations, 1, p.trial.(sn).nGratings);
@@ -25,10 +25,10 @@ p.trial.(sn).hGratings.size = ceil(2.5*p.trial.(sn).gratingRadius*p.trial.displa
 
 infiniteLoopStopper = 1e4;
 
-pos = rand(setupRNG, 2,p.trial.(sn).nGratings)*10-5;
+pos = rand(setupRNG, 2,p.trial.(sn).nGratings)*20-10;
 for kPos = 2:p.trial.(sn).nGratings
     
-    pos(:,kPos) = rand(setupRNG, 2,1)*10 - 5;
+    pos(:,kPos) = rand(setupRNG, 2,1)*20 - 10;
     
     r = sqrt((pos(1,1:(kPos-1)) - pos(1,kPos)).^2 + (pos(2,1:(kPos-1)) - pos(2,kPos)).^2);
     loopCounter = 1;
@@ -59,7 +59,7 @@ p.trial.(sn).hReward.iTrial        = p.trial.pldaps.iTrial;
 % --- Setup dot motion trial
 % the @trial object (initially in state 0)
 % hFix,hDots,hChoice,hCue,hFace,hReward,
-p.trial.(sn).hTrial = stimuli.gratingForage.gratingForageTrial( ...
+p.trial.(sn).hTrial = stimuli.gratingForage.gratingForageTrial(setupRNG, ...
   p.trial.(sn).hGratings, p.trial.(sn).hNoise, p.trial.(sn).hFace, p.trial.(sn).hReward, ...
   'fixWinRadius',p.trial.(sn).gratingRadius * p.trial.display.ppd, ...
   'fixGracePeriod',p.trial.(sn).fixGracePeriod, ...

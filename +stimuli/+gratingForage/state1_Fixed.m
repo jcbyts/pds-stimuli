@@ -27,8 +27,8 @@ classdef state1_Fixed < stimuli.state
             % draw gratings
             hTrial.hGratings.beforeFrame();
             
-            hTrial.hFace.position = [hTrial.x hTrial.y]; %hTrial.hGratings.position(randi(size(hTrial.hGratings.position,1)),:);
-            hTrial.hFace.beforeFrame();
+%             hTrial.hFace.position = [hTrial.x hTrial.y]; %hTrial.hGratings.position(randi(size(hTrial.hGratings.position,1)),:);
+%             hTrial.hFace.beforeFrame();
             
         end % before frame
         
