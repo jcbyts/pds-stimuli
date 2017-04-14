@@ -4,7 +4,8 @@ clear settingsStruct
 Screen('Preference','ScreenToHead', 1,0,0);
 
 subject = 'Chelsea';
-rewardAmount = .01;
+rewardAmount  = .01;
+noiseContrast = .05;
 
 % add modular trial functions
 settingsStruct.eyemarker.use=false;
