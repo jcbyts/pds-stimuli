@@ -50,6 +50,7 @@ classdef fixFlashTrial < stimuli.trial
     rewardFaceDuration
     
     maxRewardCnt@double;
+    rewardLevels@double;
     
     holdXY
     
@@ -100,6 +101,7 @@ classdef fixFlashTrial < stimuli.trial
       p.addParameter('rewardForObtainFixation', false)
       p.addParameter('rewardFaceDuration', .5)
       p.addParameter('maxRewardCnt',NaN,@(x) isscalar(x) && isreal(x));
+      p.addParameter('rewardLevels',[.1 .2 .5]);
       
       p.addParameter('viewpoint',false,@islogical);
       
@@ -121,6 +123,7 @@ classdef fixFlashTrial < stimuli.trial
       o.iti                 = args.iti;
       o.rewardFaceDuration  = args.rewardFaceDuration;
             
+      o.rewardLevels                 = args.rewardLevels;
       o.maxRewardCnt        = args.maxRewardCnt;
       o.rewardForObtainFixation = args.rewardForObtainFixation;
            

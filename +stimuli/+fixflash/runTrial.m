@@ -50,11 +50,13 @@ switch state
         
         % overlay pointer drawing
 %         ctr=p.trial.display.ctr(1:2);
+        p.trial.sparseNoise.on = 0;
         switch p.trial.(sn).hTrial.stateId
-            case 0 % FixWait
+            case {0,1,8} % FixWait
                 fixClr = p.trial.display.clut.bg_white;
-            case {1,2,3,4,8} % FixHold
+            case {2,3,4} % FixHold
                 fixClr = p.trial.display.clut.bg_green;
+                p.trial.sparseNoise.on = 1;
             case 7
                 fixClr = p.trial.display.clut.bg_red;
         end
