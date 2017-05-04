@@ -26,31 +26,87 @@ p.defaultParameters.pldaps.trialFunction='stimuli.gratingForage.runTrial';
 % --- Parameters of the Grating Forage task
 
 % --- Stimulus parameters
-p.trial.(sn).bgColour 	   = .5; % pldaps controls this when the screen is opened
+if ~isfield(p.trial.(sn), 'bgColour')
+    p.trial.(sn).bgColour 	   = .5; % pldaps controls this when the screen is opened
+end
 
-p.trial.(sn).nGratings       = 8;
-p.trial.(sn).nOrientations   = 12;
-p.trial.(sn).gratingRadius   = 1; % degrees
-p.trial.(sn).gratingBuffer   = 2.5; % x radius
-p.trial.(sn).gratingContrast = .1; % michelson contrast
-p.trial.(sn).gratingSF       = 4; % cycles / degree
-p.trial.(sn).isGabor         = true;
-p.trial.(sn).holdDuration    = .1; % seconds;
-p.trial.(sn).rewardRate      = .2;
-p.trial.(sn).trialDuration   = 20; % seconds
+if ~isfield(p.trial.(sn), 'nGratings')
+    p.trial.(sn).nGratings       = 8;
+end
 
-p.trial.(sn).faceRadius = 1; % degree
-p.trial.(sn).hGratings = stimuli.gratingForage.makeGratings(p);
-p.trial.(sn).hNoise    = stimuli.gratingForage.makeGratings(p);
+if ~isfield(p.trial.(sn), 'nOrientations')
+    p.trial.(sn).nOrientations   = 12;
+end
 
-p.trial.(sn).fixWinRadius = 1.5;
-p.trial.(sn).fixGracePeriod = .05;
-p.trial.(sn).fixDuration = .1;
-p.trial.(sn).trialTimeout = 10;
-p.trial.(sn).iti = 1;
+if ~isfield(p.trial.(sn), 'nPhases')
+    p.trial.(sn).nPhases = 4;
+end
+
+if ~isfield(p.trial.(sn), 'gratingRadius')
+    p.trial.(sn).gratingRadius   = 1; % degrees
+end
+
+if ~isfield(p.trial.(sn), 'gratingBuffer')
+    p.trial.(sn).gratingBuffer   = 2.5; % x radius
+end
+
+if ~isfield(p.trial.(sn), 'gratingContrast')
+    p.trial.(sn).gratingContrast = .1; % michelson contrast
+end
+
+if ~isfield(p.trial.(sn), 'gratingSF')
+    p.trial.(sn).gratingSF       = 4; % cycles / degree
+end
+
+if ~isfield(p.trial.(sn), 'isGabor')
+    p.trial.(sn).isGabor         = true;
+end
+
+if ~isfield(p.trial.(sn), 'holdDuration')
+    p.trial.(sn).holdDuration    = .1; % seconds;
+end
+
+if ~isfield(p.trial.(sn), 'rewardRate')
+    p.trial.(sn).rewardRate      = .2;
+end
+
+
+if ~isfield(p.trial.(sn), 'faceRadius')
+    p.trial.(sn).faceRadius = 1; % degree
+end
+
+if ~isfield(p.trial.(sn), 'fixWinRadius')
+    p.trial.(sn).fixWinRadius = 1.5;
+end
+
+% -------------------------------------------------------------------------
+% --- Trial Timing
+if ~isfield(p.trial.(sn), 'trialDuration')
+    p.trial.(sn).trialDuration   = 10; % seconds
+end
+
+if ~isfield(p.trial.(sn), 'fixGracePeriod')
+    p.trial.(sn).fixGracePeriod = .05;
+end
+
+if ~isfield(p.trial.(sn), 'fixDuration') % TODO: WHAT IS THIS PARAMETER FOR
+    p.trial.(sn).fixDuration = .1;
+end
+
+if ~isfield(p.trial.(sn), 'trialTimeout')
+    p.trial.(sn).trialTimeout = 10;
+end
+
+if ~isfield(p.trial.(sn), 'iti')
+    p.trial.(sn).iti = 1;
+end
 
 % -------------------------------------------------------------------------
 % --- setup stimuli and prepare to run
+
+% --- Gratings
+p.trial.(sn).hGratings = stimuli.gratingForage.makeGratings(p);
+p.trial.(sn).hNoise    = stimuli.gratingForage.makeGratings(p);
 
 % --- Face Textures
 hFace = stimuli.textures(p.trial.display.ptr);

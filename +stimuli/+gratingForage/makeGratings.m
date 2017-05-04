@@ -9,22 +9,30 @@ end
 
 
 % Make a gabor texture using current parameters
-n = p.trial.(sn).nOrientations;
-A.tex           = nan(n,1);
-A.texRect       = nan(n,4);
+nOr = p.trial.(sn).nOrientations;
+nPh = p.trial.(sn).nPhases;
+
+n = nOr * nPh;
 
 % initialize parameters
-A.orientations  = ((1:n)-1)/n * 180;
-A.phase         = repmat(pi,1,n); %rand(1,n)*pi;
-A.contrast      = repmat(p.trial.(sn).gratingContrast,1,n);
-A.sf            = repmat(p.trial.(sn).gratingSF,1,n);
+condOr  = ((1:nOr)-1)/nOr * 180;
+condPh  = ((1:nPh)-1)/nPh * 180;
+
+[orientations, phase] = meshgrid(condOr, condPh);
+orientations = orientations(:);
+phase        = phase(:);
+
+sf            = repmat(p.trial.(sn).gratingSF,1,n);
+
+% pixels per degree multiplier
 ppd = p.trial.display.ppd;
+
 dpix = ceil(2.5*p.trial.(sn).gratingRadius*ppd);
 if rem(dpix,2) % force even
     dpix = dpix-1;
 end
 
-xax = (-dpix/2:dpix/2)./ppd ;
+xax = (-dpix/2:dpix/2)./ppd ; % convert back to degrees
 [xx,yy] = meshgrid( xax );
 
 hGratings = stimuli.textures(p.trial.display.ptr);
@@ -32,10 +40,10 @@ hGratings = stimuli.textures(p.trial.display.ptr);
 for k = 1:n
     
   % variables for this 
-  omega   = pi * A.sf(k);
-  theta = A.orientations(k)/180*pi;
-  phi   = A.phase(k);
-  contrast = A.contrast(k);
+  omega    = 2 * pi * sf(k);
+  theta    = orientations(k) / 180 * pi;
+  phi      = phase(k) / 180 * pi;
+  
   % get rotation
   zz = sin(theta) .* xx + cos(theta) .* yy;
   
@@ -50,15 +58,12 @@ for k = 1:n
   end
   
   img = sinecarrier*255/2 + 255/2;
-%   img = img.*contrast;
+  
   mask = mask - min(mask(:));
   mask = mask./max(mask(:));
   img(:,:,2) = img(:,:,1);
   img(:,:,3) = img(:,:,1);
   img(:,:,4) = uint8(255.*mask);
-  
-  
-  %   G = round(G*128 + 128); % round to pixel values (is this necessary?)
   
   hGratings.addTexture(k, img);
 end
