@@ -15,9 +15,9 @@ setupRNG=p.trial.(sn).rngs.conditionerRNG;
 
 % --- Necessary parameters for fixation noise
 p.trial.(sn).hNoise.position = [0 0];
-p.trial.(sn).hNoise.alpha = .2;
+p.trial.(sn).hNoise.alpha = .5;
 p.trial.(sn).hNoise.id = randi(p.trial.(sn).nOrientations);
-p.trial.(sn).hNoise.size = ceil(3*p.trial.(sn).gratingRadius*p.trial.display.ppd)*[1 1];
+p.trial.(sn).hNoise.size = ceil(3*p.trial.(sn).noiseRadius*p.trial.display.ppd)*[1 1];
 
 % --- Setup gratings
 p.trial.(sn).hGratings.id = randi(p.trial.(sn).nOrientations, 1, p.trial.(sn).nGratings);

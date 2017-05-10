@@ -46,6 +46,8 @@ if ~isfield(p.trial.(sn), 'gratingRadius')
     p.trial.(sn).gratingRadius   = 1; % degrees
 end
 
+p.trial.(sn).noiseRadius = p.trial.(sn).gratingRadius;
+
 if ~isfield(p.trial.(sn), 'gratingBuffer')
     p.trial.(sn).gratingBuffer   = 2.5; % x radius
 end
