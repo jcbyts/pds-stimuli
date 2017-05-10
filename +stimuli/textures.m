@@ -63,20 +63,20 @@ classdef textures < handle
 %       value = cellfun(@(x) x.alpha, o.texture(idx), 'UniformOutput', 1);
 %     end
 
-    function value = get.texIds(o),
+    function value = get.texIds(o)
       value = cellfun(@(x) x.id, o.texture, 'UniformOutput', 0);
     end
     
-    function value = get.numTex(o),
+    function value = get.numTex(o)
       value = length(o.texture);
     end
   end
   
   methods (Access = public)
-    function o = textures(winPtr,varargin), % marmoview's initCmd?
+    function o = textures(winPtr,varargin) % marmoview's initCmd?
       o.winPtr = winPtr;
       
-      if nargin == 1,
+      if nargin == 1
         return
       end
 
@@ -85,13 +85,13 @@ classdef textures < handle
       p = inputParser;
 %       p.KeepUnmatched = true;
       p.StructExpand = true;
-      p.addParamValue('size',NaN,@isfloat); % pixels
-      p.addParamValue('position',o.position,@isfloat); % [x,y] (pixels)
-      p.addParamValue('alpha',o.alpha,@isfloat); % opacity, 0..1
+      p.addParameter('size',NaN,@isfloat); % pixels
+      p.addParameter('position',o.position,@isfloat); % [x,y] (pixels)
+      p.addParameter('alpha',o.alpha,@isfloat); % opacity, 0..1
 
       try
         p.parse(args{:});
-      catch,
+      catch
         warning('Failed to parse name-value arguments.');
         return;
       end
@@ -103,19 +103,19 @@ classdef textures < handle
       o.alpha = args.alpha;
     end
         
-    function beforeTrial(o),
+    function beforeTrial(o)
     end
     
-    function beforeFrame(o),
+    function beforeFrame(o)
       o.drawTextures();
     end
         
-    function afterFrame(o),
+    function afterFrame(o)
     end
   end % methods
     
   methods (Access = public)        
-    function drawTextures(o),
+    function drawTextures(o)
       % get textures to draw...
       idx = o.getTexIdx(o.id);
       
@@ -129,7 +129,7 @@ classdef textures < handle
       r = floor(o.size./2); % pixels
 %       rect = kron([1,1],o.position) + kron(r(:),[-1, -1, +1, +1]);
 
-      if size(r,2) == 1,
+      if size(r,2) == 1
         r = repmat(r,1,2); % square texture(s)
       end
       rect = kron([1,1],o.position) + kron([-1,1],r);
@@ -138,7 +138,7 @@ classdef textures < handle
       Screen('DrawTextures',o.winPtr,texPtr,[],rect',[],filterMode,o.alpha);
     end
     
-    function addTexture(o,id,img,varargin),
+    function addTexture(o,id,img,varargin)
       % add IMG to the list of textures, with texture id ID.
       %
       % IMG can be a NxM matrix of pixel luminance values, an NxMx3 matrix
@@ -151,7 +151,7 @@ classdef textures < handle
       
       % check if this Id already exists...
       idx = o.getTexIdx(id);
-      if isempty(idx),
+      if isempty(idx)
         % new texture
         idx = length(o.texture)+1;
       end
@@ -161,18 +161,30 @@ classdef textures < handle
       sz = size(img);
       o.texture{idx} = struct('id',id,'size',sz(2:1),'alpha',1.0','ptr',texPtr);
     end
+    
+    function closeAll(o)
+       
+        idx = o.getTexIdx(o.id);
+      
+      texPtr = cellfun(@(x) x.ptr, o.texture(idx),'UniformOutput',true);
+        
+    end
+    
+    function closeTexture(o,id)
+        
+    end
         
   end % methods
     
   methods (Access = private),
-    function idx = getTexIdx(o,id),
+    function idx = getTexIdx(o,id)
       % get index in texPtr (or texIds) based on id
-      if length(o.texture) == 0,
+      if length(o.texture) == 0
         idx = [];
         return;
       end
 
-      if ~iscell(id),
+      if ~iscell(id)
         id = arrayfun(@(x) x, id, 'UniformOutput', 0);
       end
       
