@@ -45,6 +45,9 @@ switch state
 
         % --- @dotMotionTrial/afterFrame handles all task state transitions
         p.trial.(sn).hTrial.afterFrame(p.trial.ttime);
+        
+        noise = p.trial.(sn).hNoise;
+        p.trial.(sn).revcoXyId(p.trial.iFrame,:) = [noise.position noise.id];
 
     % --- Draw task semantics using info from hTrial
     case p.trial.pldaps.trialStates.framePrepareDrawing
@@ -72,6 +75,9 @@ switch state
     case p.trial.pldaps.trialStates.trialSetup
         
         stimuli.gratingForage.trialSetup(p, sn);
+        
+        % preallocate noise
+        p.trial.(sn).revcoXyId = nan(10e4,3);
         
 	% --- All Screen() calls go here
     case p.trial.pldaps.trialStates.frameDraw
