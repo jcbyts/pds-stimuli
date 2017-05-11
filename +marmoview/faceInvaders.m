@@ -99,7 +99,7 @@ switch state
         % TODO: motion object should take this RNG stream to save the seed
         p.trial.(sn).maxFrames = p.trial.pldaps.maxTrialLength * p.trial.display.frate;
         
-        p.trial.(sn).m = stimuli.MotionObjects(p, p.trial.(sn).MotN);
+        p.trial.(sn).m = stimuli.MotionObjects(p, p.trial.(sn).MotN, 'type', p.trial.faceForage.type);
         p.trial.(sn).m.setup;
         
         p.trial.(sn).x = nan(p.trial.(sn).maxFrames, p.trial.(sn).MotN);
@@ -119,7 +119,7 @@ switch state
             plot(p.trial.(sn).x(ix,i), p.trial.(sn).y(ix,i), 'r.');
         end
         
-        
+        p.trial.(sn).m.objects.closeAll;
         drawnow
     
         % --- handles that depend on pldaps being totally set up

@@ -167,12 +167,12 @@ classdef textures < handle
 %         idx = o.getTexIdx(o.id);
 %       
 %       texPtr = cellfun(@(x) x.ptr, o.texture(idx),'UniformOutput',true);
-      for i = 1:numel(o.texIds)
-          Screen('Close', o.texIds{i})
-      end
-      o.id = [];
-      o.texIds = cell();
-      o.numTex = 0;
+        
+	  Screen('Close', cell2mat(o.texIds))
+      
+%       o.id = [];
+%       o.texIds = {};
+%       o.numTex = 0;
         
     end
     

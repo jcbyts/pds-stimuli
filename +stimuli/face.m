@@ -38,7 +38,7 @@ classdef face < stimuli.textures
             
             % --- initialize so the texture is ready to use
             o.id  = randi(o.numTex);
-            o.size = sz;
+            o.size = sz(1:2);
             o.position = p.trial.display.ctr(1:2);
         end
         

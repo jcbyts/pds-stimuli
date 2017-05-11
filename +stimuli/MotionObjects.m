@@ -81,10 +81,10 @@ classdef MotionObjects < handle
             m.ptr       = p.trial.display.ptr;
             
             m.hReward   = stimuli.reward(p);
-            m.dWidth    = p.trial.display.dWidth/2;
-            m.dHeight   = p.trial.display.dHeight/2;
-            m.pWidth    = p.trial.display.pWidth/2;
-            m.pHeight   = p.trial.display.pHeight/2;
+            m.dWidth    = p.trial.display.dWidth;
+            m.dHeight   = p.trial.display.dHeight;
+            m.pWidth    = p.trial.display.pWidth;
+            m.pHeight   = p.trial.display.pHeight;
             
             m.ppd     = p.trial.display.ppd;
             m.ctr     = p.trial.display.ctr;
@@ -139,7 +139,7 @@ classdef MotionObjects < handle
             m.repulse       = ones(1,m.N);
             m.color         = ones(3,m.N);
             m.colorThresh   = 40;
-            m.alpha         = ones(1,m.N); % faces appear gradually
+            m.alpha         = rand(1,m.N)*2*pi; % faces appear gradually
             m.rotAngles     = zeros(1,m.N);
             m.ctrExplode    = zeros(1,m.N);
             m.ctrHold       = zeros(1,m.N);
@@ -209,6 +209,7 @@ classdef MotionObjects < handle
             m.dotI    = reshape(ones(100,1)*(1:m.N), 1, maxDots);
             m.dotC    = zeros(3, maxDots);
             m.dotCtr  = zeros(1, maxDots);
+            
             
         end % constructor
         
@@ -340,6 +341,13 @@ classdef MotionObjects < handle
             % --- Calculate texture rectangles
             m.dstRects = kron([-1; -1; 1; 1], m.radius*m.ppd) + kron([1; 1], [m.ppd*m.x + m.ctr(1); -m.ppd*m.y + m.ctr(2)]);
             
+            % --- TEXTURE OBJECTS
+            m.objects.position = [m.ppd*m.x(:) + m.ctr(1) -m.ppd*m.y(:) + m.ctr(2)];
+            m.objects.size     = repmat(2*m.radius(:)*m.ppd,1,2);
+            m.alpha = m.alpha + .05;
+            m.objects.alpha    = cos(m.alpha).^2;
+            m.objects.id       = m.faceint;
+            
             iiExplode = m.ctrHold>m.expThresh & iiIntact;
             if any(iiExplode)
                 m.ctrExplode(iiExplode)=1;
@@ -399,7 +407,9 @@ classdef MotionObjects < handle
 
             iiTex=m.ctrExplode==0;
             if any(iiTex)
-                Screen('DrawTextures', m.ptr, m.texid(iiTex), [], m.dstRects(:,iiTex), m.rotAngles(iiTex), [], m.alpha(iiTex), m.color(:,iiTex));
+%                 Screen('DrawTextures', m.ptr, m.texid(iiTex), [], m.dstRects(:,iiTex), m.rotAngles(iiTex), [], m.alpha(iiTex), m.color(:,iiTex));
+                m.objects.alpha(~iiTex) = 0;
+                m.objects.drawTextures();
             end
             
             
@@ -512,6 +522,7 @@ classdef MotionObjects < handle
             % --- Calculate texture rectangles
             m.dstRects = kron([-1; -1; 1; 1], m.radius*m.ppd) + kron([1; 1], [m.ppd*m.x + m.ctr(1); -m.ppd*m.y + m.ctr(2)]);
             
+            m.objects.position = [m.ppd*m.x + m.ctr(1); -m.ppd*m.y + m.ctr(2)];
 %             m.dstRects(:,ix) = kron([-1; -1; 1; 1], m.radius(ix)) + kron([1; 1], [m.x(ix); m.y(ix)]);
         end % refresh
         
