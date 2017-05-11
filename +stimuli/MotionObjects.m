@@ -5,7 +5,8 @@ classdef MotionObjects < handle
     %   
     %   All arguments can be vectorized and if they are, must be size Num
     properties (Access = public)
-        p@pldaps                % pointer to pldaps object
+        ptr                     % pointer to PTB display
+        hReward                 % reward class
         N@double                % number of motion objects
         radius@double           % array of object sizes
         visible@logical         % visible or not
@@ -58,15 +59,39 @@ classdef MotionObjects < handle
         removed
     end
     
+    properties (Access = private)
+        dWidth % display width
+        dHeight
+        pWidth
+        pHeight
+        
+        ifi % inter frame interval (1/framerate)
+        ppd
+        ctr
+    end
+    
     methods
         % --- Contstructor make motion objects
         function m=MotionObjects(p, N, varargin)
             % m=MotionOject(pldapsObject, Number, varargin)
             % Since we're setting most of the parameters here, we don't
             % need to parse a lot of arguments. Let's just set it up
-            % 
-            m.p=p;
+            
+            % --- Save all important pldaps variables
+            m.ptr       = p.trial.display.ptr;
+            
+            m.hReward   = stimuli.reward(p);
+            m.dWidth    = p.trial.display.dWidth;
+            m.dHeight   = p.trial.display.dHeight;
+            m.pWidth    = p.trial.display.pWidth;
+            m.pHeight   = p.trial.display.pHeight;
+            
+            m.ppd     = p.trial.display.ppd;
+            m.ctr     = p.trial.display.ctr;
+            m.ifi     = p.trial.display.ifi;
+            
             m.N=N; % number
+            
             ip=inputParser();
             ip.addParameter('initialRange', 40)
             ip.addParameter('forceField', false)
@@ -292,27 +317,20 @@ classdef MotionObjects < handle
             end
             
             % --- Bounce of walls
-            ii=m.x > m.p.trial.display.dWidth/2 | m.x < -m.p.trial.display.dWidth/2;
+            ii=m.x > m.dWidth/2 | m.x < -m.dWidth/2;
             m.dx(ii) = -m.dx(ii);
             m.x(ii)  = m.x(ii) + m.repulse(ii) .* m.dx(ii); % repulse
             
-            ii=m.y > m.p.trial.display.dHeight/2 | m.y < -m.p.trial.display.dHeight/2;
+            ii=m.y > m.dHeight/2 | m.y < -m.dHeight/2;
             m.dy(ii) = -m.dy(ii);
 %             m.y(ii)  = m.y(ii) + m.repulse(ii) .* m.dy(ii); % repulse
             
             % --- Translate position
             m.x = m.x + m.dx;
             m.y = m.y + m.dy;
-            
-%             xypixx = pds.deg2px([m.xpixx; m.ypixx], m.p.trial.display.viewdist, m.p.trial.display.w2px,false);
-%             m.xpixx = xypixx(1,:) + m.p.trial.display.ctr(1);
-%             m.ypixx = xypixx(2,:) + m.p.trial.display.ctr(2);
                         
             % --- Calculate texture rectangles
-            ppd=m.p.trial.display.ppd;
-            ctr=m.p.trial.display.ctr(1:2);
-            m.dstRects = kron([-1; -1; 1; 1], m.radius*ppd) + kron([1; 1], [ppd*m.x + ctr(1); -ppd*m.y + ctr(2)]);
-            
+            m.dstRects = kron([-1; -1; 1; 1], m.radius*m.ppd) + kron([1; 1], [m.ppd*m.x + m.ctr(1); -m.ppd*m.y + m.ctr(2)]);
             
             iiExplode = m.ctrHold>m.expThresh & iiIntact;
             if any(iiExplode)
@@ -331,14 +349,13 @@ classdef MotionObjects < handle
             
             iiExplode=(m.ctrExplode==1); % first frame of explosion
             if any(iiExplode)
-                pds.behavior.reward.give(m.p)
-                ppd=m.p.trial.display.ppd;
+                m.hReward.give();
                 
                for i = find(iiExplode)
                     ii=m.dotI==i;
                     
-                    m.dotx(ii)=m.x(i)*ppd + m.p.trial.display.ctr(1);
-                    m.doty(ii)=-m.y(i)*ppd + m.p.trial.display.ctr(2);
+                    m.dotx(ii)=m.x(i)*m.ppd + m.ctr(1);
+                    m.doty(ii)=-m.y(i)*m.ppd + m.ctr(2);
                     m.dotdx(ii)=randn(1,100)*m.expSpeed(i);
                     m.dotdy(ii)=randn(1,100)*m.expSpeed(i);
                     m.dotC(:,ii)=repmat(m.color(:,i),1, 100);
@@ -348,10 +365,10 @@ classdef MotionObjects < handle
             
         end
         
-        function isheld(m)
+        function isheld(m, xy)
             
-            xDeg=(m.p.trial.eyeX - m.p.trial.display.ctr(1)) / m.p.trial.display.ppd;
-            yDeg=-(m.p.trial.eyeY - m.p.trial.display.ctr(2)) / m.p.trial.display.ppd;
+            xDeg=(xy(1) - m.ctr(1)) / m.ppd;
+            yDeg=-(xy(2) - m.ctr(2)) / m.ppd;
             
             dist=sqrt((xDeg - m.x).^2 + (yDeg - m.y).^2);
             
@@ -374,7 +391,7 @@ classdef MotionObjects < handle
 
             iiTex=m.ctrExplode==0;
             if any(iiTex)
-                Screen('DrawTextures', m.p.trial.display.ptr, m.texid(iiTex), [], m.dstRects(:,iiTex), m.rotAngles(iiTex), [], m.alpha(iiTex), m.color(:,iiTex));
+                Screen('DrawTextures', m.ptr, m.texid(iiTex), [], m.dstRects(:,iiTex), m.rotAngles(iiTex), [], m.alpha(iiTex), m.color(:,iiTex));
             end
             
             
@@ -391,7 +408,7 @@ classdef MotionObjects < handle
                 xy=[m.dotx(iiExplode); m.doty(iiExplode)];
                 dcolor=m.dotC(:,iiExplode);
                 dotSz=m.dotS(iiExplode);
-                Screen('DrawDots',m.p.trial.display.ptr,xy, dotSz, dcolor, [], 2);
+                Screen('DrawDots',m.ptr,xy, dotSz, dcolor, [], 2);
             end
 %             elseif m.ctrExplode==1
 %                 m.xy=repmat(m.xypixx', 100,1)';
@@ -443,7 +460,7 @@ classdef MotionObjects < handle
         function setup(m)
             %% load marmoset face textures
             % create face textures... useful for visual feedback to our subject
-            m.winRect=m.p.trial.display.ctr+[-m.p.trial.display.pWidth -m.p.trial.display.pHeight m.p.trial.display.pWidth m.p.trial.display.pHeight]/2;
+            m.winRect=m.ctr +[-m.pWidth -m.pHeight m.pWidth m.pHeight]/2;
             MFL=load(fullfile(marmoview.supportDataDir,'MarmosetFaceLibrary.mat'));
             MFL = struct2cell(MFL);
             %MFL = MFL([7,10,13,17,18,19,20,24,25,27]); % these faces seem most centered
@@ -461,7 +478,7 @@ classdef MotionObjects < handle
                 g = g./max(g(:));
                 img(:,:,4) = uint8(255.*g); % alpha channel: 0 = transparent, 255 = opaque
                 
-                m.texid(k)=Screen('MakeTexture',m.p.trial.display.ptr,img);
+                m.texid(k)=Screen('MakeTexture',m.ptr,img);
             end
 %             m.srcRect=[0 0 fliplr(sz(1:2))];
             
@@ -481,13 +498,11 @@ classdef MotionObjects < handle
             m.x(ix) = (rand(1,sum(ix))-0.5) * 35;
             m.y(ix) = (rand(1,sum(ix))-0.5) * 35;
             
-            m.dx(ix) = cosd(m.direction(ix)) .* m.speed(ix) .* m.p.trial.display.ifi;
-            m.dy(ix) = sind(m.direction(ix)) .* m.speed(ix) .* m.p.trial.display.ifi;
+            m.dx(ix) = cosd(m.direction(ix)) .* m.speed(ix) .* m.ifi;
+            m.dy(ix) = sind(m.direction(ix)) .* m.speed(ix) .* m.ifi;
             
             % --- Calculate texture rectangles
-             ppd=m.p.trial.display.ppd;
-            ctr=m.p.trial.display.ctr(1:2);
-            m.dstRects = kron([-1; -1; 1; 1], m.radius*ppd) + kron([1; 1], [ppd*m.x + ctr(1); -ppd*m.y + ctr(2)]);
+            m.dstRects = kron([-1; -1; 1; 1], m.radius*m.ppd) + kron([1; 1], [m.ppd*m.x + m.ctr(1); -m.ppd*m.y + m.ctr(2)]);
             
 %             m.dstRects(:,ix) = kron([-1; -1; 1; 1], m.radius(ix)) + kron([1; 1], [m.x(ix); m.y(ix)]);
         end % refresh
