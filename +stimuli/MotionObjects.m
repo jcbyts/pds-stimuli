@@ -10,7 +10,7 @@ classdef MotionObjects < handle
         N@double                % number of motion objects
         radius@double           % array of object sizes
         visible@logical         % visible or not
-        type@double             % stimulus type (1: face, 2: dotfield)
+        type                    % stimulus type (1: face, 2: dotfield)
         motion@double           % motion type (1: linear)
         forcefield@logical      % false
         speed@double            % array of speeds
@@ -33,7 +33,7 @@ classdef MotionObjects < handle
         dotCtr@double
         dotI@double
         
-        
+        objects
         texid
         dstRects
         MarmoFaces
@@ -96,10 +96,18 @@ classdef MotionObjects < handle
             ip.addParameter('initialRange', 40)
             ip.addParameter('forceField', false)
             ip.addParameter('motionType', 'linear')
-            ip.addParameter('Type', 'face')
+            ip.addParameter('type', 'face')
             
             ip.parse(varargin{:}); % parse optional inputs
             
+            m.type = ip.Results.type;
+            
+            switch m.type
+                case {1, 'face', 'Face'}
+                    m.objects = stimuli.face(p);
+                case {2, 'grating', 'Grating'}
+                    m.objects = stimuli.gratings(p);
+            end
             % -------------------------------------------------------------
             % --- Build objects based on argument sets
             m.x=(rand(1,m.N)-0.5)*ip.Results.initialRange;
