@@ -132,7 +132,7 @@ classdef textures < handle
       if size(r,2) == 1
         r = repmat(r,1,2); % square texture(s)
       end
-      rect = kron([1,1],o.position) + kron([-1,1],r);
+      rect = bsxfun(@plus, kron([1,1],o.position),kron([-1,1],r));
     
       filterMode = 1; % bilinear interpolation
       Screen('DrawTextures',o.winPtr,texPtr,[],rect',[],filterMode,o.alpha);

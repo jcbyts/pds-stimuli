@@ -81,10 +81,10 @@ classdef MotionObjects < handle
             m.ptr       = p.trial.display.ptr;
             
             m.hReward   = stimuli.reward(p);
-            m.dWidth    = p.trial.display.dWidth;
-            m.dHeight   = p.trial.display.dHeight;
-            m.pWidth    = p.trial.display.pWidth;
-            m.pHeight   = p.trial.display.pHeight;
+            m.dWidth    = p.trial.display.dWidth/2;
+            m.dHeight   = p.trial.display.dHeight/2;
+            m.pWidth    = p.trial.display.pWidth/2;
+            m.pHeight   = p.trial.display.pHeight/2;
             
             m.ppd     = p.trial.display.ppd;
             m.ctr     = p.trial.display.ctr;
@@ -372,7 +372,7 @@ classdef MotionObjects < handle
             
             dist=sqrt((xDeg - m.x).^2 + (yDeg - m.y).^2);
             
-            iiHeld = ((dist < m.radius) - .5) * 2;
+            iiHeld = ((dist < m.radius*2) - .5) * 2;
             
             m.ctrHold = m.ctrHold + iiHeld;
             m.ctrHold(m.ctrHold < 0) = 0;
