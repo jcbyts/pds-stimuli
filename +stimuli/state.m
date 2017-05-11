@@ -30,7 +30,7 @@ classdef (Abstract) state < handle
   end
   
   methods (Access = public)
-    function s = state(id,hTrial),
+    function s = state(id,hTrial)
       s.id = id;
       s.hTrial = hTrial;
     end

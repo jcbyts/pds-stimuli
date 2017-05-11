@@ -46,7 +46,8 @@ end
 
 % --- Necessary parameters for foraged gratings
 p.trial.(sn).hGratings.position = bsxfun(@plus, pds.deg2px(pos, p.trial.display.viewdist, p.trial.display.w2px)', p.trial.display.ctr(1:2));
-p.trial.(sn).hGratings.alpha = p.trial.(sn).gratingContrast;
+p.trial.(sn).hGratings.alpha    = p.trial.(sn).gratingContrast;
+
 % --- Face for aditional reward
 p.trial.(sn).hFace.size     = 2 * p.trial.(sn).faceRadius * ppd;
 p.trial.(sn).hFace.position = [0 0];

@@ -106,34 +106,25 @@ end
 % -------------------------------------------------------------------------
 % --- setup stimuli and prepare to run
 
+nOr = p.trial.(sn).nOrientations;
+nPh = p.trial.(sn).nPhases;
+
+% initialize parameters
+condOr  = ((1:nOr)-1)/nOr * 180;
+condPh  = ((1:nPh)-1)/nPh * 180;
+
 % --- Gratings
-p.trial.(sn).hGratings = stimuli.gratingForage.makeGratings(p);
-p.trial.(sn).hNoise    = stimuli.gratingForage.makeGratings(p);
+p.trial.(sn).hGratings = stimuli.gratings(p, 'orientation', condOr, ...
+    'phase', condPh, 'sf', p.trial.(sn).gratingSF, 'radius', p.trial.(sn).gratingRadius, ...
+    'isgabor', p.trial.(sn).isGabor);
+
+p.trial.(sn).hNoise    = stimuli.gratings(p, 'orientation', condOr, ...
+    'phase', condPh, 'sf', p.trial.(sn).gratingSF, 'radius', p.trial.(sn).gratingRadius, ...
+    'isgabor', p.trial.(sn).isGabor);
 
 % --- Face Textures
-hFace = stimuli.textures(p.trial.display.ptr);
+p.trial.(sn).hFace = stimuli.face(p);
 
-% load marmoset face textures
-MFL=load(fullfile(marmoview.supportDataDir,'MarmosetFaceLibrary.mat'));
-MFL = struct2cell(MFL);
-MFL = MFL([7,10,13,17:20,24,25,27]); % these faces seem most centered
-
-for id = 1:length(MFL)
-    img = MFL{id};
-    
-    sz = size(img);
-    % gaussian envelope...
-    x = (1:sz(1))-sz(1)/2; y = (1:sz(2))-sz(2)/2;
-    [x,y] = meshgrid(x,y);
-    g = exp(-(x.^2+y.^2)/(2*(max(sz(1:2))/6)^2));
-    g = g - min(g(:));
-    g = g./max(g(:));
-    img(:,:,4) = uint8(255.*g); % alpha channel: 0 = transparent, 255 = opaque
-    
-    hFace.addTexture(id, img);
-end
-
-p.trial.(sn).hFace = hFace;
 p.trial.pldaps.draw.eyepos.use = false;
 
 % -------------------------------------------------------------------------

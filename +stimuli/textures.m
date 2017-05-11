@@ -164,9 +164,15 @@ classdef textures < handle
     
     function closeAll(o)
        
-        idx = o.getTexIdx(o.id);
-      
-      texPtr = cellfun(@(x) x.ptr, o.texture(idx),'UniformOutput',true);
+%         idx = o.getTexIdx(o.id);
+%       
+%       texPtr = cellfun(@(x) x.ptr, o.texture(idx),'UniformOutput',true);
+      for i = 1:numel(o.texIds)
+          Screen('Close', o.texIds{i})
+      end
+      o.id = [];
+      o.texIds = cell();
+      o.numTex = 0;
         
     end
     
@@ -179,7 +185,7 @@ classdef textures < handle
   methods (Access = private),
     function idx = getTexIdx(o,id)
       % get index in texPtr (or texIds) based on id
-      if length(o.texture) == 0
+      if isempty(o.texture)
         idx = [];
         return;
       end

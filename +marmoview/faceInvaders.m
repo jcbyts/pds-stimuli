@@ -14,7 +14,7 @@ if nargin==1
     
     p = pdsDefaultTrialStructure(p);
     
-%     p.defaultParameters.pldaps.trialMasterFunction='runModularTrial';
+    p.defaultParameters.pldaps.trialMasterFunction='runModularTrial';
     p.defaultParameters.pldaps.trialFunction='marmoview.faceInvaders';
     
     c.Nr=1; %one condition;
@@ -71,7 +71,7 @@ switch state
     case p.trial.pldaps.trialStates.frameUpdate
         
         p.trial.(sn).m.move()
-        p.trial.(sn).m.isheld();
+        p.trial.(sn).m.isheld([p.trial.eyeX p.trial.eyeY]);
         
         
         
@@ -121,6 +121,12 @@ switch state
         
         
         drawnow
+    
+        % --- handles that depend on pldaps being totally set up
+    case p.trial.pldaps.trialStates.experimentPostOpenScreen
+        
+        % --- Reward
+%         p.trial.(sn).hReward    = stimuli.reward(p);
         
     otherwise    
         
