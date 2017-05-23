@@ -11,19 +11,18 @@ classdef MotionObjects < handle
         radius@double           % array of object sizes
         visible@logical         % visible or not
         type                    % stimulus type (1: face, 2: dotfield)
-        motion@double           % motion type (1: linear)
         forcefield@logical      % false
         speed@double            % array of speeds
         direction@double        % array of directions
-        exploded
-        dx@double               
-        dy@double
-        xpx@double
-        ypx@double
-        x@double
-        y@double 
+        exploded                % exploded status
+        dx@double               % x velocity
+        dy@double               % y velocity
+        xpx@double              % x location (pixels)
+        ypx@double              % y location (pixels)
+        x@double                % x location (degrees)
+        y@double                % y location (degrees)
         
-        % dots for explosions
+        % --- dots for explosions
         dotx@double
         doty@double
         dotdx@double
@@ -32,29 +31,45 @@ classdef MotionObjects < handle
         dotC@double
         dotCtr@double
         dotI@double
+
+        % --- parameters governing the location that an object can appear in
+        appearDist@char         % distribution from which to generate locations
+        appearGazeCont@logical  % is Ctr in gaze contingent coordinates
+        appearRangePar@double   % range parameter for appearance of objects
+        appearCenter@double        % center of pdf for object appearance
+        appearTau@double        % frequency of transition (linear? cosine?)
+        lifetime@double         % lifetime of objects (frames)
         
+        alpha@double
+
+        % --- parameters governing behavior of the objects
+        ctrHold
+        ctrExplode
+        deathExplode@logical
+        expThresh
+        stimtype
+        repulse
+        invade
+
+        % --- parameters governing the appearance of objectsS
         objects
         texid
         dstRects
         MarmoFaces
         rotAngles
-        alpha
+        
         srcRect
-        ctrHold
-        ctrExplode
-        deathExplode@logical
-        expThresh
+        
         colorThresh
         color
         faceint
-        stimtype
+        
         expSpeed
         dotSize
         expDur
         expRad
         winRect
-        repulse
-        invade
+
         maxradius
         removed
     end
@@ -80,23 +95,35 @@ classdef MotionObjects < handle
             % --- Save all important pldaps variables
             m.ptr       = p.trial.display.ptr;
             
-            m.hReward   = stimuli.reward(p);
+            m.hReward   = stimuli.reward(p); % object that handles the reward delivery
+            
+            % size of the display
             m.dWidth    = p.trial.display.dWidth;
             m.dHeight   = p.trial.display.dHeight;
             m.pWidth    = p.trial.display.pWidth;
             m.pHeight   = p.trial.display.pHeight;
             
-            m.ppd     = p.trial.display.ppd;
-            m.ctr     = p.trial.display.ctr;
-            m.ifi     = p.trial.display.ifi;
+            % variables for converting units
+            m.ppd       = p.trial.display.ppd;
+            m.ctr       = p.trial.display.ctr;
+            m.ifi       = p.trial.display.ifi;
             
             m.N=N; % number
             
             ip=inputParser();
-            ip.addParameter('initialRange', 40)
+            ip.addParameter('type', 'face')
+            
+            % --- parameters for the appearance behavior
+            ip.addParameter('appearDist', 'uniform')
+            ip.addParameter('appearGazeCont', false)
+            ip.addParameter('appearRangePar', 10)
+            ip.addParameter('appearCenter', [0 0])
+            ip.addParameter('appearTau', 3)
+            
+            % --- parameters for movement behavior
             ip.addParameter('forceField', false)
             ip.addParameter('motionType', 'linear')
-            ip.addParameter('type', 'face')
+            ip.addParameter('speed', 0)
             
             ip.parse(varargin{:}); % parse optional inputs
             
@@ -108,18 +135,90 @@ classdef MotionObjects < handle
                 case {2, 'grating', 'Grating'}
                     m.objects = stimuli.gratings(p);
             end
-            % -------------------------------------------------------------
-            % --- Build objects based on argument sets
-            m.x=(rand(1,m.N)-0.5)*ip.Results.initialRange;
-            m.y=(rand(1,m.N)-0.5)*ip.Results.initialRange;
+
             
             
+            % --- initialize required variables 
+            m.stimtype      = randi(3,1,m.N); %1+floor( rand(1,m.N) * 3.99999);
+            m.invade        = ones(1,m.N);    % no expansion rate
+            m.removed       = zeros(1,m.N);   % take out of game (allow to clear board)
+            m.maxradius     = 8.0;
+            m.deathExplode  = false(1,m.N);
+            m.direction     = rand(1,m.N)*360;
+            
+            m.appearDist        = ip.Results.appearDist;
+            m.appearGazeCont    = ip.Results.appearGazeCont;
+            m.appearRangePar    = ip.Results.appearRangePar;
+            m.appearCenter         = ip.Results.appearCenter;
+            m.appearTau         = ip.Results.appearTau;
+
+            m.visible=false(1,m.N);
+            m.exploded = 0;
+            
+            m.radius        = nan(1,m.N);
+            m.speed         = nan(1,m.N);
+            m.dotSize       = nan(1,m.N);
+            m.faceint       = nan(1,m.N);
+            m.expSpeed      = nan(1,m.N);
+            m.expThresh     = nan(1,m.N);
+            m.expDur        = nan(1,m.N);
+            m.expRad        = nan(1,m.N);
+            m.repulse       = ones(1,m.N);
+            m.color         = ones(3,m.N);
+            m.colorThresh   = 40;
+            m.alpha         = rand(1,m.N)*2*pi; % faces appear gradually
+            m.rotAngles     = zeros(1,m.N);
+            m.ctrExplode    = zeros(1,m.N);
+            m.ctrHold       = zeros(1,m.N);
+
+            % initialize objects
+            m.initObjects(1:m.N);
+            
+            % ---- Setup explosion dots
+            maxDots=100*m.N;
+            m.dotx    = nan(1,maxDots);
+            m.doty    = nan(1,maxDots);
+            m.dotdx   = nan(1,maxDots);
+            m.dotdy   = nan(1,maxDots);
+            m.dotS    = nan(1,maxDots);
+            m.dotI    = reshape(ones(100,1)*(1:m.N), 1, maxDots);
+            m.dotC    = zeros(3, maxDots);
+            m.dotCtr  = zeros(1, maxDots);
+            
+            
+        end % constructor
+
+        function initObjects(m, idx)
+
+            if nargin < 2
+                idx = 1:m.N;
+            end
+
+            if islogical(idx)
+                idx = find(idx);
+            end
+            
+            n = numel(idx);
+            
+            switch m.appearDist
+                case 'uniform'
+                    m.x(idx) = (rand(1,n) - 0.5) * m.appearRangePar + m.appearCenter(1);
+                    m.y(idx) = (rand(1,n) - 0.5) * m.appearRangePar + m.appearCenter(2);
+                case 'gaussian'
+                    m.x(idx) = randn(1,n) * m.appearRangePar + m.appearCenter(1);
+                    m.y(idx) = randn(1,n) * m.appearRangePar + m.appearCenter(2);
+                otherwise
+                    m.appearDist = 'uniform';
+                    m.x(idx) = (rand(1,n) - 0.5) * m.appearRangePar + m.appearCenter(1);
+                    m.y(idx) = (rand(1,n) - 0.5) * m.appearRangePar + m.appearCenter(2);
+            end
+
             %***** two kinds of objects, 
             %***** small and slow, low reward, (glow yellow)
             %***** and fast and big, higher reward (glow red)
-            m.stimtype      = randi(3,1,m.N); %1+floor( rand(1,m.N) * 3.99999);
-            m.invade        = ones(1,m.N);  % no expansion rate
-            m.removed       = zeros(1,m.N);  % take out of game (allow to clear board)
+            m.stimtype(idx) = randi(3,1,n);
+            m.invade        = ones(1,n);  % no expansion rate
+            m.removed       = zeros(1,n);  % take out of game (allow to clear board)
             m.maxradius     = 8.0;
             m.deathExplode  = false(1,m.N);
             m.direction     = rand(1,m.N)*360;
@@ -198,21 +297,9 @@ classdef MotionObjects < handle
                 m.invade(ix) = 1.0015;
                 m.speed(ix)  = 12 + 4*rand(1,sum(ix));
             end % invader selection
-            
-            % ---- Setup explosion dots
-            maxDots=100*m.N;
-            m.dotx    = nan(1,maxDots);
-            m.doty    = nan(1,maxDots);
-            m.dotdx   = nan(1,maxDots);
-            m.dotdy   = nan(1,maxDots);
-            m.dotS    = nan(1,maxDots);
-            m.dotI    = reshape(ones(100,1)*(1:m.N), 1, maxDots);
-            m.dotC    = zeros(3, maxDots);
-            m.dotCtr  = zeros(1, maxDots);
-            
-            
-        end % constructor
-        
+
+        end % initialize locations
+
 %         function [hit,loc,rad,death] = exploded(m)
 %            hit = 0;
 %            loc = [];
@@ -228,41 +315,41 @@ classdef MotionObjects < handle
 %            end
 %         end
         
-        function wipeclear(m) %,loc,rad,death)
-%             
-%             if ( size(m.xy,1) == 1 )  %don't clear if it is already exploding
-%              if (m.removed == 0)   
-%                dist = norm(m.xy - loc);
-%                if (dist < rad)
-%                   if (death == 1)
-%                       m.deathExplode = 1;  % explosion becomes infectious
-%                   else
-%                       
-%                      %*******
-%                      winRect=m.winRect;
-%                      %******
-%                      dv = (m.xy - loc)/dist;
-%                      newxy = loc + (rad * dv);  % jump stim just outside radius
-%                      %***** safety check if explosion pushes it outside
-%                      %boundaries, and if so then re-initialize it
-%                      newxypixx = pds.deg2px(newxy',m.p.trial.display.viewdist,m.p.trial.display.w2px,false)...
-%                                     +m.p.trial.display.ctr(1:2)';
-%                      if (newxypixx(1) < winRect(1)) | (newxypixx(1) > winRect(3)) | ...
-%                         (newxypixx(2) < winRect(2)) | (newxypixx(2) > winRect(4)) 
-%                          %newxy = loc - (rad*dv);
-%                           m.ctrExplode = 1;  % if so, explode it as well
-%                           if (death == 0)
-%                              m.p.trial.exploded=m.p.trial.exploded+1;  % can get points, else not
-%                           end
-%                      else
-%                           m.xy = newxy;
-%                      end
-%                      %******
-%                   end
-%               end 
-%             end
-%           end
-        end
+%         function wipeclear(m) %,loc,rad,death)
+% %             
+% %             if ( size(m.xy,1) == 1 )  %don't clear if it is already exploding
+% %              if (m.removed == 0)   
+% %                dist = norm(m.xy - loc);
+% %                if (dist < rad)
+% %                   if (death == 1)
+% %                       m.deathExplode = 1;  % explosion becomes infectious
+% %                   else
+% %                       
+% %                      %*******
+% %                      winRect=m.winRect;
+% %                      %******
+% %                      dv = (m.xy - loc)/dist;
+% %                      newxy = loc + (rad * dv);  % jump stim just outside radius
+% %                      %***** safety check if explosion pushes it outside
+% %                      %boundaries, and if so then re-initialize it
+% %                      newxypixx = pds.deg2px(newxy',m.p.trial.display.viewdist,m.p.trial.display.w2px,false)...
+% %                                     +m.p.trial.display.ctr(1:2)';
+% %                      if (newxypixx(1) < winRect(1)) | (newxypixx(1) > winRect(3)) | ...
+% %                         (newxypixx(2) < winRect(2)) | (newxypixx(2) > winRect(4)) 
+% %                          %newxy = loc - (rad*dv);
+% %                           m.ctrExplode = 1;  % if so, explode it as well
+% %                           if (death == 0)
+% %                              m.p.trial.exploded=m.p.trial.exploded+1;  % can get points, else not
+% %                           end
+% %                      else
+% %                           m.xy = newxy;
+% %                      end
+% %                      %******
+% %                   end
+% %               end 
+% %             end
+% %           end
+%         end
         
         % -----------------------------------------------------------------
         % General move function
@@ -293,7 +380,9 @@ classdef MotionObjects < handle
                 
                 
                 %*****************
-                m.refresh(iiExploded);
+                m.initObjects(iiExploded)
+                % m.lifeCtr(iiExploded) = m.maxLifetime
+                % m.refresh(iiExploded);
                 %*******************
                 
                 m.ctrExplode(iiExploded)    = 0;
