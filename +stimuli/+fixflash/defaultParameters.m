@@ -120,36 +120,18 @@ if ~isfield(p.trial.(sn), 'staircaseStep')
     p.trial.(sn).staircaseStep = .05; % seconds
 end
 
+if ~isfield(p.trial.(sn), 'rewardLevels')
+    p.trial.(sn).rewardLevels = [.2 .4 .8 1 1.2 1.4];
+end
+
+
+
 % -------------------------------------------------------------------------
 % --- setup stimuli and prepare to run
 
 % --- Fixation
 p.trial.(sn).hFix(1) 	= stimuli.fixation(p.trial.display.ptr);
 p.trial.(sn).hFix(2) 	= stimuli.fixation(p.trial.display.ptr);
-
-% --- Face Textures
-% hFace = stimuli.textures(p.trial.display.ptr);
-% 
-% % load marmoset face textures
-% MFL=load(fullfile(marmoview.supportDataDir,'MarmosetFaceLibrary.mat'));
-% MFL = struct2cell(MFL);
-% MFL = MFL([7,10,13,17:20,24,25,27]); % these faces seem most centered
-% 
-% for id = 1:length(MFL)
-%     img = MFL{id};
-%     
-%     sz = size(img);
-%     % gaussian envelope...
-%     x = (1:sz(1))-sz(1)/2; y = (1:sz(2))-sz(2)/2;
-%     [x,y] = meshgrid(x,y);
-%     g = exp(-(x.^2+y.^2)/(2*(max(sz(1:2))/6)^2));
-%     g = g - min(g(:));
-%     g = g./max(g(:));
-%     img(:,:,4) = uint8(255.*g); % alpha channel: 0 = transparent, 255 = opaque
-%     
-%     hFace.addTexture(id, img);
-% end
-% p.trial.(sn).hFace = hFace;
 
 p.trial.(sn).hFace = stimuli.face(p);
 
