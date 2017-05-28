@@ -51,7 +51,7 @@ classdef butterfly < handle
 
         
         winRect
-
+        rndStr@RandStream
         maxradius
         removed
     end
@@ -100,6 +100,7 @@ classdef butterfly < handle
             m.ctr       = p.trial.display.ctr;
             m.ifi       = p.trial.display.ifi;
             
+            m.rndStr    = RandStream('mt19937ar');
             m.N=N; % number
             
             ip=inputParser();
@@ -122,6 +123,7 @@ classdef butterfly < handle
           
             % --- parameters for general appearance
             
+            ip.addParameter('randStream', m.rndStr)
             
             ip.parse(varargin{:}); % parse optional inputs
             
@@ -130,6 +132,8 @@ classdef butterfly < handle
             m.onLifetime  = ip.Results.onLifetime;
             m.offLifetime = ip.Results.offLifetime;
             m.maxContrast = ip.Results.maxContrast;
+            
+            m.rndStr      = ip.Results.randStream;
             
             switch m.type
                 case {1, 'face', 'Face'}
@@ -140,7 +144,7 @@ classdef butterfly < handle
 
             end
 
-            m.direction         = rand(1,m.N)*360;
+            m.direction         = rand(m.rndStr, 1,m.N)*360;
             
             m.appearDist        = ip.Results.appearDist;
             m.appearGazeCont    = ip.Results.appearGazeCont;
@@ -155,17 +159,18 @@ classdef butterfly < handle
 
             m.color         = ones(3,m.N);
             m.colorThresh   = 40;
-            
-            m.alpha         = rand(1,m.N)*2*pi; % faces appear gradually
-            
+                        
             m.rotAngles     = zeros(1,m.N);
             m.ctrHold       = zeros(1,m.N);
-            m.ctrOn         = randi(m.onLifetime,1,m.N);
-            m.ctrOff        = randi(m.offLifetime,1,m.N);
+            m.ctrOn         = nan(1,m.N);
+            m.ctrOff        = nan(1,m.N);
             
-            idx = m.ctrOn > m.ctrOff;
-            m.ctrOff(idx) = nan;
-            m.ctrOn(~idx) = nan;
+            counter = (m.onLifetime + m.offLifetime)*(1:m.N)/m.N - m.offLifetime;
+            
+            ix=counter >= 0;
+            m.ctrOn(ix) = ceil(abs(counter(ix)));
+            ix=counter < 0;
+            m.ctrOff(ix) = ceil(abs(counter(ix)));
             
             % initialize objects
             m.initObjects(1:m.N);
@@ -188,15 +193,15 @@ classdef butterfly < handle
             % --- update generating distribution
             switch m.appearDist
                 case 'uniform'
-                    genX = @(n) (rand(1,n) - 0.5) * m.appearRangePar + m.appearCenter(1);
-                    genY = @(n) (rand(1,n) - 0.5) * m.appearRangePar + m.appearCenter(2);
+                    genX = @(n) (rand(m.rndStr,1,n) - 0.5) * m.appearRangePar + m.appearCenter(1);
+                    genY = @(n) (rand(m.rndStr,1,n) - 0.5) * m.appearRangePar + m.appearCenter(2);
                 case 'gaussian'
-                    genX = @(n) randn(1,n) * m.appearRangePar + m.appearCenter(1);
-                    genY = @(n) randn(1,n) * m.appearRangePar + m.appearCenter(2);
+                    genX = @(n) randn(m.rndStr,1,n) * m.appearRangePar + m.appearCenter(1);
+                    genY = @(n) randn(m.rndStr,1,n) * m.appearRangePar + m.appearCenter(2);
                 otherwise
                     m.appearDist = 'uniform';
-                    genX = @(n) (rand(1,n) - 0.5) * m.appearRangePar + m.appearCenter(1);
-                    genY = @(n) (rand(1,n) - 0.5) * m.appearRangePar + m.appearCenter(2);
+                    genX = @(n) (rand(m.rndStr,1,n) - 0.5) * m.appearRangePar + m.appearCenter(1);
+                    genY = @(n) (rand(m.rndStr,1,n) - 0.5) * m.appearRangePar + m.appearCenter(2);
             end
             
             % --- generate x,y with buffer 
@@ -230,15 +235,15 @@ classdef butterfly < handle
             end
             
 
-            m.direction(idx)  = rand(1,n)*360;
+            m.direction(idx)  = rand(m.rndStr,1,n)*360;
            
             % initialize variables
-            m.texid(idx)    = randi(m.objects.numTex, 1, n);
+            m.texid(idx)         = randi(m.rndStr,m.objects.numTex, 1, n);
             
             m.color(:,idx)       = ones(3,n);
             m.colorThresh(idx)   = 40;
             
-            m.alpha(idx)         = rand(1,n)*2*pi; % faces appear gradually
+            m.alpha(idx)         = rand(m.rndStr,1,n); % faces appear gradually
             m.rotAngles(idx)     = zeros(1,n);
             m.ctrHold(idx)       = zeros(1,n);
             
@@ -262,12 +267,11 @@ classdef butterfly < handle
             switch m.motionType
                 
                 case 'linear'
-                    
                     m.x = m.x + m.dx;
                     m.y = m.y + m.dy;
                 case 'randomwalk'
-                    m.dx = m.dx + randn(1,m.N) .* m.speed * m.ifi;
-                    m.dy = m.dy + randn(1,m.N) .* m.speed * m.ifi;
+                    m.dx = m.dx + randn(m.rndStr,1,m.N) .* m.speed * m.ifi;
+                    m.dy = m.dy + randn(m.rndStr,1,m.N) .* m.speed * m.ifi;
                     m.x = m.x + m.dx;
                     m.y = m.y + m.dy;
             end
@@ -284,7 +288,8 @@ classdef butterfly < handle
             
            % --- update objects
             m.objects.position = [m.ppd*m.x(:) + m.ctr(1) -m.ppd*m.y(:) + m.ctr(2)];
-            m.objects.size     = repmat(2*m.radius(:)*m.ppd,1,2);
+            m.objects.texSize  = cell2mat(cellfun(@(x) x.size, m.objects.texture(m.texid), 'UniformOutput', false)');
+%             m.objects.texSize  = repmat(2*m.radius(:)*m.ppd,1,2);
             
             % --- turn off
             turnOff = m.ctrOn > m.onLifetime;

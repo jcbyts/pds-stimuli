@@ -5,22 +5,23 @@ classdef textures < handle
     %
     %   size     - texture size (wdth,hght; pixels)
     %   position - center of texture (x,y; pixels)
+    %
+    % Example Call:
+    %  o = textures(winPtr)
+    
     
     % 26-06-2016 - Shaun L. Cloherty <s.cloherty@ieee.org>
+    % 27-05-2017 - Jake L. Yates
     
     properties (Access = public),
         id; % id of the texture to show on call to drawTextures();
         
-        size@double; % width, or [wdth, hght] (pixels)
+        texSize@double; % width, or [wdth, hght] (pixels)
         position@double = [0.0, 0.0]; % position [x,y] (pixels)
         
         alpha@double = 1.0; % alpha (opacity) for the selected texture(s)
-    end
-    
-    properties (Access = private)
-        winPtr@double % ptb window (pass nan to operate without PTB)
         
-        % each entry in the texture contains a structure with fields:
+         % each entry in the texture contains a structure with fields:
         %   id - the texture id
         %   size - the texture size (wdth, hght)
         %   alpha - alpha value (default: 1)
@@ -28,10 +29,17 @@ classdef textures < handle
         texture = {};
     end
     
+    properties (Access = private)
+        winPtr@double % ptb window (pass nan to operate without PTB)
+        glsl
+        texMode=2;
+    end
+    
     % dependent properties, calculated on the fly...
     properties (Dependent, SetAccess = private, GetAccess = public)
         texIds@cell; % texture ids
         numTex@double;   % the number of textures
+       
     end
     
     %   properties (Dependent, SetAccess = public, GetAccess = public)
@@ -47,11 +55,22 @@ classdef textures < handle
         function value = get.numTex(o)
             value = length(o.texture);
         end
+        
     end
     
     methods (Access = public)
         function o = textures(winPtr,varargin) % marmoview's initCmd?
             o.winPtr = winPtr;
+            
+            if ~isnan(o.winPtr)
+                [sourceFactorOld, destinationFactorOld]=Screen('BlendFunction', o.winPtr);
+                
+                if strcmp(sourceFactorOld, GL_SRC_ALPHA) && strcmp(destinationFactorOld, GL_ONE_MINUS_SRC_ALPHA)
+                    o.texMode = [];
+                else
+                    o.texMode=2;
+                end
+            end
             
             if nargin == 1
                 return
@@ -60,7 +79,6 @@ classdef textures < handle
             % initialise input parser
             args = varargin;
             p = inputParser;
-            %       p.KeepUnmatched = true;
             p.StructExpand = true;
             p.addParameter('size',NaN,@isfloat); % pixels
             p.addParameter('position',o.position,@isfloat); % [x,y] (pixels)
@@ -75,9 +93,15 @@ classdef textures < handle
             
             args = p.Results;
             
-            o.size = args.size;
+            o.texSize = args.size;
             o.position = args.position;
             o.alpha = args.alpha;
+            
+            if ~isnan(o.winPtr)
+                o.glsl = []; %MakeTextureDrawShader(o.winPtr, 'SeparateAlphaChannel');
+            else
+                o.glsl = [];
+            end
         end
         
         function beforeTrial(o)
@@ -98,7 +122,7 @@ classdef textures < handle
             
             texPtr = cellfun(@(x) x.ptr, o.texture(idx),'UniformOutput',true);
  
-            r = floor(o.size./2); % pixels
+            r = floor(o.texSize./2); % pixels
             
             if size(r,2) == 1
                 r = repmat(r,1,2); % square texture(s)
@@ -121,7 +145,7 @@ classdef textures < handle
             % FIXME: extend this to take an optional ALPHA value
             
             if ~isnan(o.winPtr)
-                texPtr = Screen('MakeTexture',o.winPtr,img);
+                texPtr = Screen('MakeTexture',o.winPtr,img, [], [], o.texMode, [], o.glsl);
             else
                 texPtr = img;
             end
@@ -136,7 +160,7 @@ classdef textures < handle
             assert(numel(idx) == 1,'Duplicate texture Id %s found!',id);
             
             sz = size(img);
-            o.texture{idx} = struct('id',id,'size',sz(2:1),'alpha',1.0','ptr',texPtr);
+            o.texture{idx} = struct('id',id,'size',sz(1:2),'alpha',1.0','ptr',texPtr);
         end
         
         function closeAll(o)

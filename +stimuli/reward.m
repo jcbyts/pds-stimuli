@@ -14,7 +14,6 @@ classdef reward < handle
         iTrial
         iReward
         
-        
     end
     
     methods

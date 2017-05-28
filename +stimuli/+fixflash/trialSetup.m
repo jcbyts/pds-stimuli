@@ -58,7 +58,7 @@ p.trial.(sn).hFix(2).position   = p.trial.(sn).hFix(1).position;
 % fixation duration
 p.trial.(sn).fixDuration = p.trial.(sn).minFixDuration;
 
-assert(p.trial.display.colorclamp | p.trial.display.normalizeColor, 'color range not [0-1]')
+% assert(p.trial.display.colorclamp | p.trial.display.normalizeColor, 'color range not [0-1]')
 
 % --- Feedback for incorrect choices...
 p.trial.(sn).hFbk.size      = 2 * p.trial.(sn).feedbackApertureRadius * ppd;
@@ -67,7 +67,7 @@ p.trial.(sn).hFbk.colour    = p.trial.display.bgColor + p.trial.(sn).feedbackApe
 p.trial.(sn).hFbk.weight    = 4;
 
 % --- Face for aditional reward
-p.trial.(sn).hFace.size     = 2 * p.trial.(sn).faceRadius * ppd;
+p.trial.(sn).hFace.texSize  = 2 * p.trial.(sn).faceRadius * ppd;
 p.trial.(sn).hFace.position = p.trial.(sn).hFix(1).position;
 p.trial.(sn).hFace.id       = p.trial.(sn).faceIndex;
 
