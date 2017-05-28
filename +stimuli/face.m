@@ -31,14 +31,26 @@ classdef face < stimuli.textures
                 g = exp(-(x.^2+y.^2)/(2*(max(sz(1:2))/6)^2));
                 g = g - min(g(:));
                 g = g./max(g(:));
-                img(:,:,4) = uint8(255.*g); % alpha channel: 0 = transparent, 255 = opaque
+                
+                
+                
+                if strcmp(p.trial.display.sourceFactorNew, GL_SRC_ALPHA) && strcmp(p.trial.display.destinationFactorNew, GL_ONE_MINUS_SRC_ALPHA)
+                    img(:,:,4) = uint8(255.*g); % alpha channel: 0 = transparent, 255 = opaque
+                else
+                    img = double(img);
+%                     img(:,:,4) = 255*g;
+                    img = (img - 127)/127;
+                    for i = 1:3
+                        img(:,:,i) = img(:,:,i).*g;
+                    end
+                end
                 
                 o.addTexture(id, img);
             end
             
             % --- initialize so the texture is ready to use
             o.id  = randi(o.numTex);
-            o.size = sz(1:2);
+            o.texSize  = sz(1:2);
             o.position = p.trial.display.ctr(1:2);
         end
         

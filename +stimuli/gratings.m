@@ -54,9 +54,6 @@ classdef gratings < stimuli.textures
                 xax = (-dpix/2:dpix/2) ./ ppd ; % convert back to degrees
                 [xx,yy] = meshgrid( xax );
                 
-                
-                
-                
                 % variables for this
                 omega    = 2 * pi * o.sf(k);
                 theta    = o.orientation(k) / 180 * pi;
@@ -75,20 +72,24 @@ classdef gratings < stimuli.textures
                     mask = sqrt(xx.^2 + yy.^2) < sigma;
                 end
                 
-                img = sinecarrier*255/2 + 255/2;
-                
-                mask = mask - min(mask(:));
-                mask = mask./max(mask(:));
-                img(:,:,2) = img(:,:,1);
-                img(:,:,3) = img(:,:,1);
-                img(:,:,4) = uint8(255.*mask);
+                if strcmp(p.trial.display.sourceFactorNew, GL_SRC_ALPHA) && strcmp(p.trial.display.destinationFactorNew, GL_ONE_MINUS_SRC_ALPHA)
+                    img = sinecarrier*255/2 + 255/2;
+                    
+                    mask = mask - min(mask(:));
+                    mask = mask./max(mask(:));
+                    img(:,:,2) = img(:,:,1);
+                    img(:,:,3) = img(:,:,1);
+                    img(:,:,4) = uint8(255.*mask);
+                else
+                    img = sinecarrier .* mask;
+                end
                 
                 o.addTexture(k, img);
             end
 
             % --- initialize so the texture is ready to use
-            o.id  = randi(o.numTex);
-            o.size = ceil(2.5 * o.radius(o.id)*ppd)*[1 1];
+            o.id       = o.numTex;
+            o.texSize  = ceil(2.5 * o.radius(o.id)*ppd)*[1 1];
             o.position = p.trial.display.ctr(1:2);
             
         end

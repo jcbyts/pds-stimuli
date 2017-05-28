@@ -22,7 +22,7 @@ if nargin==1
     
     p.defaultParameters.pldaps.finish = length(p.conditions);
     
-    p.trial.(sn).rngs.randomNumberGenerater='mt19937ar';
+    p.trial.(sn).rngs.randomNumberGenerater='mrg32k3a';
     p.trial.(sn).rngs.trialSeeds = randi(2^32, [3e3 1]);
     p.trial.exploded=0;
     
@@ -89,20 +89,29 @@ switch state
 
         p.trial.(sn).m.draw()
 %         Screen('DrawText', p.trial.display.ptr, num2str(p.trial.exploded), 50, 50, [1 1 1]);
-        
+    
+%--------------------------------------------------------------------------
+% --- Before Trial
     case p.trial.pldaps.trialStates.trialSetup
         
         % setup random seed
-        p.trial.(sn).rngs.conditionerRNG=RandStream.create(p.trial.(sn).rngs.randomNumberGenerater, 'seed', p.trial.(sn).rngs.trialSeeds(p.trial.pldaps.iTrial), 'NumStreams', 1);
+        [p.trial.(sn).rngs.conditionerRNG, motionRNG]=RandStream.create(p.trial.(sn).rngs.randomNumberGenerater, 'seed', p.trial.(sn).rngs.trialSeeds(p.trial.pldaps.iTrial), 'NumStreams', 2);
         setupRNG=p.trial.(sn).rngs.conditionerRNG;
         
-        % TODO: motion object should take this RNG stream to save the seed
         p.trial.(sn).maxFrames = p.trial.pldaps.maxTrialLength * p.trial.display.frate;
         
         % --- this might not be ideal
         if ~isfield(p.trial.(sn), 'm') || ~isa(p.trial.(sn).m, 'butterfly')
             p.trial.(sn).m = stimuli.butterfly(p, p.trial.(sn).MotN, 'type', p.trial.(sn).type, ...
-                'motionType', p.trial.(sn).motionType);
+                'motionType', p.trial.(sn).motionType, 'randStream', motionRNG, ...
+                'appearDist', 'gaussian', ...
+                'appearGazeCont', p.trial.(sn).appearGazeContingent, ...
+                'appearRangePar', p.trial.(sn).appearRangePar, ...
+                'appearCenter', p.trial.(sn).appearCenter, ...
+                'appearTau', p.trial.(sn).appearTau, ...
+                'maxContrast', p.trial.(sn).maxContrast, ...
+                'onLifetime', p.trial.(sn).onLifetime, ...
+                'offLifetime', p.trial.(sn).offLifetime);
         end
         
         % randomize speed
@@ -114,7 +123,8 @@ switch state
         p.trial.(sn).y = nan(p.trial.(sn).maxFrames, p.trial.(sn).MotN);
         
         p.trial.(sn).ctrHold    = nan(p.trial.(sn).maxFrames, p.trial.(sn).MotN);
-        
+      
+    % --- After Trial
     case p.trial.pldaps.trialStates.trialCleanUpandSave
         
         figure(1); clf
