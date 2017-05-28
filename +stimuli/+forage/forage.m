@@ -1,4 +1,4 @@
-function p=faceInvaders(p, state, sn)
+function p=forage(p, state, sn)
 % FACEFORAGE module for PLDAPS open reception
 % Draws randomly scaled gaussians across the screen for reverse
 % correlation. Based loosely on ProceduralGarborium.m
@@ -6,7 +6,7 @@ function p=faceInvaders(p, state, sn)
 
 
 if nargin<3
-    sn='faceForage';
+    sn='stimulus';
 end
 
 if nargin==1
@@ -15,7 +15,7 @@ if nargin==1
     p = pdsDefaultTrialStructure(p);
     
     p.defaultParameters.pldaps.trialMasterFunction='runModularTrial';
-    p.defaultParameters.pldaps.trialFunction='marmoview.faceInvaders';
+    p.defaultParameters.pldaps.trialFunction='stimuli.forage.forage';
     
     c.Nr=1; %one condition;
     p.conditions=repmat({c},1,200);
@@ -35,7 +35,7 @@ if nargin==1
     
     
     if ~isfield(p.trial.(sn), 'MotN')
-        p.trial.(sn).MotN       = 30;  % number of face objects
+        p.trial.(sn).MotN       = 5;  % number of face objects
     end
     
     if ~isfield(p.trial.(sn), 'minSpeed')
@@ -55,7 +55,7 @@ if nargin==1
     end
     
     if ~isfield(p.trial.(sn), 'type')
-        p.trial.(sn).type       = 'face';
+        p.trial.(sn).type       = 'grating';
     end
     
     return
@@ -70,14 +70,14 @@ switch state
     % Update all behavior of the objects
     case p.trial.pldaps.trialStates.frameUpdate
         
-        p.trial.(sn).m.move()
         p.trial.(sn).m.isheld([p.trial.eyeX p.trial.eyeY]);
+        p.trial.(sn).m.move()
         
         
-        
-        p.trial.(sn).x(p.trial.iFrame, :) = p.trial.(sn).m.x;
-        p.trial.(sn).y(p.trial.iFrame, :) = p.trial.(sn).m.y;
-        p.trial.(sn).ctrExplode(p.trial.iFrame, :) = p.trial.(sn).m.ctrExplode;
+        % --- logging parameters
+        p.trial.(sn).eyes(p.trial.iFrame,:) = [p.trial.eyeX;p.trial.eyeY];
+        p.trial.(sn).x(p.trial.iFrame, :)   = p.trial.(sn).m.x;
+        p.trial.(sn).y(p.trial.iFrame, :)   = p.trial.(sn).m.y;
         p.trial.(sn).ctrHold(p.trial.iFrame, :) = p.trial.(sn).m.ctrHold;
         
         % flag end of trial (if time is greater than max trial length)
@@ -93,21 +93,27 @@ switch state
     case p.trial.pldaps.trialStates.trialSetup
         
         % setup random seed
-        p.trial.(sn).rngs.conditionerRNG=RandStream(p.trial.(sn).rngs.randomNumberGenerater, 'seed', p.trial.(sn).rngs.trialSeeds(p.trial.pldaps.iTrial));
-        %         setupRNG=p.trial.(sn).rngs.conditionerRNG;
+        p.trial.(sn).rngs.conditionerRNG=RandStream.create(p.trial.(sn).rngs.randomNumberGenerater, 'seed', p.trial.(sn).rngs.trialSeeds(p.trial.pldaps.iTrial), 'NumStreams', 1);
+        setupRNG=p.trial.(sn).rngs.conditionerRNG;
         
         % TODO: motion object should take this RNG stream to save the seed
         p.trial.(sn).maxFrames = p.trial.pldaps.maxTrialLength * p.trial.display.frate;
         
-        p.trial.(sn).m = stimuli.MotionObjects(p, p.trial.(sn).MotN, 'type', p.trial.faceForage.type);
-        p.trial.(sn).m.setup;
+        % --- this might not be ideal
+        if ~isfield(p.trial.(sn), 'm') || ~isa(p.trial.(sn).m, 'butterfly')
+            p.trial.(sn).m = stimuli.butterfly(p, p.trial.(sn).MotN, 'type', p.trial.(sn).type, ...
+                'motionType', p.trial.(sn).motionType);
+        end
         
+        % randomize speed
+        p.trial.(sn).m.speed = (p.trial.(sn).maxSpeed - p.trial.(sn).minSpeed) .* rand(setupRNG, size(p.trial.(sn).m.speed)) + p.trial.(sn).minSpeed;
+        
+        % --- preallocate variables to track
+        p.trial.(sn).eyes = nan(p.trial.(sn).maxFrames, 2);
         p.trial.(sn).x = nan(p.trial.(sn).maxFrames, p.trial.(sn).MotN);
         p.trial.(sn).y = nan(p.trial.(sn).maxFrames, p.trial.(sn).MotN);
-        p.trial.(sn).ctrExplode = nan(p.trial.(sn).maxFrames, p.trial.(sn).MotN);
-        p.trial.(sn).ctrHold    = nan(p.trial.(sn).maxFrames, p.trial.(sn).MotN);
         
-        p.trial.(sn).rngs.trialStateRNG = rng();
+        p.trial.(sn).ctrHold    = nan(p.trial.(sn).maxFrames, p.trial.(sn).MotN);
         
     case p.trial.pldaps.trialStates.trialCleanUpandSave
         
@@ -125,8 +131,7 @@ switch state
         % --- handles that depend on pldaps being totally set up
     case p.trial.pldaps.trialStates.experimentPostOpenScreen
         
-        % --- Reward
-%         p.trial.(sn).hReward    = stimuli.reward(p);
+
         
     otherwise    
         
