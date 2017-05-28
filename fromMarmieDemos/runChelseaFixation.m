@@ -3,9 +3,9 @@ sca
 clear settingsStruct
 Screen('Preference','ScreenToHead', 1,0,0);
 
-subject = 'Chelsea';
-rewardAmount  = .025;
-noiseContrast = 0.075;
+subject = 'Ellie';
+rewardAmount  = .05;
+noiseContrast = 0.0;
 
 % add modular trial functions
 settingsStruct.eyemarker.use=false;
@@ -91,5 +91,5 @@ settingsStruct.pldaps.pause.preExperiment=true;
 %--- Chelsea specific fixation parameters
 settingsStruct.stimulus.fixWinRadius = 1.5;
 settingsStruct.stimulus.fixPointRadius = .3;
-settingStruct.stimulus.rewardLevels = [0.2 0.4 0.8 1.0 1.2 1.4 1.7 2.0];
+settingStruct.stimulus.rewardLevels = [0.1 0.2 0.4 0.8 1.0 1.2 1.4 1.7 2.0];
 p=pldaps(@stimuli.fixflash.defaultParameters, subject, settingsStruct); p.run
