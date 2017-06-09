@@ -71,8 +71,8 @@ handles.text.outcomeTitle  = title(handles.TrialOutcomes, 'Trial Outcomes');
 handles.text.outcomeylabel = ylabel(handles.TrialOutcomes, '# Trials');
 
 handles.text.holdTitle  = title(handles.HoldTime, 'Hold Duration');
-handles.text.holdylabel = ylabel(handles.HoldTime, '# Trials');
-handles.text.holdxlabel = xlabel(handles.HoldTime, 'Seconds');
+handles.text.holdylabel = ylabel(handles.HoldTime, 'Seconds');
+handles.text.holdxlabel = xlabel(handles.HoldTime, '# Trials');
 
 % Update handles structure
 guidata(hObject, handles);
