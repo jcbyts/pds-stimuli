@@ -4,6 +4,7 @@ classdef face < stimuli.textures
     
     properties
         radius
+        maxContrast
     end
     
     methods
@@ -11,10 +12,13 @@ classdef face < stimuli.textures
             
             ip = inputParser();
             ip.addParameter('radius', 1); % degrees
+            ip.addParameter('maxContrast', 1);
             ip.parse(varargin{:})
             
             % --- Face Textures
             o = o@stimuli.textures(p.trial.display.ptr); % call the parent constructor
+            
+            o.maxContrast = ip.Results.maxContrast;
             
             % load marmoset face textures
             MFL=load(fullfile(marmoview.supportDataDir,'MarmosetFaceLibrary.mat'));
@@ -42,6 +46,10 @@ classdef face < stimuli.textures
                     img = (img - 127)/127;
                     for i = 1:3
                         img(:,:,i) = img(:,:,i).*g;
+                    end
+                    
+                    if strcmp(p.trial.display.sourceFactorNew, GL_ONE)
+                        img = img .* o.maxContrast;
                     end
                 end
                 
