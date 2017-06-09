@@ -55,6 +55,8 @@ function calibrationGUI_OpeningFcn(hObject, ~, handles, varargin)
 % Choose default command line output for calibrationGUI
 handles.output = hObject;
 handles.p = varargin{1}; % pointer to pldaps object
+
+Screen('BlendFunction', handles.p.trial.display.ptr, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 handles.S = struct; % Settings for the protocol, NOT changed while running
 handles.A = struct; % plot
 
@@ -79,16 +81,22 @@ if isfield(S,'guiLocation')
   set(hObject,'Position',S.guiLocation);
 end
 
+% -------------------------------------------------------------------------
+% --- Check if calibration matrix exists
 % EYE CALIBRATION STUFF HERE
 cm=getCalibrationPref(handles.p,1);
 % marmoview specific preferences override pldaps
 if handles.p.trial.eyelink.use && handles.p.trial.eyelink.useAsEyepos
-    handles.p.trial.eyelink.useRawData=true;
-    handles.p.trial.eyelink.calibration_matrix=[];
-    for i = 1:2 % loop over eye index
-        % get subject specific calibration matrix
-        cm=getCalibrationPref(handles.p,1);
-        handles.p.trial.eyelink.calibration_matrix(:,:,i) = cm';
+    if handles.p.trial.eyelink.useRawData && ~isempty(handles.p.trial.eyelink.calibration_matrix)
+        cm = handles.p.trial.eyelink.calibration_matrix(:,:,handles.p.trial.eyelink.eyeIdx)';
+    else
+        handles.p.trial.eyelink.useRawData=true;
+        handles.p.trial.eyelink.calibration_matrix=[];
+        for i = 1:2 % loop over eye index
+            % get subject specific calibration matrix
+            cm=getCalibrationPref(handles.p,1);
+            handles.p.trial.eyelink.calibration_matrix(:,:,i) = cm';
+        end
     end
         
 end
@@ -385,6 +393,8 @@ saveCalibrationAsRigPref(handles.p, handles.A.cm)
 function closeButton_Callback(hObject, eventdata, handles)
 
 handles=cleanupMarmosetTextures(handles);
+
+Screen('BlendFunction', handles.p.trial.display.ptr, handles.p.trial.display.sourceFactorNew, handles.p.trial.display.destinationFactorNew);
 
 close(handles.figure1, 'force');
 
