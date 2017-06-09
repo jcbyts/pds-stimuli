@@ -43,7 +43,7 @@ end
 sz = p.trial.(sn).fixPointRadius * ppd;
 p.trial.(sn).hFix(1).cSize      = sz;
 p.trial.(sn).hFix(1).sSize      = 2*sz;
-p.trial.(sn).hFix(1).cColour    = zeros(1,3);
+p.trial.(sn).hFix(1).cColour    = -ones(1,3);
 p.trial.(sn).hFix(1).sColour    = ones(1,3);
 p.trial.(sn).hFix(1).position   = [xpos ypos] * ppd + ctr;
 

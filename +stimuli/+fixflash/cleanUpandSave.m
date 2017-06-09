@@ -1,7 +1,7 @@
 function p = cleanUpandSave(p, sn)
 
 % --- Staircase parameters
-if p.trial.(sn).staircaseOn
+if p.trial.(sn).staircaseOn && p.trial.(sn).minFixDuration < p.trial.(sn).maxFixDuration
     
     
     lastError = p.trial.(sn).hTrial.error;

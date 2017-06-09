@@ -93,7 +93,7 @@ if ~isfield(p.trial.(sn), 'minFixDuration')
 end
 
 if ~isfield(p.trial.(sn), 'maxFixDuration')
-    p.trial.(sn).maxFixDuration     = 0.400;
+    p.trial.(sn).maxFixDuration     = 1.500;
 end
 
 if ~isfield(p.trial.(sn), 'holdDuration')
