@@ -28,9 +28,10 @@ if nargin==1
     
     %----------------------------------------------------------------------
     % Default Conditions
-    if ~isfield(p.trial.(sn), 'maxTrialLength')
+    if ~isfield(p.trial.pldaps, 'maxTrialLength')
         p.trial.pldaps.maxTrialLength = 20;
     end
+    
     p.trial.pldaps.maxFrames        = p.trial.pldaps.maxTrialLength*p.trial.display.frate;
     
     
@@ -56,6 +57,38 @@ if nargin==1
     
     if ~isfield(p.trial.(sn), 'type')
         p.trial.(sn).type       = 'grating';
+    end
+    
+    if ~isfield(p.trial.(sn), 'appearGazeCont')
+        p.trial.(sn).appearGazeCont = false;
+    end
+    
+    if ~isfield(p.trial.(sn), 'appearRangePar')
+        p.trial.(sn).appearRangePar = 5;
+    end
+    
+    if ~isfield(p.trial.(sn), 'appearCenter')
+        p.trial.(sn).appearCenter = [0 0];
+    end
+    
+    if ~isfield(p.trial.(sn), 'appearTau')
+        p.trial.(sn).appearTau = 30;
+    end
+    
+    if ~isfield(p.trial.(sn), 'offLifetime')
+        p.trial.(sn).offLifetime = 250;
+    end
+    
+    if ~isfield(p.trial.(sn), 'onLifetime')
+        p.trial.(sn).onLifetime = 100;
+    end
+    
+    if ~isfield(p.trial.(sn), 'maxContrast')
+        p.trial.(sn).maxContrast = .2;
+    end
+    
+    if ~isfield(p.trial.(sn), 'holdDuration')
+        p.trial.(sn).holdDuration = 15;
     end
     
     return
@@ -110,8 +143,10 @@ switch state
                 'appearCenter', p.trial.(sn).appearCenter, ...
                 'appearTau', p.trial.(sn).appearTau, ...
                 'maxContrast', p.trial.(sn).maxContrast, ...
+                'radius', p.trial.(sn).radius, ...
                 'onLifetime', p.trial.(sn).onLifetime, ...
-                'offLifetime', p.trial.(sn).offLifetime);
+                'offLifetime', p.trial.(sn).offLifetime, ...
+                'holdDuration', p.trial.(sn).holdDuration);
         end
         
         % randomize speed
