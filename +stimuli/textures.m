@@ -63,12 +63,14 @@ classdef textures < handle
             o.winPtr = winPtr;
             
             if ~isnan(o.winPtr)
+                try
                 [sourceFactorOld, destinationFactorOld]=Screen('BlendFunction', o.winPtr);
                 
                 if strcmp(sourceFactorOld, GL_SRC_ALPHA) && strcmp(destinationFactorOld, GL_ONE_MINUS_SRC_ALPHA)
                     o.texMode = [];
                 else
                     o.texMode=2;
+                end
                 end
             end
             
@@ -166,7 +168,9 @@ classdef textures < handle
         function closeAll(o)
             
             if ~isnan(o.winPtr)
-                Screen('Close', cell2mat(o.texIds))
+                for i = 1:o.numTex
+                    Screen('Close', o.texture{i}.ptr)
+                end
             end
             
         end
