@@ -35,6 +35,7 @@ classdef butterfly < handle
         ctrHold                 % frame counter for fixation
         ctrOn                   % how long object has been on
         ctrOff                  % how long object has been off
+        holdDuration@double=15  % how many frames to hold before reward
         motionType              % governs movement 
 
 
@@ -120,6 +121,7 @@ classdef butterfly < handle
             ip.addParameter('radius', 1)
             ip.addParameter('onLifetime', 60)
             ip.addParameter('offLifetime', 120)
+            ip.addParameter('holdDuration', m.holdDuration)
           
             % --- parameters for general appearance
             
@@ -132,14 +134,14 @@ classdef butterfly < handle
             m.onLifetime  = ip.Results.onLifetime;
             m.offLifetime = ip.Results.offLifetime;
             m.maxContrast = ip.Results.maxContrast;
-            
+            m.holdDuration= ip.Results.holdDuration;
             m.rndStr      = ip.Results.randStream;
             
             switch m.type
                 case {1, 'face', 'Face'}
-                    m.objects = stimuli.face(p);
+                    m.objects = stimuli.face(p, 'maxContrast', m.maxContrast);
                 case {2, 'grating', 'Grating'}
-                    m.objects = stimuli.gratings(p);
+                    m.objects = stimuli.gratings(p, 'maxContrast', m.maxContrast);
                 otherwise
 
             end
@@ -243,7 +245,7 @@ classdef butterfly < handle
             m.color(:,idx)       = ones(3,n);
             m.colorThresh(idx)   = 40;
             
-            m.alpha(idx)         = rand(m.rndStr,1,n); % faces appear gradually
+            m.alpha(idx)         = rand(m.rndStr,1,n)*m.maxContrast; % faces appear gradually
             m.rotAngles(idx)     = zeros(1,n);
             m.ctrHold(idx)       = zeros(1,n);
             
@@ -288,33 +290,39 @@ classdef butterfly < handle
             
            % --- update objects
             m.objects.position = [m.ppd*m.x(:) + m.ctr(1) -m.ppd*m.y(:) + m.ctr(2)];
-            m.objects.texSize  = cell2mat(cellfun(@(x) x.size, m.objects.texture(m.texid), 'UniformOutput', false)');
-%             m.objects.texSize  = repmat(2*m.radius(:)*m.ppd,1,2);
+%             m.objects.texSize  = cell2mat(cellfun(@(x) x.size, m.objects.texture(m.texid), 'UniformOutput', false)');
+            m.objects.texSize  = repmat(2*m.radius(:)*m.ppd,1,2);
             
             % --- turn off
             turnOff = m.ctrOn > m.onLifetime;
             turnOn  = m.ctrOff > m.offLifetime;
             
-            m.ctrOn(turnOff) = nan;
-            m.ctrOff(turnOff) = 0;
-            m.alpha(turnOff)  = 0;
-            
-            m.ctrOff(turnOn) = nan;
-            m.ctrOn(turnOn)  = 0;
-            m.alpha(turnOn)  = 1;
-            
-            m.alpha(m.alpha > 0) = max(m.maxContrast, (m.maxContrast/m.appearTau) * m.ctrOn(m.alpha > 0));
-
-            m.objects.alpha    = m.alpha;
-            
-            m.objects.id       = m.texid; 
-            
-            heldIx = m.ctrHold >= 10;
+            % --- check hold status
+            heldIx = m.ctrHold >= m.holdDuration;
             if any(heldIx)
                 m.hReward.give();
                 m.initObjects(heldIx);
             end
             m.ctrHold(heldIx) = 0;
+            
+            % --- flip states
+            turnOff = turnOff | heldIx;
+            turnOn  = turnOn & ~heldIx;
+            
+            m.ctrOn(turnOff) = nan;
+            m.ctrOff(turnOff) = 1;
+            m.alpha(turnOff)  = 0;
+            
+            m.ctrOff(turnOn) = nan;
+            m.ctrOn(turnOn)  = 1;
+            m.alpha(turnOn)  = 1;
+            
+            m.alpha(m.alpha > 0) = min(m.maxContrast, (m.maxContrast/m.appearTau) * m.ctrOn(m.alpha > 0));
+
+            m.objects.alpha    = m.alpha;
+            
+            m.objects.id       = m.texid; 
+            
         end
         
         % -----------------------------------------------------------------
@@ -349,7 +357,7 @@ classdef butterfly < handle
             
             dist=sqrt((xDeg - m.x).^2 + (yDeg - m.y).^2);
             
-            iiHeld = ((dist < m.radius*2) - .5) * 2;
+            iiHeld = ((dist < m.radius) - .5) * 2;
             
             m.ctrHold = m.ctrHold + iiHeld;
             m.ctrHold(m.ctrHold < 0) = 0;
