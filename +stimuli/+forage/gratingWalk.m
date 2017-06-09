@@ -15,37 +15,28 @@ p = pdsDefaultTrialStructure(p);
 p.defaultParameters.pldaps.trialMasterFunction='runModularTrial';
 p.defaultParameters.pldaps.trialFunction='stimuli.forage.forage';
 
-c.Nr=1; %one condition;
-p.conditions=repmat({c},1,200);
 
-p.defaultParameters.pldaps.finish = length(p.conditions);
+
+p.defaultParameters.pldaps.finish = 200;
 
 p.trial.(sn).rngs.randomNumberGenerater='mrg32k3a';
-p.trial.(sn).rngs.trialSeeds = randi(2^32, [3e3 1]);
+p.trial.(sn).rngs.trialSeeds = repmat(randi(2^32, [10 1]), 1e3,1);
 
 %----------------------------------------------------------------------
 % Default Conditions
+
+if ~isfield(p.trial.(sn), 'holdDuration')
+    p.trial.(sn).holdDuration = 15;
+end
+    
 if ~isfield(p.trial.(sn), 'maxTrialLength')
     p.trial.pldaps.maxTrialLength = 20;
 end
 p.trial.pldaps.maxFrames        = p.trial.pldaps.maxTrialLength*p.trial.display.frate;
 
 
-p.trial.(sn).MotN       = 2;  % number of face objects
-p.trial.(sn).minSpeed   = .5;
-p.trial.(sn).maxSpeed   = 1;
-p.trial.(sn).motionType = 'randomwalk';
-p.trial.(sn).type       = 'grating';
 
-p.trial.(sn).appearGazeContingent = false;
-p.trial.(sn).appearRangePar = 5;
-p.trial.(sn).appearCenter = [0 0];
-p.trial.(sn).appearTau = 10;
-p.trial.(sn).maxContrast = 0.1;
-            
-p.trial.(sn).radius = .5;
-p.trial.(sn).onLifetime  = .5 * p.trial.display.frate;
-p.trial.(sn).offLifetime = 1.5 * p.trial.display.frate;
+p = stimuli.forage.updateConditions(p);
 
 
 
