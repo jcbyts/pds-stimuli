@@ -1,9 +1,10 @@
-subject = 'Ellie';
+subject = 'test';
 % 
 % behavior = @stimuli.forage.faceWalk;
 % behavior = @plain;
 
-behavior = @stimuli.forage.gratingWalk;
+behavior = @stimuli.forage.faceForageRandomWalk;
+
 
 
 showCSDFlash       = true;
@@ -12,13 +13,7 @@ showGaussNoise     = false;
 showHartleyStimuli = true;
 showGaussianBlobs  = true;
 
-% gaussianContrast = .15;
-% behavior = @stimuli.fixflash.defaultParameters;% 
-% showCSDFlash       = false;
-% showNatBackground  = false;
-% showGaussNoise     = false;
-% showHartleyStimuli = true;
-% showGaussianBlobs  = false;
+gaussianContrast = .15;
 
 settingsStruct = struct();
 settingsStruct.display.destinationFactorNew = GL_ONE;
@@ -43,6 +38,25 @@ settingsStruct.stimulus.fixPointRadius = .3;
 settingsStruct.stimulus.holdDuration = 30; % frames (counter, not continuous)
 
 %--------------------------------------------------------------------------
+% Add gaussian Pyramid noise
+sn='gaussianNoiseBlobs';
+settingsStruct.(sn).stateFunction.name='v1mapping.gaussianNoiseBlobs';
+settingsStruct.(sn).use=showGaussianBlobs;
+settingsStruct.(sn).stateFunction.acceptsLocationInput=true;
+settingsStruct.(sn).stateFunction.order=-5;
+settingsStruct.(sn).stateFunction.requestedStates.experimentPostOpenScreen=true;
+settingsStruct.(sn).stateFunction.requestedStates.trialSetup=true;
+settingsStruct.(sn).stateFunction.requestedStates.trialPrepare=true;
+settingsStruct.(sn).stateFunction.requestedStates.frameUpdate=true;
+settingsStruct.(sn).stateFunction.requestedStates.frameDraw=true;
+settingsStruct.(sn).stateFunction.requestedStates.trialCleanUpandSave=true;
+% important parameters
+settingsStruct.(sn).N=200; % number in the base level
+settingsStruct.(sn).levels=1; % number of levels
+settingsStruct.(sn).contrast=gaussianContrast;
+settingsStruct.(sn).sigma0=0.25;
+
+%--------------------------------------------------------------------------
 % Add CSD module
 sn='csdFlash';
 settingsStruct.(sn).stateFunction.name='v1mapping.csdFlash';
@@ -54,10 +68,10 @@ settingsStruct.(sn).stateFunction.requestedStates.trialSetup=true;
 settingsStruct.(sn).stateFunction.requestedStates.framePrepareDrawing=true;
 settingsStruct.(sn).stateFunction.requestedStates.frameDraw=true;
 settingsStruct.(sn).stateFunction.requestedStates.trialCleanUpandSave=true;
-settingsStruct.(sn).onDuration = 50;
+settingsStruct.(sn).onDuration  = 50;
 settingsStruct.(sn).offDuration = 150;
-settingsStruct.(sn).onColor = 1;
-settingsStruct.(sn).offColor = .5;
+settingsStruct.(sn).onColor     = 1;
+settingsStruct.(sn).offColor    = .5;
 
 %--------------------------------------------------------------------------
 % Add natural background module
@@ -75,21 +89,6 @@ settingsStruct.(sn).stateFunction.requestedStates.frameDraw=true;
 settingsStruct.(sn).stateFunction.requestedStates.trialCleanUpandSave=true;
 settingsStruct.(sn).imageContrast = .5;
 
-%--------------------------------------------------------------------------
-% Add Gaussian Pyramid Noise
-sn='gaussPyrNoise';
-settingsStruct.(sn).stateFunction.name='v1mapping.gaussPyrNoise';
-settingsStruct.(sn).use=showGaussNoise;
-settingsStruct.(sn).stateFunction.acceptsLocationInput=true;
-settingsStruct.(sn).stateFunction.order=-5;
-settingsStruct.(sn).stateFunction.requestedStates.experimentPostOpenScreen=true;
-% settingsStruct.eyemarker.stateFunction.requestedStates.experimentCleanUp=true;
-settingsStruct.(sn).stateFunction.requestedStates.trialSetup=true;
-% settingsStruct.eyemarker.stateFunction.requestedStates.frameUpdate=true;
-settingsStruct.(sn).stateFunction.requestedStates.framePrepareDrawing=true;
-settingsStruct.(sn).stateFunction.requestedStates.frameDraw=true;
-settingsStruct.(sn).stateFunction.requestedStates.trialCleanUpandSave=true;
-
 
 %--------------------------------------------------------------------------
 % Add Hartley Stimulus
@@ -105,42 +104,13 @@ settingsStruct.(sn).stateFunction.requestedStates.trialPrepare=true;
 settingsStruct.(sn).stateFunction.requestedStates.frameUpdate=true;
 settingsStruct.(sn).stateFunction.requestedStates.frameDraw=true;
 settingsStruct.(sn).stateFunction.requestedStates.trialCleanUpandSave=true;
-% settingsStruct.(sn).OnDuration=2;
-% settingsStruct.(sn).OffDuration=4;
-% settingsStruct.(sn).contrast=.25;
-% settingsStruct.(sn).Freq0=.025;
-% settingsStruct.(sn).nOctaves=5;
-% settingsStruct.(sn).tfs=0;
-% settingsStruct.(sn).sfscale=1;
-
-settingsStruct.hartley.OnDuration     = 2;
-settingsStruct.hartley.OffDuration    = 4;       
-settingsStruct.hartley.contrast       = .1;
-settingsStruct.hartley.tfs            = 0; %[0 2 4 8 16];
-settingsStruct.hartley.sfscale        = 1;
-settingsStruct.hartley.nOctaves       = 5;
-settingsStruct.hartley.Freq0          =.5;
-
-
-%--------------------------------------------------------------------------
-% Add gaussian blob noise
-sn='gaussianNoiseBlobs';
-settingsStruct.(sn).stateFunction.name='v1mapping.gaussianNoiseBlobs';
-settingsStruct.(sn).use=showGaussianBlobs;
-settingsStruct.(sn).stateFunction.acceptsLocationInput=true;
-settingsStruct.(sn).stateFunction.order=-5;
-settingsStruct.(sn).stateFunction.requestedStates.experimentPostOpenScreen=true;
-% settingsStruct.eyemarker.stateFunction.requestedStates.experimentCleanUp=true;
-settingsStruct.(sn).stateFunction.requestedStates.trialSetup=true;
-settingsStruct.(sn).stateFunction.requestedStates.trialPrepare=true;
-settingsStruct.(sn).stateFunction.requestedStates.frameUpdate=true;
-settingsStruct.(sn).stateFunction.requestedStates.frameDraw=true;
-settingsStruct.(sn).stateFunction.requestedStates.trialCleanUpandSave=true;
-% important parameters
-settingsStruct.(sn).N=3; % number in the base level
-settingsStruct.(sn).levels=5; % number of levels
-settingsStruct.(sn).contrast=gaussianContrast;
-settingsStruct.(sn).sigma0=1;
+settingsStruct.(sn).OnDuration     = 2;
+settingsStruct.(sn).OffDuration    = 4;       
+settingsStruct.(sn).contrast       = .1;
+settingsStruct.(sn).tfs            = 0; %[0 2 4 8 16];
+settingsStruct.(sn).sfscale        = 1;
+settingsStruct.(sn).nOctaves       = 5;
+settingsStruct.(sn).Freq0          =.5;
 
 
 settingsStruct.pldaps.pause.preExperiment = 1;

@@ -1,21 +1,21 @@
-subject = 'Ellie';
+subject = 'test';
 % 
 % behavior = @stimuli.forage.faceWalk;
-behavior = @plain;
+% behavior = @plain;
 
-% behavior = @stimuli.forage.gratingWalk;
+behavior = @stimuli.forage.faceFinder;
 
 
 
-showNatBackground  = true;
+% showNatBackground  = true;
 
 % gaussianContrast = .15;
 % behavior = @stimuli.fixflash.defaultParameters;% 
-% showCSDFlash       = false;
-% showNatBackground  = false;
-% showGaussNoise     = false;
-% showHartleyStimuli = true;
-% showGaussianBlobs  = false;
+showCSDFlash       = false;
+showNatBackground  = true;
+showGaussNoise     = false;
+showHartleyStimuli = false;
+showGaussianBlobs  = false;
 
 settingsStruct = struct();
 settingsStruct.display.destinationFactorNew = GL_ONE;
@@ -31,7 +31,7 @@ settingsStruct.eyemarker.use=false;
 settingsStruct.pldaps.useModularStateFunctions = true;
 settingsStruct.pldaps.trialMasterFunction='runModularTrial';
 settingsStruct.pldaps.save.mergedData=0;
-settingsStruct.behavior.reward.defaultAmount=.01;
+settingsStruct.behavior.reward.defaultAmount=.05;
 
 settingsStruct.session.subject=subject;
 
