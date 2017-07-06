@@ -7,11 +7,11 @@ behavior = @stimuli.forage.faceForageRandomWalk;
 
 
 
-showCSDFlash       = true;
+showCSDFlash       = false;
 showNatBackground  = true;
 showGaussNoise     = false;
-showHartleyStimuli = true;
-showGaussianBlobs  = true;
+showHartleyStimuli = false;
+showGaussianBlobs  = false;
 
 gaussianContrast = .15;
 

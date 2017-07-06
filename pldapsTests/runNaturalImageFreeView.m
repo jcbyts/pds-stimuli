@@ -1,9 +1,9 @@
-subject = 'test';
+subject = 'Ellie';
 % 
 % behavior = @stimuli.forage.faceWalk;
-% behavior = @plain;
+behavior = @plain;
 
-behavior = @stimuli.forage.faceFinder;
+% behavior = @stimuli.forage.faceFinder;
 
 
 

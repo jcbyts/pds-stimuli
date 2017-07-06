@@ -1,8 +1,25 @@
-subject = 'test';
+function runFixFlashWithGaussianPyrNoise(subject, pauseBeforeStart)
+
+if nargin < 2
+    pauseBeforeStart = true;
+    if nargin < 1
+        subject = 'Ellie';
+    end
+end
 
 
+% --- parameters for the gaussian pyramid noise stimulus
 gaussianContrast = .3;
-behavior = @stimuli.fixflash.defaultParameters;% 
+gaussianSigma    = 0.25;
+numInBaseLevel   = 50;   % number in the base level
+numLevels        = 1;    % number of levels (should be 1!!)
+fixWinRadius     = 1.5;  % fixation window radius (degrees)
+fixPointRadius   = .3;
+rewardAmount     = .05; % ul? syringe pump uncalibrated
+
+%--------------------------------------------------------------------------
+% --- Setup PLDAPS
+behavior = @stimuli.fixflash.defaultParameters;
 showCSDFlash       = false;
 showNatBackground  = false;
 showGaussNoise     = false;
@@ -11,25 +28,20 @@ showGaussianBlobs  = true;
 
 settingsStruct = struct();
 settingsStruct.display.destinationFactorNew = GL_ONE;
-if showNatBackground
-    settingsStruct.display.sourceFactorNew = GL_SRC_ALPHA;
-else
-    settingsStruct.display.sourceFactorNew = GL_ONE;
-end
-settingsStruct.display.colorclamp = 1;
+settingsStruct.display.sourceFactorNew = GL_ONE;
+settingsStruct.display.colorclamp     = 1;
 settingsStruct.display.normalizeColor = 1;
 
 settingsStruct.eyemarker.use=false;
 settingsStruct.pldaps.useModularStateFunctions = true;
 settingsStruct.pldaps.trialMasterFunction='runModularTrial';
 settingsStruct.pldaps.save.mergedData=0;
-settingsStruct.behavior.reward.defaultAmount=.05;
+settingsStruct.behavior.reward.defaultAmount = rewardAmount;
 
 settingsStruct.session.subject=subject;
 
-settingsStruct.stimulus.fixWinRadius = 1.5;
-settingsStruct.stimulus.fixPointRadius = .3;
-settingsStruct.stimulus.holdDuration = 30; % frames (counter, not continuous)
+settingsStruct.stimulus.fixWinRadius   = fixWinRadius;
+settingsStruct.stimulus.fixPointRadius = fixPointRadius;
 
 %--------------------------------------------------------------------------
 % Add CSD module
@@ -125,155 +137,32 @@ settingsStruct.(sn).stateFunction.requestedStates.trialPrepare=true;
 settingsStruct.(sn).stateFunction.requestedStates.frameUpdate=true;
 settingsStruct.(sn).stateFunction.requestedStates.frameDraw=true;
 settingsStruct.(sn).stateFunction.requestedStates.trialCleanUpandSave=true;
-% important parameters
-% settingsStruct.(sn).N=3; % number in the base level
-% settingsStruct.(sn).levels=5; % number of levels
-% settingsStruct.(sn).contrast=gaussianContrast;
-% settingsStruct.(sn).sigma0=1;
+settingsStruct.(sn).N        = numInBaseLevel; % number in the base level
+settingsStruct.(sn).levels   = numLevels; % number of levels
+settingsStruct.(sn).contrast = gaussianContrast;
+settingsStruct.(sn).sigma0   = gaussianSigma;
 
-settingsStruct.(sn).N=100; % number in the base level
-settingsStruct.(sn).levels=1; % number of levels
-settingsStruct.(sn).contrast=gaussianContrast;
-settingsStruct.(sn).sigma0=0.25;
-
-settingsStruct.pldaps.pause.preExperiment = 1;
+if pauseBeforeStart
+    settingsStruct.pldaps.pause.preExperiment = true;
+else
+    settingsStruct.pldaps.pause.preExperiment = false;
+end
 
 try
-cm = getpref('marmoview_calibration', subject);
-cm2 = cm(:,:,1)';
-cm2(:,:,2) = cm(:,:,2)';
-
-settingsStruct.eyelink.calibration_matrix = cm2;
-settingsStruct.eyelink.useRawData = true;
+    cm = getpref('marmoview_calibration', subject);
+    cm2 = cm(:,:,1)';
+    cm2(:,:,2) = cm(:,:,2)';
+    
+    settingsStruct.eyelink.calibration_matrix = cm2;
+    settingsStruct.eyelink.useRawData = true;
+catch me
+    throw(me)
 end
 
 
-
+% run pldaps
 p = pldaps(behavior, settingsStruct);
 
 p.run
 
 return
-%%
-for tr = 1:numel(p.data)
-    figure(1); clf
-    plot(p.data{tr}.timing.frameStateChangeTimes'*1000, '-')
-    title(sprintf('Trial %d', tr))
-    pause
-end
-
-return
-% %% test noise stimuli
-% 
-% lev1 = stimuli.gaussians(p, 'sigma', [0.1 .25 .5 1]);
-% % lev2 = stimuli.gaussians(p, 'sigma', .25);
-% % lev3 = stimuli.gaussians(p, 'sigma', .5);
-% % lev4 = stimuli.gaussians(p, 'sigma', 1);
-% 
-% n1 = stimuli.textureFlashNoise(p,lev1, 'num', 4^4);
-% % n2 = stimuli.textureFlashNoise(p,lev2, 'num', 4^3);
-% % n3 = stimuli.textureFlashNoise(p,lev3, 'num', 4^2);
-% % n4 = stimuli.textureFlashNoise(p,lev4, 'num', 4);
-% 
-% %%
-% tic
-% n1.beforeFrame()
-% toc
-% % n2.beforeFrame()
-% % n3.beforeFrame()
-% % n4.beforeFrame()
-% 
-% Screen('Flip', p.trial.display.ptr);
-% 
-% tic
-% n1.afterFrame()
-% toc
-% % n2.afterFrame()
-% % n3.afterFrame()
-% % n4.afterFrame()
-% 
-% %%
-% 
-% n = stimuli.gaussianPyrNoise(p)
-% 
-% n.setup
-% 
-% %%
-% figure(1); clf
-% plot(n.x, n.y, 'o')
-% 
-% n.update
-% 
-% %% grating noise
-% n = stimuli.gratings(p);
-% %%
-% n = stimuli.gaussians(p, 'sigma', [0.1 .25 .5 1]);
-% 
-% %%
-% ng = 100;
-% % n.id = randi(n.numTex, 1, ng);
-% n.texSize = cell2mat(cellfun(@(x) x.size, n.texture(n.id), 'UniformOutput', false)');
-% n.alpha = repmat(.15, 1, ng);
-% 
-% 
-% n.position = n.position + 10*randn(ng,2); %rand(ng, 2)*600;
-% % n.position = rand(ng, 2)*600;
-% n.beforeFrame()
-% 
-% Screen('Flip', p.trial.display.ptr);
-% %%
-% 
-% 
-% % Screen('BlendFunction',  p.trial.display.ptr, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-% Screen('BlendFunction',  p.trial.display.ptr, GL_SRC_ALPHA, GL_ONE);
-% n = stimuli.gaussians(p, 'sigma', [0.1 .25 .5 1]);
-% 
-% 
-% 
-% n.id = [7 8];
-% n.texSize = cell2mat(cellfun(@(x) x.size, n.texture(n.id), 'UniformOutput', false)');
-% n.position = [p.trial.display.ctr(1:2); p.trial.display.ctr(1:2)+[0 50]];
-% n.alpha    = repmat(.1, 1, numel(n.id));
-% 
-% n.beforeFrame()
-% Screen('Flip', p.trial.display.ptr);
-% 
-% img=Screen('GetImage', p.trial.display.ptr, p.trial.display.winRect);
-% 
-% figure(1); clf
-% plot(mean(img,3)-127)
-% 
-% 
-% %%
-% p.trial.display.ptr = nan;
-% n = stimuli.gaussians(p, 'sigma', [0.1 .25 .5 1]);
-% 
-% n.id = [8 7];
-% n.texSize = cell2mat(cellfun(@(x) x.size, n.texture(n.id), 'UniformOutput', false)');
-% n.position = [p.trial.display.ctr(1:2); p.trial.display.ctr(1:2)+[0 0]];
-% n.alpha    = repmat(.15, 1, 2);
-% 
-% a = stimuli.textureFlashNoise(p, n)
-% 
-% a.getImage
-% 
-% 
-% 
-% %%
-% ng   = 100;
-% n.id = randi(numel(n.sigma), 1, ng);
-% n.texSize = repmat(ceil(7*n.sigma(n.id)*p.trial.display.ppd), 1, 2);
-% n.alpha = repmat(.15, 1, ng);
-% n.position = rand(ng, 2)*300;
-% 
-% 
-% n.beforeFrame()
-% 
-% Screen('Flip', p.trial.display.ptr);
-% 
-% 
-% img=Screen('GetImage', p.trial.display.ptr, p.trial.display.winRect);
-% 
-% %%
-% 
-% p.trial.display.ptr = nan;
