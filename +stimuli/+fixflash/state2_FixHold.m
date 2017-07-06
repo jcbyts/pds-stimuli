@@ -53,6 +53,7 @@ classdef state2_FixHold < stimuli.state
             
             if (r > hTrial.fixWinRadius) % left fixation window
                 hTrial.holdDuration = t - s.tStart;
+
                 hTrial.holdXY       = mean(s.eyeXY,1);
                 
                 hTrial.error = 2;

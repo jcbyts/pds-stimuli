@@ -13,23 +13,6 @@ ctr   = p.trial.display.ctr(1:2);   % center of the screen
 p.trial.(sn).rngs.conditionerRNG=RandStream(p.trial.(sn).rngs.randomNumberGenerater, 'seed', p.trial.(sn).rngs.trialSeeds(p.trial.pldaps.iTrial));
 setupRNG=p.trial.(sn).rngs.conditionerRNG;
 
-% EYE CALIBRATION STUFF HERE
-
-% % marmoview specific preferences override pldaps
-% if p.trial.eyelink.use && p.trial.eyelink.useAsEyepos
-%     p.trial.eyelink.useRawData=true;
-%     p.trial.eyelink.calibration_matrix=[];
-%     for i = 1:2 % loop over eye index
-%         % get subject specific calibration matrix
-%         cm=getCalibrationPref(p,1);
-%         p.trial.eyelink.calibration_matrix(:,:,i) = cm';
-%     end
-%         
-% end
-
-
-
-
 % --- Fixation position
 if p.trial.(sn).fixationJitter
     xpos = p.trial.(sn).fixationJitterSize * randn(setupRNG) + p.trial.(sn).fixationX;
@@ -85,7 +68,7 @@ p.trial.(sn).hTrial = stimuli.fixflash.fixFlashTrial( ...
   'fixGracePeriod',p.trial.(sn).fixGracePeriod, ...
   'fixDuration', p.trial.(sn).minFixDuration, ...
   'fixFlashCnt',p.trial.(sn).fixFlashCnt, ...
-  'holdDuration',p.trial.(sn).holdDuration, ...
+  'holdDuration',0, ...  % hold duration tracks how long fixation was held (not a parameter)
   'trialTimeout',p.trial.(sn).trialTimeout, ...
   'iti',p.trial.(sn).iti, ...
   'maxRewardCnt',p.trial.(sn).maxRewardCnt, ...

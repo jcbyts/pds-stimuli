@@ -44,6 +44,9 @@ switch state
 
         % --- @dotMotionTrial/afterFrame handles all task state transitions
         p.trial.(sn).hTrial.afterFrame(p.trial.ttime);
+        if p.trial.(sn).hTrial.holdDuration > 10
+            keyboard
+        end
 
     % --- Draw task semantics using info from hTrial
     case p.trial.pldaps.trialStates.framePrepareDrawing

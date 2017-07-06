@@ -1,16 +1,16 @@
 function updateGUI(p,sn)
 
-% hObj = stimuli.fixflash.fixFlashPlot(1);
 hObj = p.functionHandles.fixFlashPlot;
-figure(hObj)
+figure(hObj) % bring figure to the front
 handles = guidata(hObj);
 
 if nargin < 3
     sn = 'stimulus';
 end
-            
+
+% get coded trial outcomes
 outcomes = [cellfun(@(x) x.(sn).hTrial.error, p.data) p.trial.(sn).hTrial.error];
-errs = [0 1 2];
+errs = [0 1 2]; % outcomes of interest (0 - completed)
 n = numel(errs);
 num = zeros(n,1);
 for i = 1:n
@@ -20,15 +20,16 @@ end
 
 handles.plots.outcomeBar.YData = num;
 
-% TODO: This is a hack for the weird n=30 bug
+% get all hold durations
 tmp = [cellfun(@(x) x.(sn).hTrial.holdDuration, p.data) p.trial.stimulus.hTrial.holdDuration];
-% assert(all(tmp<10), 'why are hold durations longer thatn 10s!?')
-handles.plots.holdDurHist.Data = tmp(tmp<10);
-handles.text.holdTitle.String = sprintf('Hold Duration (%02.2f, %02.2f, %02.2f)', min(handles.plots.holdDurHist.Data(outcomes==0)), mean(handles.plots.holdDurHist.Data(outcomes==0)), max(handles.plots.holdDurHist.Data));
+
+handles.plots.holdDurHist.Data = tmp;
+handles.text.holdTitle.String  = sprintf('Hold Duration (%02.2f, %02.2f, %02.2f)', min(handles.plots.holdDurHist.Data(outcomes==0)), mean(handles.plots.holdDurHist.Data(outcomes==0)), max(handles.plots.holdDurHist.Data));
 handles.plots.holdDurHist.BinMethod = 'auto';
 handles.plots.holdDurHist.NumBins = 30;
 handles.plots.textOutcome0.Position = [handles.plots.outcomeBar.XData(1) handles.plots.outcomeBar.YData(1) 0];
 handles.plots.textOutcome0.String   = num2str(handles.plots.outcomeBar.YData(1));
+
 
 handles.plots.textOutcome1.Position = [handles.plots.outcomeBar.XData(2) handles.plots.outcomeBar.YData(2) 0];
 handles.plots.textOutcome1.String   = num2str(handles.plots.outcomeBar.YData(2));
@@ -41,6 +42,7 @@ handles.plots.fixScatter.YData = [cellfun(@(x) x.stimulus.hTrial.holdXY(2), p.da
 
 handles.plots.staircaseMin.XData = 1:p.trial.pldaps.iTrial;
 handles.plots.staircaseMax.XData = 1:p.trial.pldaps.iTrial;
+
 tmp1 = [cellfun(@(x) x.(sn).hTrial.fixDuration, p.data) p.trial.(sn).minFixDuration];
 tmp1(tmp1 > 10) = nan;
 handles.plots.staircaseMin.YData = tmp1;
@@ -95,7 +97,7 @@ if p.trial.eyelink.use
     iti       = p.trial.stimulus.hTrial.getTxTime(8);
     
     eyexy = bsxfun(@minus, eyexy, p.trial.stimulus.hFix(1).position');
-	eyexy = pds.px2deg(eyexy, p.trial.display.viewdist, p.trial.display.px2w);
+    eyexy = pds.px2deg(eyexy, p.trial.display.viewdist, p.trial.display.px2w);
     
     ax =handles.LastTrialPlot;
     hold(ax, 'off');
@@ -123,8 +125,9 @@ if p.trial.eyelink.use
     ylabel(ax, 'degrees')
     xlabel(ax, 'Time (seconds')
     title(ax, 'Last Trial')
+    
+    
+    guidata(hObj, handles)
+    
+    drawnow
 end
-
-guidata(hObj, handles)
-
-drawnow

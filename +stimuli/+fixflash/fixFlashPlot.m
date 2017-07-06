@@ -93,8 +93,8 @@ handles.text.holdylabel = ylabel(handles.HoldTime, '# Trials');
 handles.text.holdxlabel = xlabel(handles.HoldTime, 'Seconds');
 
 handles.text.StaircaseTitle  = title(handles.StairCasePlot, 'Staircase');
-handles.text.Staircaseylabel = ylabel(handles.StairCasePlot, 'Trial');
-handles.text.Staircasexlabel = xlabel(handles.StairCasePlot, 'Seconds');
+handles.text.Staircaseylabel = ylabel(handles.StairCasePlot, 'Seconds');
+handles.text.Staircasexlabel = xlabel(handles.StairCasePlot, 'Trial');
 
 handles.TrialOutcomes.XTick = [0 1 2];
 handles.TrialOutcomes.XTickLabel = {'Good', 'No Fix', 'Break Fix'};
