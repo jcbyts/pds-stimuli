@@ -87,36 +87,36 @@ c{iCond}.hartley.tfs            = 0; %[0 2 4 8 16];
 c{iCond}.hartley.sfscale        = 1;
 c{iCond}.hartley.nOctaves       = 5;
 c{iCond}.hartley.Freq0          =.5;
-
-% --- Condition 3: Face Forage with CSD flash
-iCond = iCond+1;
-c{iCond} = struct(sn, struct());
-c{iCond}.Nr = iCond;
-c{iCond}.(sn).MotN       = 2;  % number of face objects
-c{iCond}.(sn).minSpeed   = 1;
-c{iCond}.(sn).maxSpeed   = 3;
-c{iCond}.(sn).motionType = 'randomwalk';
-c{iCond}.(sn).type       = 'face'; 
-c{iCond}.(sn).appearGazeContingent = false;
-c{iCond}.(sn).appearRangePar = 5;
-c{iCond}.(sn).appearCenter = [0 0];
-c{iCond}.(sn).appearTau = 1;
-c{iCond}.(sn).maxContrast = .5;
-c{iCond}.(sn).radius = 1;
-c{iCond}.(sn).onLifetime  = 1 * p.trial.display.frate;
-c{iCond}.(sn).offLifetime = 2 * p.trial.display.frate;
-c{iCond}.(sn).gratingParams = {'sf', [.25 .5 1], 'orientation', 0:(180/12):(180-(180/12)), ...
-    'phase', 0:(360/4):(360 - (360/4)), 'isgabor', true};
-% --- modules
-c{iCond}.natImgBackground.use = false;
-c{iCond}.natImgBackground.on = false;
-c{iCond}.gaussianNoiseBlobs.use = false;
-c{iCond}.hartley.use = false;
-c{iCond}.csdFlash.use = true;
-c{iCond}.csdFlash.onDuration = 50;
-c{iCond}.csdFlash.offDuration = 150;
-c{iCond}.csdFlash.onColor = 1;
-c{iCond}.csdFlash.offColor = .2;
+% % 
+% % % --- Condition 3: Face Forage with CSD flash
+% % iCond = iCond+1;
+% c{iCond} = struct(sn, struct());
+% c{iCond}.Nr = iCond;
+% c{iCond}.(sn).MotN       = 2;  % number of face objects
+% c{iCond}.(sn).minSpeed   = 1;
+% c{iCond}.(sn).maxSpeed   = 3;
+% c{iCond}.(sn).motionType = 'randomwalk';
+% c{iCond}.(sn).type       = 'face'; 
+% c{iCond}.(sn).appearGazeContingent = false;
+% c{iCond}.(sn).appearRangePar = 5;
+% c{iCond}.(sn).appearCenter = [0 0];
+% c{iCond}.(sn).appearTau = 1;
+% c{iCond}.(sn).maxContrast = .5;
+% c{iCond}.(sn).radius = 1;
+% c{iCond}.(sn).onLifetime  = 1 * p.trial.display.frate;
+% c{iCond}.(sn).offLifetime = 2 * p.trial.display.frate;
+% c{iCond}.(sn).gratingParams = {'sf', [.25 .5 1], 'orientation', 0:(180/12):(180-(180/12)), ...
+%     'phase', 0:(360/4):(360 - (360/4)), 'isgabor', true};
+% % --- modules
+% c{iCond}.natImgBackground.use = false;
+% c{iCond}.natImgBackground.on = false;
+% c{iCond}.gaussianNoiseBlobs.use = false;
+% c{iCond}.hartley.use = false;
+% c{iCond}.csdFlash.use = true;
+% c{iCond}.csdFlash.onDuration = 50;
+% c{iCond}.csdFlash.offDuration = 150;
+% c{iCond}.csdFlash.onColor = 1;
+% c{iCond}.csdFlash.offColor = .2;
 % 
 % % --- Condition 4: Face Invaders on Natural background
 % iCond = iCond+1;
