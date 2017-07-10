@@ -30,10 +30,13 @@ switch state
         
     case p.trial.pldaps.trialStates.trialSetup
         
+        p.trial.display.sourceFactorNew = GL_ONE;
+        p.trial.display.destinationFactorNew = GL_ONE;
+        Screen('BlendFunction', p.trial.display.ptr, p.trial.display.sourceFactorNew, p.trial.display.destinationFactorNew);
+        
         % setup random seed
         p.trial.(sn).rngs.conditionerRNG=RandStream(p.trial.(sn).rngs.randomNumberGenerater, 'seed', p.trial.(sn).rngs.trialSeeds(p.trial.pldaps.iTrial));
         setupRNG=p.trial.(sn).rngs.conditionerRNG;
-        
         
         if p.trial.(sn).on
             p.trial.(sn).n=stimuli.gaussianNoise(p.trial.display.ptr, 'contrast', p.trial.(sn).contrast, ...
@@ -43,9 +46,9 @@ switch state
                 'levels', p.trial.(sn).levels);
             p.trial.(sn).n.setup;
             p.trial.(sn).n.update;
-            p.trial.(sn).xpos=nan(10e3, p.trial.(sn).n.count);
-            p.trial.(sn).ypos=nan(10e3, p.trial.(sn).n.count);
-            p.trial.(sn).gridpos=nan(10e3,p.trial.(sn).n.count);
+            p.trial.(sn).xpos=nan(p.trial.pldaps.maxFrames, p.trial.(sn).n.count);
+            p.trial.(sn).ypos=nan(p.trial.pldaps.maxFrames, p.trial.(sn).n.count);
+            p.trial.(sn).gridpos=nan(p.trial.pldaps.maxFrames,p.trial.(sn).n.count);
 %             p.trial.(sn).scale=nan(10e3, p.trial.(sn).n.count);
 %             p.trial.(sn).contrast=nan(10e3, p.trial.(sn).n.count);
         end
@@ -81,9 +84,9 @@ switch state
             p.trial.(sn).step=1;
         end
         
-        
-        p.trial.(sn).rngs.randomNumberGenerater='mt19937ar';
+        p.trial.(sn).rngs.randomNumberGenerater='twister';
         p.trial.(sn).rngs.trialSeeds = randi(2^32, [3e3 1]);
+        
         
     case p.trial.pldaps.trialStates.trialCleanUpandSave
         if p.trial.(sn).on
@@ -91,6 +94,8 @@ switch state
             p.trial.(sn).xpos(ix,:)=[];
             p.trial.(sn).ypos(ix,:)=[];
             p.trial.(sn).gridpos(ix,:)=[];
+            
+            p.trial.(sn).n.closeTextures();
 %             p.trial.(sn).scale(ix,:)=[];
         end
         

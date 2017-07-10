@@ -15,7 +15,7 @@ numInBaseLevel   = 50;   % number in the base level
 numLevels        = 1;    % number of levels (should be 1!!)
 fixWinRadius     = 1.5;  % fixation window radius (degrees)
 fixPointRadius   = .3;
-rewardAmount     = .05; % ul? syringe pump uncalibrated
+rewardAmount     = 0.10; %.05; % ul? syringe pump uncalibrated
 
 %--------------------------------------------------------------------------
 % --- Setup PLDAPS

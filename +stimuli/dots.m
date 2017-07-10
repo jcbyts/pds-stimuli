@@ -149,7 +149,7 @@ classdef dots < handle
   
   % -------------------------------------------------------------------------------
   % --- Internal methods. Called by the methods above
-  methods (Access = private)        
+  methods (Access = public)        
 
     % --- Initialize dots
     function initDots(o,idx)

@@ -29,6 +29,10 @@ switch state
         
     case p.trial.pldaps.trialStates.trialSetup
         
+        p.trial.display.sourceFactorNew = GL_ONE;
+        p.trial.display.destinationFactorNew = GL_ONE;
+        Screen('BlendFunction', p.trial.display.ptr, p.trial.display.sourceFactorNew, p.trial.display.destinationFactorNew);
+        
         % setup random seed
         p.trial.(sn).rngs.conditionerRNG=RandStream(p.trial.(sn).rngs.randomNumberGenerater, 'seed', p.trial.(sn).rngs.trialSeeds(p.trial.pldaps.iTrial));
         setupRNG=p.trial.(sn).rngs.conditionerRNG;
@@ -51,8 +55,9 @@ switch state
             
             % exponential decay
             p.trial.(sn).M=p.trial.display.ppd; % grid size
-            p.trial.(sn).kxs=sort([0 2.^(0:(p.trial.(sn).nOctaves-1))*p.trial.(sn).Freq0]);
-            p.trial.(sn).kys=sort([0 2.^(0:(p.trial.(sn).nOctaves-1))*p.trial.(sn).Freq0]);
+%             sort([-2.^(0:P.nOctaves)*P.Freq0 0 2.^(0:P.nOctaves)*P.Freq0]); % both positive and negative sied
+            p.trial.(sn).kxs=sort([-2.^(0:(p.trial.(sn).nOctaves-1))*p.trial.(sn).Freq0 0 2.^(0:(p.trial.(sn).nOctaves-1))*p.trial.(sn).Freq0]);
+            p.trial.(sn).kys=sort([-2.^(0:(p.trial.(sn).nOctaves-1))*p.trial.(sn).Freq0 0 2.^(0:(p.trial.(sn).nOctaves-1))*p.trial.(sn).Freq0]);
             p.trial.(sn).count=1;
         
             on=ceil(exprnd(p.trial.(sn).OnDuration, p.trial.(sn).maxFrames,1));

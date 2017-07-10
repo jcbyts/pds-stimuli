@@ -14,6 +14,7 @@ classdef gratings < stimuli.textures
         sf
         isgabor
         radius
+        maxContrast
     end
     
     
@@ -28,6 +29,7 @@ classdef gratings < stimuli.textures
             ip.addParameter('orientation', 0:(180/8):(180 - (180/8)));
             ip.addParameter('phase', 0:(360/4):(360 - (360/4)));
             ip.addParameter('isgabor', true);
+            ip.addParameter('maxContrast', 1);
             ip.parse(varargin{:})
             
             [th, ph, sz, sfs] = ndgrid(ip.Results.orientation, ip.Results.phase, ip.Results.radius, ip.Results.sf);
@@ -39,6 +41,7 @@ classdef gratings < stimuli.textures
             o.sf          = sfs(:);
             o.radius      = sz(:);
             o.isgabor     = ip.Results.isgabor;
+            o.maxContrast = ip.Results.maxContrast;
             
             n = numel(o.orientation);
             
@@ -80,6 +83,8 @@ classdef gratings < stimuli.textures
                     img(:,:,2) = img(:,:,1);
                     img(:,:,3) = img(:,:,1);
                     img(:,:,4) = uint8(255.*mask);
+                elseif strcmp(p.trial.display.sourceFactorNew, GL_ONE) && strcmp(p.trial.display.destinationFactorNew, GL_ONE)
+                    img = o.maxContrast .* sinecarrier .* mask;
                 else
                     img = sinecarrier .* mask;
                 end

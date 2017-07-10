@@ -159,6 +159,10 @@ classdef gaussianNoise < handle
             Screen('DrawTextures', n.ptr, n.tex, [], n.dstRects, 0, 0, [], [], [], kPsychDontDoRotation, n.mypars);
         end
         
+        function closeTextures(n)
+            Screen('Close', n.tex);
+        end
+        
         function img=image(n)
             [xx,yy]=meshgrid(0:(n.dim(1)-1), 0:(n.dim(2)-1));
             s=[n.texrect(3) n.texrect(4)];

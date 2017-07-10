@@ -23,6 +23,8 @@ switch state
         
         %------------------------------------------------------------------
         % Select images to draw this trial
+        p.trial.display.sourceFactorNew = GL_SRC_ALPHA;
+        Screen('BlendFunction', p.trial.display.ptr, p.trial.display.sourceFactorNew, p.trial.display.destinationFactorNew);
         
         % setup random seed
         p.trial.(sn).rngs.conditionerRNG=RandStream(p.trial.(sn).rngs.randomNumberGenerater, 'seed', p.trial.(sn).rngs.trialSeeds(p.trial.pldaps.iTrial));
@@ -33,9 +35,18 @@ switch state
         
         p.trial.(sn).texToDraw=randi(setupRNG, p.trial.(sn).numToShow);
         
+        blendFlag = strcmp(p.trial.display.destinationFactorNew, GL_ONE);
         for i=1:p.trial.(sn).numToShow
             m=imread(fullfile(p.trial.(sn).imgDir, p.trial.(sn).fileList(p.trial.(sn).imgIndex(i)).name));
-            p.trial.(sn).tex(i)=Screen('MakeTexture',p.trial.display.ptr,m,[],[]);
+            texMode = [];
+            if blendFlag
+                m = double(m);
+                m = (m - 127) / 127;
+                m = m .* p.trial.(sn).imageContrast;
+                texMode = 2;
+            end
+            
+            p.trial.(sn).tex(i)=Screen('MakeTexture',p.trial.display.ptr,m,[],[],texMode);
             %             Screen('BlendFunction', p.trial.(sn).background.tex(i), GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         end
         
@@ -53,6 +64,10 @@ switch state
         
         if ~isfield(p.trial.(sn), 'numToShow')
             p.trial.(sn).numToShow=10;
+        end
+        
+        if ~isfield(p.trial.(sn), 'imageContrast')
+            p.trial.(sn).imageContrast = .5;
         end
         
         p.trial.(sn).rngs.randomNumberGenerater='mrg32k3a';
