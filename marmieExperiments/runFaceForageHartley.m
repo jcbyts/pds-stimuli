@@ -197,8 +197,86 @@ c{iCond}.gaussianNoiseBlobs.use = false;
 c{iCond}.hartley.use            = false;
 c{iCond}.csdFlash.use           = false;
 
+%% --- Condition 3: Frozen Seed of Hartley
+sn  = 'stimulus';
+iCond = 3;
+c{iCond} = struct(sn, struct());
+c{iCond}.Nr = iCond;
+c{iCond}.(sn).MotN       = 2;  % number of face objects
+c{iCond}.(sn).minSpeed   = 3;  % minumum speed of face objects
+c{iCond}.(sn).maxSpeed   = 8;
+c{iCond}.(sn).motionType = 'randomwalk'; % randomwalk or linear
+c{iCond}.(sn).type       = 'face';       % face or grating
+c{iCond}.(sn).appearGazeContingent = false;
+c{iCond}.(sn).appearRangePar = 2;
+c{iCond}.(sn).appearCenter = [0 -2];
+c{iCond}.(sn).appearTau = 1;
+c{iCond}.(sn).maxContrast = 0.3;
+c{iCond}.(sn).radius = 1;
+c{iCond}.(sn).onLifetime  = 120;
+c{iCond}.(sn).offLifetime = 240;
+% if type is 'grating', these parameters will be used
+c{iCond}.(sn).gratingParams = {'sf', [.25 .5 1], 'orientation', 0:(180/12):(180-(180/12)), ...
+    'phase', 0:(360/4):(360 - (360/4)), 'isgabor', true};
+% --- modules
+c{iCond}.natImgBackground.use        = false;
+c{iCond}.natImgBackground.on         = false;
+c{iCond}.gaussianNoiseBlobs.use      = false;
+
+c{iCond}.csdFlash.use                = false;
+
+sn = 'hartley';
+c{iCond}.(sn).use                 = true;
+
+c{iCond}.(sn).rngs.conditionerRNG = RandStream('mt19937ar','Seed',15239487);
+setupRNG=c{iCond}.(sn).rngs.conditionerRNG;
+
+c{iCond}.(sn).setupRNG='frozenSequence';
+
+c{iCond}.(sn).sequenceLength = 6*120;
+c{iCond}.(sn).count = 1;
+c{iCond}.(sn).maxFrames=10e3;
+c{iCond}.(sn).kx=nan(c{iCond}.(sn).maxFrames, c{iCond}.(sn).count);
+c{iCond}.(sn).ky=nan(c{iCond}.(sn).maxFrames, c{iCond}.(sn).count);
+c{iCond}.(sn).on=zeros(c{iCond}.(sn).maxFrames,c{iCond}.(sn).count);
+c{iCond}.(sn).phi=nan(c{iCond}.(sn).maxFrames,c{iCond}.(sn).count);
+c{iCond}.(sn).tf=nan(c{iCond}.(sn).maxFrames,c{iCond}.(sn).count);
 
 
+c{iCond}.(sn).kxs=sort([-2.^(0:(p.trial.(sn).nOctaves-1))*p.trial.(sn).Freq0 0 2.^(0:(p.trial.(sn).nOctaves-1))*p.trial.(sn).Freq0]);
+c{iCond}.(sn).kys=sort([-2.^(0:(p.trial.(sn).nOctaves-1))*p.trial.(sn).Freq0 0 2.^(0:(p.trial.(sn).nOctaves-1))*p.trial.(sn).Freq0]);
+
+on=ceil(exprnd(p.trial.(sn).OnDuration, c{iCond}.(sn).sequenceLength,1));
+off=round(exprnd(p.trial.(sn).OffDuration, c{iCond}.(sn).sequenceLength,1));
+maxDuration = 20;
+on=min(on, maxDuration);
+off=min(off, maxDuration);
+step=on+off;
+nUpdates=find(cumsum(step)>c{iCond}.(sn).sequenceLength,1);
+
+[kxg, kyg, ktfg]=ndgrid(c{iCond}.(sn).kxs, c{iCond}.(sn).kys, p.trial.(sn).tfs);
+gridIx=randi(setupRNG, numel(kxg), nUpdates, 1);
+fr=0;
+for iStim=1:nUpdates
+    iFrames=fr+(1:on(iStim));
+    c{iCond}.(sn).kx(iFrames)=kxg(gridIx(iStim));
+    c{iCond}.(sn).ky(iFrames)=kyg(gridIx(iStim));
+    c{iCond}.(sn).on(iFrames)=1;
+    c{iCond}.(sn).tf(iFrames)=ktfg(gridIx(iStim));
+    c{iCond}.(sn).phi(iFrames)=rand*2*pi;
+    fr=iFrames(end)+off(iStim)-1;
+end
+
+nRepeats = ceil(c{iCond}.(sn).maxFrames / c{iCond}.(sn).sequenceLength);
+inds = 1:c{iCond}.(sn).sequenceLength;
+c{iCond}.(sn).kx = repmat(c{iCond}.(sn).kx(inds,:), nRepeats, 1);
+c{iCond}.(sn).ky = repmat(c{iCond}.(sn).ky(inds,:), nRepeats, 1);
+c{iCond}.(sn).on = repmat(c{iCond}.(sn).on(inds,:), nRepeats, 1);
+c{iCond}.(sn).tf = repmat(c{iCond}.(sn).tf(inds,:), nRepeats, 1);
+c{iCond}.(sn).phi = repmat(c{iCond}.(sn).phi(inds,:), nRepeats, 1);
+
+
+%%
 % --- setup number of conditions        
 condN = ones(1,iCond);
 condN(1) = 3;

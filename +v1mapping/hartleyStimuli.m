@@ -33,6 +33,8 @@ switch state
         p.trial.display.destinationFactorNew = GL_ONE;
         Screen('BlendFunction', p.trial.display.ptr, p.trial.display.sourceFactorNew, p.trial.display.destinationFactorNew);
         
+        
+        
         % setup random seed
         p.trial.(sn).rngs.conditionerRNG=RandStream(p.trial.(sn).rngs.randomNumberGenerater, 'seed', p.trial.(sn).rngs.trialSeeds(p.trial.pldaps.iTrial));
         setupRNG=p.trial.(sn).rngs.conditionerRNG;
@@ -43,10 +45,15 @@ switch state
             p.trial.(sn).n=stimuli.hartley(p.trial.display.ptr, 'contrast', p.trial.(sn).contrast, ...
                 'ppd', 1, 'M', p.trial.(sn).M);
             p.trial.(sn).n.setup;
+            
+            if isfield(p.trial.(sn), 'kx')
+                return
+            end
 %             p.trial.(sn).n.update;
             p.trial.(sn).setupRNG=setupRNG;
             
             p.trial.(sn).maxFrames=10e3;
+            p.trial.(sn).count=1;
             p.trial.(sn).kx=nan(p.trial.(sn).maxFrames, p.trial.(sn).count);
             p.trial.(sn).ky=nan(p.trial.(sn).maxFrames, p.trial.(sn).count);
             p.trial.(sn).on=zeros(p.trial.(sn).maxFrames,p.trial.(sn).count);
@@ -58,7 +65,7 @@ switch state
 %             sort([-2.^(0:P.nOctaves)*P.Freq0 0 2.^(0:P.nOctaves)*P.Freq0]); % both positive and negative sied
             p.trial.(sn).kxs=sort([-2.^(0:(p.trial.(sn).nOctaves-1))*p.trial.(sn).Freq0 0 2.^(0:(p.trial.(sn).nOctaves-1))*p.trial.(sn).Freq0]);
             p.trial.(sn).kys=sort([-2.^(0:(p.trial.(sn).nOctaves-1))*p.trial.(sn).Freq0 0 2.^(0:(p.trial.(sn).nOctaves-1))*p.trial.(sn).Freq0]);
-            p.trial.(sn).count=1;
+            
         
             on=ceil(exprnd(p.trial.(sn).OnDuration, p.trial.(sn).maxFrames,1));
             off=round(exprnd(p.trial.(sn).OffDuration, p.trial.(sn).maxFrames,1));

@@ -5,7 +5,7 @@ Screen('Preference','ScreenToHead', 1,0,0);
 
 subject = 'Ellie';
 rewardAmount  = .05;
-noiseContrast = 0.0;
+noiseContrast = 0.3;
 
 % add modular trial functions
 settingsStruct.eyemarker.use=false;
@@ -80,7 +80,7 @@ settingsStruct.(sn).contrast = noiseContrast;
 settingsStruct.(sn).gazeContingent = false;
 settingsStruct.(sn).xy = [1920 1080]/2;
 settingsStruct.(sn).pxsize = 20;
-settingsStruct.(sn).size = [10 10];
+settingsStruct.(sn).size = [20 20];
 
 settingsStruct.datapixx.use=true;
 settingsStruct.datapixx.LogOnsetTimestampLevel=0;
@@ -89,7 +89,7 @@ settingsStruct.display.switchOverlayCLUTs=0;
 settingsStruct.pldaps.pause.preExperiment=true;
 
 %--- Chelsea specific fixation parameters
-settingsStruct.stimulus.fixWinRadius = 1.5;
-settingsStruct.stimulus.fixPointRadius = .3;
+% settingsStruct.stimulus.fixWinRadius = 1.5;
+% settingsStruct.stimulus.fixPointRadius = .3;
 settingStruct.stimulus.rewardLevels = [0.1 0.2 0.4 0.8 1.0 1.2 1.4 1.7 2.0];
 p=pldaps(@stimuli.fixflash.defaultParameters, subject, settingsStruct); p.run
