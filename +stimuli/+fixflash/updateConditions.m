@@ -1,5 +1,8 @@
 function updateConditions(p, sn)
 
+if ~isempty(p.conditions)
+    return
+end
 
 c.Nr=1; %one condition;
 if isinf(p.defaultParameters.pldaps.finish)
