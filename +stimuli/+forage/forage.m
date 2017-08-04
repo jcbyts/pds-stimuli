@@ -163,12 +163,34 @@ switch state
     case p.trial.pldaps.trialStates.trialCleanUpandSave
         
         figure(1); clf
-        plot(p.trial.(sn).x, p.trial.(sn).y, 'k.'); hold on
+        subplot(4,3,1:6)
+        plot(p.trial.(sn).x, p.trial.(sn).y, '.', 'MarkerSize', 2); hold on
         
-        for i=1:p.trial.(sn).MotN
-            ix=diff(p.trial.(sn).ctrHold(:,i))>0;
-            plot(p.trial.(sn).x(ix,i), p.trial.(sn).y(ix,i), 'r.');
-        end
+        p.trial.(sn).eyes = bsxfun(@minus, p.trial.(sn).eyes, p.trial.display.ctr(1:2));
+        p.trial.(sn).eyes = pds.px2deg(p.trial.(sn).eyes', p.trial.display.viewdist, p.trial.display.px2w)';
+        plot(p.trial.(sn).eyes(:,1), p.trial.(sn).eyes(:,2), 'k.', 'MarkerSize', 2)
+        xlabel('Degrees')
+        ylabel('Degrees')
+        axis tight
+        
+%         for i=1:p.trial.(sn).MotN
+%             ix=diff(p.trial.(sn).ctrHold(:,i))>0;
+%             plot(p.trial.(sn).x(ix,i), p.trial.(sn).y(ix,i), 'r.');
+%         end
+        
+        subplot(4,3,7:9)
+        plot(p.trial.(sn).x); hold on
+        plot(p.trial.(sn).eyes(:,1), 'k')
+        xlabel('Frame')
+        ylabel('Degrees')
+        axis tight
+        
+        subplot(4,3,10:12)
+        plot(p.trial.(sn).x); hold on
+        plot(p.trial.(sn).eyes(:,1), 'k')
+        xlabel('Frame')
+        ylabel('Degrees')
+        axis tight
         
         p.trial.(sn).m.objects.closeAll;
         drawnow

@@ -37,7 +37,8 @@ classdef butterfly < handle
         ctrOff                  % how long object has been off
         holdDuration@double=15  % how many frames to hold before reward
         motionType              % governs movement 
-
+        
+        rewardWindow@double = 1;
 
         % --- parameters governing the appearance of objects
         objects
@@ -91,8 +92,8 @@ classdef butterfly < handle
             m.hReward   = stimuli.reward(p); % object that handles the reward delivery
             
             % size of the display
-            m.dWidth    = p.trial.display.dWidth;
-            m.dHeight   = p.trial.display.dHeight;
+            m.dWidth    = 10; %p.trial.display.dWidth;
+            m.dHeight   = 10; %p.trial.display.dHeight;
             m.pWidth    = p.trial.display.pWidth;
             m.pHeight   = p.trial.display.pHeight;
             
@@ -143,6 +144,7 @@ classdef butterfly < handle
                 case {2, 'grating', 'Grating'}
                     m.objects = stimuli.gratings(p, 'maxContrast', m.maxContrast);
                 otherwise
+                    m.objects = stimuli.singledot(p, 'maxContrast', m.maxContrast);
 
             end
 
@@ -302,8 +304,9 @@ classdef butterfly < handle
             if any(heldIx)
                 m.hReward.give();
                 m.initObjects(heldIx);
+                m.ctrHold(:) = 0;
             end
-            m.ctrHold(heldIx) = 0;
+%             m.ctrHold(heldIx) = 0;
             
             % --- flip states
             turnOff = turnOff | heldIx;
@@ -357,7 +360,7 @@ classdef butterfly < handle
             
             dist=sqrt((xDeg - m.x).^2 + (yDeg - m.y).^2);
             
-            iiHeld = ((dist < m.radius) - .5) * 2;
+            iiHeld = ((dist < (m.radius + m.rewardWindow)) - .5) * 2;
             
             m.ctrHold = m.ctrHold + iiHeld;
             m.ctrHold(m.ctrHold < 0) = 0;
