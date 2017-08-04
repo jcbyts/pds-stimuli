@@ -1,4 +1,12 @@
-subject = 'Ellie';
+function runNaturalImageFreeView(subject, pauseBeforeStart)
+
+if nargin < 2
+    pauseBeforeStart = true;
+    if nargin < 1
+        subject = 'Ellie';
+    end
+end
+
 % 
 % behavior = @stimuli.forage.faceWalk;
 behavior = @plain;
@@ -57,7 +65,12 @@ settingsStruct.(sn).stateFunction.requestedStates.trialCleanUpandSave=true;
 settingsStruct.(sn).imageContrast = .5;
 
 
-settingsStruct.pldaps.pause.preExperiment = false;
+if pauseBeforeStart
+    settingsStruct.pldaps.pause.preExperiment = true;
+else
+    settingsStruct.pldaps.pause.preExperiment = false;
+end
+
 
 try
     cm = getpref('marmoview_calibration', subject);

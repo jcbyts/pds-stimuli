@@ -14,7 +14,7 @@ behavior = @stimuli.forage.faceForageRandomWalk;
 OnDuration       = 2; % time constant on (frames)
 OffDuration      = 4; % time constant off (frames)
 hartleyContrast  = .15; % contrast of the gratings
-nOctaves         = 5;   % number of octaves
+nOctaves         = 6;   % number of octaves
 Freq0            =.5;   % base spatial frequency
 
 

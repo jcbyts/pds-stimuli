@@ -1,4 +1,19 @@
-function runFaceForageDotMapping(subject, pauseBeforeStart)
+function runFaceForageDotMapping(subject, pauseBeforeStart, varargin)
+
+ip = inputParser();
+ip.addParameter('numDirections', 12)
+ip.addParameter('onDuration', 60)
+ip.addParameter('offDuration', 60)
+ip.addParameter('speed', 10)
+ip.addParameter('randomizeDirections', false)
+ip.addParameter('gazeContingent', false)
+ip.addParameter('task', 'fixflash')
+ip.addParameter('dotx', 5)
+ip.addParameter('doty', 5)
+ip.addParameter('apertureSize', 10)
+ip.addParameter('dotContrast', -.2)
+
+ip.parse(varargin{:});
 
 if nargin < 2
     pauseBeforeStart = true;
@@ -7,15 +22,7 @@ if nargin < 2
     end
 end
 
-behavior = @stimuli.forage.faceForageRandomWalk;
 
-
-% --- parameters for the Hartley noise stimulus
-numDirections    = 12; % time constant on (frames)
-Duration         = 10; % time constant off (frames)
-Speed            = 15; % contrast of the gratings
-randomizeDirections = false;   % number of octaves
-apertureRadius    = 5;   % base spatial frequency
 
 
 settingsStruct = struct();
@@ -35,6 +42,95 @@ settingsStruct.session.subject=subject;
 settingsStruct.stimulus.fixWinRadius = 1.5;
 settingsStruct.stimulus.fixPointRadius = .3;
 settingsStruct.stimulus.holdDuration = 30; % frames (counter, not continuous)
+
+settingsStruct.pldaps.draw.cursor.use = true;
+
+switch ip.Results.task
+        case 'fixflash'
+        behavior = @stimuli.fixflash.defaultParameters;
+        sn = 'stimulus';
+        s = struct(sn, struct());
+        s.Nr = 1;
+        s.stimulus.fixWinRadius = 1.5;
+        
+%         settingsStruct.stimulus.fixWinRadius   = 1.5;
+        settingsStruct.stimulus.fixPointRadius = .3;
+        
+    case 'faceforage'
+        behavior = @stimuli.forage.faceForageRandomWalk;
+        sn  = 'stimulus';
+        s = struct(sn, struct());
+        s.Nr = 1;
+        s.(sn).MotN       = 2;  % number of face objects
+        s.(sn).minSpeed   = 3;  % minumum speed of face objects
+        s.(sn).maxSpeed   = 8;
+        s.(sn).motionType = 'randomwalk'; % randomwalk or linear
+        s.(sn).type       = 'face';       % face or grating
+        s.(sn).appearGazeContingent = false;
+        s.(sn).appearRangePar = 2;
+        s.(sn).appearCenter = [0 -2];
+        s.(sn).appearTau = 1;
+        s.(sn).maxContrast = 0.3;
+        s.(sn).radius = 1;
+        s.(sn).onLifetime  = 120;
+        s.(sn).offLifetime = 240;
+        s.(sn).holdDuration = 60;
+        % if type is 'grating', these parameters will be used
+        s.(sn).gratingParams = {'sf', [.25 .5 1], 'orientation', 0:(180/12):(180-(180/12)), ...
+            'phase', 0:(360/4):(360 - (360/4)), 'isgabor', true};
+        
+    case 'faceinvaders'
+        behavior = @stimuli.forage.faceForageRandomWalk;
+        sn  = 'stimulus';
+        s = struct(sn, struct());
+        s.Nr = 1;
+        s.(sn).MotN       = 2;  % number of face objects
+        s.(sn).minSpeed   = 3;  % minumum speed of face objects
+        s.(sn).maxSpeed   = 8;
+        s.(sn).motionType = 'linear'; % randomwalk or linear
+        s.(sn).type       = 'face';       % face or grating
+        s.(sn).appearGazeContingent = false;
+        s.(sn).appearRangePar = 2;
+        s.(sn).appearCenter = [0 -2];
+        s.(sn).appearTau = 1;
+        s.(sn).maxContrast = 0.3;
+        s.(sn).radius = 1;
+        s.(sn).onLifetime  = 120;
+        s.(sn).offLifetime = 240;
+        s.(sn).holdDuration = 60;
+        % if type is 'grating', these parameters will be used
+        s.(sn).gratingParams = {'sf', [.25 .5 1], 'orientation', 0:(180/12):(180-(180/12)), ...
+            'phase', 0:(360/4):(360 - (360/4)), 'isgabor', true};
+        
+    case 'oddball'
+        behavior = @stimuli.forage.faceForageRandomWalk;
+        
+        sn  = 'stimulus';
+        s = struct(sn, struct());
+        s.Nr = 1;
+        s.(sn).MotN       = 2;  % number of face objects
+        s.(sn).minSpeed   = 3;  % minumum speed of face objects
+        s.(sn).maxSpeed   = 8;
+        s.(sn).motionType = 'linear'; % randomwalk or linear
+        s.(sn).type       = 'dot';       % face or grating
+        s.(sn).appearGazeContingent = false;
+        s.(sn).appearRangePar = 2;
+        s.(sn).appearCenter = [0 -2];
+        s.(sn).appearTau = 1;
+        s.(sn).maxContrast = ip.Results.dotContrast;
+        s.(sn).radius = .15;
+        s.(sn).onLifetime  = 120;
+        s.(sn).offLifetime = 340;
+        s.(sn).holdDuration = 60;
+        % if type is 'grating', these parameters will be used
+        s.(sn).gratingParams = {'sf', [.25 .5 1], 'orientation', 0:(180/12):(180-(180/12)), ...
+            'phase', 0:(360/4):(360 - (360/4)), 'isgabor', true};
+    otherwise
+        fprintf('Valid Task Options:\n')
+        fprintf('%s\n', 'fixflash', 'faceforage', 'faceinvaders', 'oddball')
+        error('runDotMapping: not a valid task')
+        
+end
 
 
 %--------------------------------------------------------------------------
@@ -68,13 +164,17 @@ settingsStruct.(sn).stateFunction.requestedStates.trialPrepare=true;
 settingsStruct.(sn).stateFunction.requestedStates.frameUpdate=true;
 settingsStruct.(sn).stateFunction.requestedStates.frameDraw=true;
 settingsStruct.(sn).stateFunction.requestedStates.trialCleanUpandSave=true;
-settingsStruct.(sn).duration = Duration;
-settingsStruct.(sn).numDirections = numDirections;
-settingsStruct.(sn).speed = Speed;
-settingsStruct.(sn).randomizeDirection = randomizeDirections;
-settingsStruct.(sn).dotx = 5;
-settingsStruct.(sn).doty = 5;
-settingsStruct.(sn).apertureSize = apertureRadius;
+settingsStruct.(sn).onDuration          = ip.Results.onDuration;
+settingsStruct.(sn).offDuration         = ip.Results.offDuration;
+settingsStruct.(sn).numDirections       = ip.Results.numDirections;
+settingsStruct.(sn).speed               = ip.Results.speed;
+settingsStruct.(sn).randomizeDirection  = ip.Results.randomizeDirections;
+settingsStruct.(sn).dotContrast         = ip.Results.dotContrast;
+settingsStruct.(sn).apertureSize        = ip.Results.apertureSize;
+settingsStruct.(sn).dotx                = ip.Results.dotx;
+settingsStruct.(sn).doty                = ip.Results.doty;
+
+
 
 if pauseBeforeStart
     settingsStruct.pldaps.pause.preExperiment = true;
@@ -99,54 +199,19 @@ p = pldaps(behavior, settingsStruct);
 
 % --- Build conditions
 
-% --- Condition 1: Face Forage with Hartley Noise
-sn  = 'stimulus';
+% --- Condition 1: Behavior with Dot Mapping
 iCond = 1;
-c{iCond} = struct(sn, struct());
-c{iCond}.Nr = iCond;
-c{iCond}.(sn).MotN       = 2;  % number of face objects
-c{iCond}.(sn).minSpeed   = 3;  % minumum speed of face objects
-c{iCond}.(sn).maxSpeed   = 8;
-c{iCond}.(sn).motionType = 'randomwalk'; % randomwalk or linear
-c{iCond}.(sn).type       = 'face';       % face or grating
-c{iCond}.(sn).appearGazeContingent = false;
-c{iCond}.(sn).appearRangePar = 2;
-c{iCond}.(sn).appearCenter = [0 -2];
-c{iCond}.(sn).appearTau = 1;
-c{iCond}.(sn).maxContrast = 0.3;
-c{iCond}.(sn).radius = 1;
-c{iCond}.(sn).onLifetime  = 120;
-c{iCond}.(sn).offLifetime = 240;
-% if type is 'grating', these parameters will be used
-c{iCond}.(sn).gratingParams = {'sf', [.25 .5 1], 'orientation', 0:(180/12):(180-(180/12)), ...
-    'phase', 0:(360/4):(360 - (360/4)), 'isgabor', true};
-% --- modules
+c{iCond}.stimulus = s.stimulus;
 c{iCond}.natImgBackground.use        = false;
 c{iCond}.natImgBackground.on         = false;
-c{iCond}.DotMapping.use                 = true;
+c{iCond}.DotMapping.use              = true;
 % % 
-% --- Condition 2: Face Forage on Natural background
+% --- Condition 2: Behavior on Natural background
 iCond = 2;
-c{iCond} = struct(sn, struct());
-c{iCond}.Nr = iCond;
-c{iCond}.(sn).MotN       = 3;  % number of face objects
-c{iCond}.(sn).minSpeed   = 0;
-c{iCond}.(sn).maxSpeed   = 0;
-c{iCond}.(sn).motionType = 'randomwalk';
-c{iCond}.(sn).type       = 'face'; 
-c{iCond}.(sn).appearGazeContingent = false;
-c{iCond}.(sn).appearRangePar = 3;
-c{iCond}.(sn).appearCenter = [0 -2];
-c{iCond}.(sn).appearTau = 60; % in frames
-c{iCond}.(sn).maxContrast = 0.5;
-c{iCond}.(sn).radius = 1;
-c{iCond}.(sn).onLifetime  = ceil(2 * 120);
-c{iCond}.(sn).offLifetime = ceil(3 * 120);
-% --- modules
+c{iCond}.stimulus = s.stimulus;
 c{iCond}.natImgBackground.use   = true;
 c{iCond}.natImgBackground.on    = true;
-c{iCond}.DotMapping.use            = false;
-
+c{iCond}.DotMapping.use         = false;
 
 % --- setup number of conditions        
 condN = ones(1,iCond);
