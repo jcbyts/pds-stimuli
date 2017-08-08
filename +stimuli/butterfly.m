@@ -92,8 +92,8 @@ classdef butterfly < handle
             m.hReward   = stimuli.reward(p); % object that handles the reward delivery
             
             % size of the display
-            m.dWidth    = 10; %p.trial.display.dWidth;
-            m.dHeight   = 10; %p.trial.display.dHeight;
+            m.dWidth    = 15; %p.trial.display.dWidth;
+            m.dHeight   = 15; %p.trial.display.dHeight;
             m.pWidth    = p.trial.display.pWidth;
             m.pHeight   = p.trial.display.pHeight;
             
