@@ -37,22 +37,84 @@ runFaceForageDotMapping(subject, pauseBeforeExperiment, ...
     'speed', 10, ...
     'apertureSize', 5, ...
     'onDuration', 60, ...  % in frames
-    'offDuration', 0, ... % in frames
+    'offDuration', 10, ... % in frames
     'numDirections', 12, ...
-    'gazeContingent', 10, ...
-    'task', 'fixflash', ...
+    'gazeContingent', false, ...
+    'task', 'oddball', ...
     'dotx', 5, ...
     'doty', -5, ...
     'randomizeDirections', false);
-%% MT mapping 2: Dot motion 
+%% MT mapping 2: Dot motion FACE FORAGE
 runFaceForageDotMapping(subject, pauseBeforeExperiment, ...
     'speed', 10, ...
-    'apertureSize', 20, ...
-    'onDuration', 60, ...  % in frames
-    'offDuration', 0, ... % in frames
+    'apertureSize', 1, ...
+    'dotContrast', .15, ...
+    'onDuration', 4, ...  % in frames
+    'offDuration', 2, ... % in frames
     'numDirections', 12, ...
-    'gazeContingent', 10, ...
-    'task', 'oddball', ...
-    'dotx', 5, ...
-    'doty', 5, ...
-    'randomizeDirections', false);
+    'gazeContingent', false, ...
+    'task', 'faceforage', ...
+    'randomizeDirections', true);
+
+%% MT mapping 2: Dot motion FIX FLASH
+runFaceForageDotMapping(subject, pauseBeforeExperiment, ...
+    'speed', 10, ...
+    'apertureSize', 1, ...
+    'dotContrast', .15, ...
+    'onDuration', 4, ...  % in frames
+    'offDuration', 6, ... % in frames
+    'numDirections', 12, ...
+    'gazeContingent', false, ...
+    'task', 'fixflash', ...
+    'randomizeDirections', true);
+
+%%
+
+
+
+
+settingsStruct = struct();
+% settingsStruct.display.destinationFactorNew = GL_ONE;
+
+settingsStruct.display.colorclamp = 1;
+settingsStruct.display.normalizeColor = 1;
+
+settingsStruct.eyemarker.use=false;
+settingsStruct.pldaps.useModularStateFunctions = true;
+settingsStruct.pldaps.trialMasterFunction='runModularTrial';
+settingsStruct.pldaps.save.mergedData=0;
+settingsStruct.behavior.reward.defaultAmount= 0.05; %.015;
+
+settingsStruct.session.subject=subject;
+
+settingsStruct.stimulus.fixWinRadius = 1.5;
+settingsStruct.stimulus.fixPointRadius = .3;
+settingsStruct.stimulus.holdDuration = 15; % frames (counter, not continuous)
+
+settingsStruct.pldaps.draw.cursor.use = true;
+
+
+if pauseBeforeExperiment
+    settingsStruct.pldaps.pause.preExperiment = true;
+else
+    settingsStruct.pldaps.pause.preExperiment = false;
+end
+
+% try
+%     cm = getpref('marmoview_calibration', subject);
+%     cm2 = cm(:,:,1)';
+%     cm2(:,:,2) = cm(:,:,2)';
+%     
+%     settingsStruct.eyelink.calibration_matrix = cm2;
+%     settingsStruct.eyelink.useRawData = true;
+% catch me
+%     throw(me)
+% end
+
+settingsStruct.eyelink.use = false;
+settingsStruct.mouse.useAsEyepos = true;
+
+p = pldaps(@stimuli.dotmotion.defaultParameters, subject, settingsStruct);
+
+p.run
+
