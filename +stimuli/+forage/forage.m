@@ -168,10 +168,13 @@ switch state
         
         p.trial.(sn).eyes = bsxfun(@minus, p.trial.(sn).eyes, p.trial.display.ctr(1:2));
         p.trial.(sn).eyes = pds.px2deg(p.trial.(sn).eyes', p.trial.display.viewdist, p.trial.display.px2w)';
+        p.trial.(sn).eyes = bsxfun(@times, p.trial.(sn).eyes, [1 -1]);
+        
         plot(p.trial.(sn).eyes(:,1), p.trial.(sn).eyes(:,2), 'k.', 'MarkerSize', 2)
         xlabel('Degrees')
         ylabel('Degrees')
-        axis tight
+        ylim([-15 15])
+        xlim([-15 15])
         
 %         for i=1:p.trial.(sn).MotN
 %             ix=diff(p.trial.(sn).ctrHold(:,i))>0;
@@ -184,13 +187,15 @@ switch state
         xlabel('Frame')
         ylabel('Degrees')
         axis tight
+        ylim([-10 10])
         
         subplot(4,3,10:12)
-        plot(p.trial.(sn).x); hold on
-        plot(p.trial.(sn).eyes(:,1), 'k')
+        plot(p.trial.(sn).y); hold on
+        plot(p.trial.(sn).eyes(:,2), 'k')
         xlabel('Frame')
         ylabel('Degrees')
         axis tight
+        ylim([-10 10])
         
         p.trial.(sn).m.objects.closeAll;
         drawnow
