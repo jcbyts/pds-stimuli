@@ -90,7 +90,7 @@ phase   = 0;
 img = MakeGabor(rPix,127, cycles, phase, p.trial.(sn).cueApertureContrast*127);
 
 p.trial.(sn).hCue.addTexture(1,img); % we better clear this at the end of trial
-p.trial.(sn).hCue.size      = p.trial.(sn).cueApertureRadius * ppd;
+p.trial.(sn).hCue.texSize   = p.trial.(sn).cueApertureRadius * ppd;
 p.trial.(sn).hCue.position  = [x; -1*y]' + ctr;
 p.trial.(sn).hCue.id        = 1;
 
@@ -101,7 +101,7 @@ p.trial.(sn).hFbk.colour    = p.trial.display.bgColor + p.trial.(sn).feedbackApe
 p.trial.(sn).hFbk.weight    = 4;
 
 % --- Face for aditional reward
-p.trial.(sn).hFace.size     = 2.5 * p.trial.(sn).cueApertureRadius * ppd;
+p.trial.(sn).hFace.texSize  = 2.5 * p.trial.(sn).cueApertureRadius * ppd;
 p.trial.(sn).hFace.position = [x; -1*y]' + ctr;
 p.trial.(sn).hFace.id       = p.trial.(sn).faceIndex;
 
