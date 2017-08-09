@@ -4,7 +4,9 @@ ip = inputParser();
 ip.addParameter('numDirections', 12)
 ip.addParameter('onDuration', 60)
 ip.addParameter('offDuration', 60)
-ip.addParameter('speed', 10)
+ip.addParameter('holdDuration', 30)
+ip.addParameter('targetSpeed', 10)
+ip.addParameter('dotSpeeds', [15 20])
 ip.addParameter('randomizeDirections', false)
 ip.addParameter('gazeContingent', false)
 ip.addParameter('task', 'fixflash')
@@ -12,6 +14,7 @@ ip.addParameter('dotx', 5)
 ip.addParameter('doty', 5)
 ip.addParameter('apertureSize', 10)
 ip.addParameter('dotContrast', -.2)
+ip.addParameter('mappingStimulus', 2)
 
 ip.parse(varargin{:});
 
@@ -35,13 +38,13 @@ settingsStruct.eyemarker.use=false;
 settingsStruct.pldaps.useModularStateFunctions = true;
 settingsStruct.pldaps.trialMasterFunction='runModularTrial';
 settingsStruct.pldaps.save.mergedData=0;
-settingsStruct.behavior.reward.defaultAmount= 0.05; %.015;
+settingsStruct.behavior.reward.defaultAmount= 0.01; %.015;
 
 settingsStruct.session.subject=subject;
 
 settingsStruct.stimulus.fixWinRadius = 1.5;
 settingsStruct.stimulus.fixPointRadius = .3;
-settingsStruct.stimulus.holdDuration = 30; % frames (counter, not continuous)
+settingsStruct.stimulus.holdDuration = 15; % frames (counter, not continuous)
 
 settingsStruct.pldaps.draw.cursor.use = true;
 
@@ -62,8 +65,8 @@ switch ip.Results.task
         s = struct(sn, struct());
         s.Nr = 1;
         s.(sn).MotN       = 2;  % number of face objects
-        s.(sn).minSpeed   = 3;  % minumum speed of face objects
-        s.(sn).maxSpeed   = 8;
+        s.(sn).minSpeed   = ip.Results.targetSpeed;  % minumum speed of face objects
+        s.(sn).maxSpeed   = ip.Results.targetSpeed;
         s.(sn).motionType = 'randomwalk'; % randomwalk or linear
         s.(sn).type       = 'face';       % face or grating
         s.(sn).appearGazeContingent = false;
@@ -74,7 +77,7 @@ switch ip.Results.task
         s.(sn).radius = 1;
         s.(sn).onLifetime  = 120;
         s.(sn).offLifetime = 240;
-        s.(sn).holdDuration = 60;
+        s.(sn).holdDuration = ip.Results.holdDuration;
         % if type is 'grating', these parameters will be used
         s.(sn).gratingParams = {'sf', [.25 .5 1], 'orientation', 0:(180/12):(180-(180/12)), ...
             'phase', 0:(360/4):(360 - (360/4)), 'isgabor', true};
@@ -85,8 +88,8 @@ switch ip.Results.task
         s = struct(sn, struct());
         s.Nr = 1;
         s.(sn).MotN       = 2;  % number of face objects
-        s.(sn).minSpeed   = 3;  % minumum speed of face objects
-        s.(sn).maxSpeed   = 8;
+        s.(sn).minSpeed   = ip.Results.targetSpeed;  % minumum speed of face objects
+        s.(sn).maxSpeed   = ip.Results.targetSpeed;
         s.(sn).motionType = 'linear'; % randomwalk or linear
         s.(sn).type       = 'face';       % face or grating
         s.(sn).appearGazeContingent = false;
@@ -97,7 +100,7 @@ switch ip.Results.task
         s.(sn).radius = 1;
         s.(sn).onLifetime  = 120;
         s.(sn).offLifetime = 240;
-        s.(sn).holdDuration = 60;
+        s.(sn).holdDuration = ip.Results.holdDuration;
         % if type is 'grating', these parameters will be used
         s.(sn).gratingParams = {'sf', [.25 .5 1], 'orientation', 0:(180/12):(180-(180/12)), ...
             'phase', 0:(360/4):(360 - (360/4)), 'isgabor', true};
@@ -109,8 +112,8 @@ switch ip.Results.task
         s = struct(sn, struct());
         s.Nr = 1;
         s.(sn).MotN       = 2;  % number of face objects
-        s.(sn).minSpeed   = 3;  % minumum speed of face objects
-        s.(sn).maxSpeed   = 8;
+        s.(sn).minSpeed   = ip.Results.targetSpeed;  % minumum speed of face objects
+        s.(sn).maxSpeed   = ip.Results.targetSpeed;
         s.(sn).motionType = 'linear'; % randomwalk or linear
         s.(sn).type       = 'dot';       % face or grating
         s.(sn).appearGazeContingent = false;
@@ -118,13 +121,13 @@ switch ip.Results.task
         s.(sn).appearCenter = [0 -2];
         s.(sn).appearTau = 1;
         s.(sn).maxContrast = ip.Results.dotContrast;
-        s.(sn).radius = .15;
+        s.(sn).radius = .5; %.15;
         s.(sn).onLifetime  = 120;
         s.(sn).offLifetime = 340;
-        s.(sn).holdDuration = 60;
+        s.(sn).holdDuration = ip.Results.holdDuration;
         % if type is 'grating', these parameters will be used
         s.(sn).gratingParams = {'sf', [.25 .5 1], 'orientation', 0:(180/12):(180-(180/12)), ...
-            'phase', 0:(360/4):(360 - (360/4)), 'isgabor', true};
+            'phase', 0:(360/4):(360 - (360/4)), 'isgabor', false};
     otherwise
         fprintf('Valid Task Options:\n')
         fprintf('%s\n', 'fixflash', 'faceforage', 'faceinvaders', 'oddball')
@@ -153,10 +156,14 @@ settingsStruct.(sn).imageContrast = .5;
 %--------------------------------------------------------------------------
 % Add Dot Mapping Stimulus
 sn='DotMapping';
-settingsStruct.(sn).stateFunction.name='v1mapping.DotMotionMapping';
+if ip.Results.mappingStimulus==2
+    settingsStruct.(sn).stateFunction.name='v1mapping.DotApertureMapping'; 
+else
+    settingsStruct.(sn).stateFunction.name='v1mapping.DotMotionMapping';
+end
 settingsStruct.(sn).use=true;
 settingsStruct.(sn).stateFunction.acceptsLocationInput=true;
-settingsStruct.(sn).stateFunction.order=-inf;
+settingsStruct.(sn).stateFunction.order=-5;
 settingsStruct.(sn).stateFunction.requestedStates.experimentPostOpenScreen=true;
 % settingsStruct.eyemarker.stateFunction.requestedStates.experimentCleanUp=true;
 settingsStruct.(sn).stateFunction.requestedStates.trialSetup=true;
@@ -167,7 +174,7 @@ settingsStruct.(sn).stateFunction.requestedStates.trialCleanUpandSave=true;
 settingsStruct.(sn).onDuration          = ip.Results.onDuration;
 settingsStruct.(sn).offDuration         = ip.Results.offDuration;
 settingsStruct.(sn).numDirections       = ip.Results.numDirections;
-settingsStruct.(sn).speed               = ip.Results.speed;
+settingsStruct.(sn).dotSpeeds           = ip.Results.dotSpeeds;
 settingsStruct.(sn).randomizeDirection  = ip.Results.randomizeDirections;
 settingsStruct.(sn).dotContrast         = ip.Results.dotContrast;
 settingsStruct.(sn).apertureSize        = ip.Results.apertureSize;
@@ -191,6 +198,11 @@ try
     settingsStruct.eyelink.useRawData = true;
 catch me
     throw(me)
+end
+
+if strcmp(subject, 'test')
+    settingsStruct.eyelink.use = false;
+    settingsStruct.mouse.useAsEyepos = true;
 end
 
 
