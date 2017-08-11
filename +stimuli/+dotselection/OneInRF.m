@@ -17,7 +17,7 @@ defaultColors(p);
 p=stimuli.clutColors(p);
 p.trial.stimulus.eyeW=8;
 
-p.defaultParameters.pldaps.trialFunction='stimuli.dotmotion.runTrial';
+p.defaultParameters.pldaps.trialFunction='stimuli.dotselection.runTrial';
 
 % -------------------------------------------------------------------------
 % --- Parameters of the dot motion task
@@ -26,70 +26,55 @@ p.defaultParameters.pldaps.trialFunction='stimuli.dotmotion.runTrial';
 p.trial.(sn).bgColour 	   = .5; % pldaps controls this when the screen is opened
 
 % --- Dot parameters
-p.trial.(sn).dotSize           = 0.1; 	 % dot size (diameter; deg)
-p.trial.(sn).dotSpeed 		   = 8.0; 	 % dot speed (deg/sec) 
-p.trial.(sn).numDots 		   = 35;    % TODO: should this be density?
+p.trial.(sn).dotSize           = 0.1; 	% dot size (diameter; deg)
+p.trial.(sn).dotSpeed 		   = 8.0; 	% dot speed (deg/sec) 
 p.trial.(sn).dotContrast       = -0.15;
-p.trial.(sn).dotMode           = 1; % motion sampled from a distribution
-p.trial.(sn).dotDist           = 1; % make it a gaussian distribution
-p.trial.(sn).dotBandwdth       = 0.0;
+p.trial.(sn).dotMode           = 1;     % motion sampled from a distribution
+p.trial.(sn).dotDist           = 1;     % make it a gaussian distribution
+p.trial.(sn).dotBandwidth       = 0.0;
+p.trial.(sn).dotDensity 	   = 100;   % dots / deg^2 / sec
+p.trial.(sn).dotApertureRadius = 2;     % degrees
+p.trial.(sn).dotLifetime       = 5;     % frames
+
 p.trial.(sn).maxBandwidth 	   = 0.0;
 p.trial.(sn).minBandwidth      = 0.0;
 p.trial.(sn).numBandwidths     = 1;
-p.trial.(sn).lifetime          = 5; % frames
+
 p.trial.(sn).numDirs 		   = 8;
 p.trial.(sn).RfCenterXy        = [5, -5];
 p.trial.(sn).DotCenterAngle(1) = 0;
 p.trial.(sn).DotCenterAngle(2) = 180;
 p.trial.(sn).yokeDirections    = false;
-p.trial.(sn).stimWinRadius     =  3.5;
+
 
 % --- Fixation point
 p.trial.(sn).fixPointRadius   = 0.3;  % radius of the fixation point
 p.trial.(sn).fixPointDim	  = 0.1; % dimming of fixation point (0 invisible)
 p.trial.(sn).fixWinRadius 	  = 1.8;
 p.trial.(sn).fixFlashCnt 	  = round(0.250*p.trial.display.frate);
+p.trial.(sn).fixPointXy       = [0, 0]; % degrees (relative to center of screen)
 
 % --- Reward
-p.trial.(sn).rewardDot1Rate = .85;
-p.trial.(sn).rewardDot2Rate = .85;
+p.trial.(sn).rewardDot1Rate     = .85;
+p.trial.(sn).rewardDot2Rate     = .85;
 
-p.trial.(sn).rewardWindow   = 30.0; % angular width (at half-height)
-p.trial.(sn).maxRewardCnt   = 4;
-p.trial.(sn).bonusDirection = 0;
-p.trial.(sn).bonusWindow    = 100.0;
-p.trial.(sn).bonusRewardCnt = 0;
+p.trial.(sn).rewardWindow       = 0.0; % buffer around dot aperture
+p.trial.(sn).maxRewardCnt       = 4;
 
-
-% --- Cue / Targets / Feedback
-p.trial.(sn).cueApertureRadius        = 1;
-p.trial.(sn).cueApertureContrast      = -0.25;
-
-p.trial.(sn).feedbackApertureRadius   = 1.8; % radius of the feedback aperture shown on incorrect trials (deg.)
-p.trial.(sn).feedbackApertureContrast = -0.5;  
-
-p.trial.(sn).choiceTargetRadius       = 0.3; % deg
-p.trial.(sn).choiceTargetContrast     = 0.075;
-p.trial.(sn).choiceCueWidth           = 6;    % deprecated 
-p.trial.(sn).choiceErrWidth           = 12;   % width of circle that shows where correct choice was
-p.trial.(sn).choiceWinMinRadius       = 3.5;
-p.trial.(sn).choiceWinMaxRadius       = 7;
-
-p.trial.(sn).faceIndex                = 1;
+% --- Face
+p.trial.(sn).faceIndex          = 1;
 
 % --- Timing
 p.trial.(sn).fixGracePeriod     = 0.050;
-p.trial.(sn).minFixDuration     = 0.200;
-p.trial.(sn).maxFixDuration     = 0.400;
-p.trial.(sn).stimDuration       = 0.600; % Dots max duration
-p.trial.(sn).holdDuration       = 0.1;   % seconds (wrt dot motion onset)
-p.trial.(sn).minCueDelay 				= 0.30;  % wrt to dot motion onset (seconds)
-p.trial.(sn).maxCueDelay 				= 0.70;  % wrt to dot motion onset (seconds)
-p.trial.(sn).choiceTargetDelay 	= 0;     % wrt to XX
-p.trial.(sn).choiceGracePeriod 	= 1.4;   % grace period (aka flight time; sec)
-p.trial.(sn).choiceDuration 		= 0.025; % seconds (minimum choice hold duration)
-p.trial.(sn).choiceTimeout 		  = 1.0;  % seconds
-p.trial.(sn).trialTimeout 		  = 4.0;  % seconds
+p.trial.(sn).minFixPreStim      = 0.200;
+p.trial.(sn).maxFixPreStim      = 0.400;
+p.trial.(sn).minFixPostStim     = 0.100; % Dots max duration
+p.trial.(sn).maxFixPostStim     = 0.6;   % seconds (wrt dot motion onset)
+p.trial.(sn).fixHoldTau         = 0.2;   % seconds (time constant of exponential decay)
+p.trial.(sn).choiceGracePeriod  = 1.4;   % grace period (aka flight time; sec)
+p.trial.(sn).choiceHoldDuration = 0.025; % seconds (minimum choice hold duration)
+p.trial.(sn).choiceTimeout 		= 1.0;   % seconds
+p.trial.(sn).trialTimeout 		= 1.0;   % seconds
 
 
 % -------------------------------------------------------------------------
@@ -100,39 +85,14 @@ p.trial.(sn).hFix(1) 	= stimuli.fixation(p.trial.display.ptr);
 p.trial.(sn).hFix(2) 	= stimuli.fixation(p.trial.display.ptr);
 
 % --- Face Textures
-hFace = stimuli.textures(p.trial.display.ptr);
-
-% load marmoset face textures
-MFL=load(fullfile(marmoview.supportDataDir,'MarmosetFaceLibrary.mat'));
-MFL = struct2cell(MFL);
-MFL = MFL([7,10,13,17:20,24,25,27]); % these faces seem most centered
-
-for id = 1:length(MFL)
-  img = MFL{id};
-  
-  sz = size(img);
-  % gaussian envelope...
-  x = (1:sz(1))-sz(1)/2; y = (1:sz(2))-sz(2)/2;
-  [x,y] = meshgrid(x,y);
-  g = exp(-(x.^2+y.^2)/(2*(max(sz(1:2))/6)^2));
-  g = g - min(g(:));
-  g = g./max(g(:));
-  img(:,:,4) = uint8(255.*g); % alpha channel: 0 = transparent, 255 = opaque
-    
-  hFace.addTexture(id, img);
-end
-p.trial.(sn).hFace = hFace;
-p.trial.(sn).hFace.id = 1;
+p.trial.(sn).hFace      = stimuli.face(p);
+p.trial.(sn).hFace.id   = p.trial.(sn).faceIndex;
 
 % --- Dots
-p.trial.(sn).hDots(1) = stimuli.dots(p.trial.display.ptr);
-p.trial.(sn).hDots(2) = stimuli.dots(p.trial.display.ptr);
+p.trial.(sn).hDots(1)   = stimuli.dots(p.trial.display.ptr);
+p.trial.(sn).hDots(2)   = stimuli.dots(p.trial.display.ptr);
 
-% --- Choice Targets
-p.trial.(sn).hChoice = stimuli.circles(p.trial.display.ptr);
-p.trial.(sn).hCue    = stimuli.textures(p.trial.display.ptr); % gabor patch
-p.trial.(sn).hFbk  	 = stimuli.circles(p.trial.display.ptr); % big bold circle
 
 % -------------------------------------------------------------------------
 % --- Update Conditions
-stimuli.dotmotion.updateConditions(p)
+stimuli.dotselection.updateConditions(p)

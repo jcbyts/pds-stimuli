@@ -1,14 +1,14 @@
-classdef state3_ShowDots < stimuli.state
-  % state 3 - show dots
+classdef state3_WaitForGo < stimuli.state
+  % state 3 - show dots and wait for go signal
   
-  % 07-07-2016 - Shaun L. Cloherty <s.cloherty@ieee.org>
+  % 11-08-2017 Jacob L. Yates   wrote it
   
   properties
     tStart = NaN; % start of THIS state
   end
   
   methods (Access = public)
-    function s = state3_ShowDots(hTrial,varargin)
+    function s = state3_WaitForGo(hTrial,varargin)
       fprintf(1,'%s\n',mfilename);
       
       s = s@stimuli.state(3,hTrial); % call the parent constructor      
@@ -19,8 +19,10 @@ classdef state3_ShowDots < stimuli.state
       
       hTrial = s.hTrial;
       
-      for k = 1:2
-        hTrial.hDots(k).beforeFrame(); % draw random dot pattern
+      if hTrial.showDots
+          for k = 1:2
+              hTrial.hDots(k).beforeFrame(); % draw random dot pattern
+          end
       end
 
       if hTrial.showFix
@@ -32,7 +34,6 @@ classdef state3_ShowDots < stimuli.state
     end
     
     function afterFrame(s,t)
-%       fprintf(1,'dotMotionState3.afterFrame()\n');
             
       hTrial = s.hTrial;
       
@@ -42,39 +43,25 @@ classdef state3_ShowDots < stimuli.state
       end
       
       % move dots...
-      for k = 1:2
-        hTrial.hDots(k).afterFrame();
-      end
-      
-      if t > (s.tStart + hTrial.holdDuration)
-        hTrial.showFix = false;
-      end
-            
-      if t > (s.tStart + hTrial.stimDuration)
-        if hTrial.showFix
-          % holdDuration is > stimDuration, move to state 4 - hide stimulus/hold fixation
-          hTrial.setState(4);
-          return;
-        else
-          % holdDuration is < stimDuration, move to state 5 - choice
-          hTrial.setState(5);
-          return;
+      if hTrial.showDots
+        for k = 1:2
+            hTrial.hDots(k).afterFrame();
         end
-      end  
+      end
       
+      if t > (s.tStart + hTrial.fixHoldPostStim)
+         hTrial.showFix = false;
+         hTrial.setState(4);
+         return
+      end
+                 
       r = norm([hTrial.x,hTrial.y]);
       
       if (r > hTrial.fixWinRadius)
-        if hTrial.showFix
           % broke fixation... move to state 7 - timeout
           hTrial.error = 3;
           hTrial.setState(7);
-          return;
-        else
-          % move to state 5 - choice
-          hTrial.setState(5);
-          return;
-        end
+          return
       end
       
     end

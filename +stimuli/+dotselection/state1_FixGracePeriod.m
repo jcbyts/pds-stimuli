@@ -25,7 +25,7 @@ classdef state1_FixGracePeriod < stimuli.state
     end
     
     function afterFrame(s,t)
-%       fprintf(1,'dotMotionState1.afterFrame()\n');
+      fprintf(1,'dotMotionState1.afterFrame()\n');
 
       hTrial = s.hTrial;
       
@@ -39,14 +39,15 @@ classdef state1_FixGracePeriod < stimuli.state
         return;
       end
 
-      r = norm(hTrial.x,hTrial.y);
-      
-      if (r > hTrial.fixWinRadius)
-        % broke fixation... move to state 7 - timeout
-        hTrial.error = 2;
-        hTrial.setState(7);
-        return;
-      end
+      % I don't think this matters -- Jake
+%       r = norm(hTrial.x,hTrial.y);
+%       
+%       if (r > hTrial.fixWinRadius)
+%         % broke fixation... move to state 7 - timeout
+%         hTrial.error = 2;
+%         hTrial.setState(7);
+%         return;
+%       end
       
       % move to state 2 - hold fixation
       hTrial.setState(2);

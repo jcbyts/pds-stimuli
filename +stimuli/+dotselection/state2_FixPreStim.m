@@ -33,12 +33,12 @@ classdef state2_FixPreStim < stimuli.state
         hTrial.setTxTime(t); % save transition time
       end
       
-      if t > (s.tStart + hTrial.fixDuration)
-        pds.behavior.reward.give(hTrial.hPldaps) % reward for fixation! (TODO: amount)
-
+      if t > (s.tStart + hTrial.fixHoldPreStim)
+        hTrial.hReward.give();
+        hTrial.showDots = true;
         % move to state 3 - show stimulus
         hTrial.setState(3);
-        return;
+        return
       end
       
       r = norm([hTrial.x,hTrial.y]);
@@ -47,7 +47,7 @@ classdef state2_FixPreStim < stimuli.state
         % broke fixation... move to state 7 - timeout
         hTrial.error = 2;
         hTrial.setState(7)
-        return;
+        return
       end
     end
     
