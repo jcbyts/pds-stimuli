@@ -22,7 +22,7 @@ function varargout = calibrationGUI(varargin)
 
 % Edit the above text to modify the response to help calibrationGUI
 
-% Last Modified by GUIDE v2.5 23-Mar-2017 11:21:33
+% Last Modified by GUIDE v2.5 04-Aug-2017 10:36:31
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -128,7 +128,7 @@ function OffsetLeft_Callback(hObject, eventdata, handles)
 cm=getCurrentCalibrationMatrix(handles.p);
 handles=updateGains(handles, cm);
 
-handles.A.c(1) = handles.A.c(1) - ...
+handles.A.c(1) = handles.A.c(1) + ...
     handles.shiftSize*handles.p.trial.display.ppd;
 
 handles=updateCalibrationMatrix(handles);
@@ -143,7 +143,7 @@ function OffsetRight_Callback(hObject, eventdata, handles) %#ok<*DEFNU>
 cm=getCurrentCalibrationMatrix(handles.p);
 handles=updateGains(handles,cm);
 
-handles.A.c(1) = handles.A.c(1) + ...
+handles.A.c(1) = handles.A.c(1) - ...
     handles.shiftSize*handles.p.trial.display.ppd;
 
 handles=updateCalibrationMatrix(handles);
@@ -362,6 +362,9 @@ for k=1:nFrames
     Screen('DrawTextures', handles.p.trial.display.ptr, texids, [], dstRects);
     Screen('DrawDots', handles.p.trial.display.overlayptr, eye', 4, handles.p.trial.display.clut.eyepos, [], 0);
     Screen('Flip', handles.p.trial.display.ptr, 0);
+    if rand < .0025
+        pds.behavior.reward.give(handles.p);
+    end
 end
 Screen('Flip', handles.p.trial.display.ptr, 0);
 
