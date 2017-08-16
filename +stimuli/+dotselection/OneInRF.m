@@ -28,7 +28,7 @@ p.trial.(sn).bgColour 	   = .5; % pldaps controls this when the screen is opened
 % --- Dot parameters
 p.trial.(sn).dotSize           = 0.1; 	% dot size (diameter; deg)
 p.trial.(sn).dotSpeed 		   = 8.0; 	% dot speed (deg/sec) 
-p.trial.(sn).dotContrast       = -0.15;
+p.trial.(sn).dotContrast       = -0.15; % -.5 to .5
 p.trial.(sn).dotMode           = 1;     % motion sampled from a distribution
 p.trial.(sn).dotDist           = 1;     % make it a gaussian distribution
 p.trial.(sn).dotBandwidth       = 0.0;
@@ -41,9 +41,14 @@ p.trial.(sn).minBandwidth      = 0.0;
 p.trial.(sn).numBandwidths     = 1;
 
 p.trial.(sn).numDirs 		   = 8;
-p.trial.(sn).RfCenterXy        = [5, -5];
-p.trial.(sn).DotCenterAngle(1) = 0;
-p.trial.(sn).DotCenterAngle(2) = 180;
+if ~isfield(p.trial.(sn), 'RfCenterXy')
+    p.trial.(sn).RfCenterXy        = [5, -5];
+end
+if ~isfield(p.trial.(sn), 'DotCenterAngle')
+    p.trial.(sn).DotCenterAngle(1) = 0;
+    p.trial.(sn).DotCenterAngle(2) = 180;
+end
+
 p.trial.(sn).yokeDirections    = false;
 
 
