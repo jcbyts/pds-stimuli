@@ -70,8 +70,8 @@ runFaceForageDotMapping(subject, pauseBeforeExperiment, ...
 
 %%
 
-
-
+subject = 'test';
+pauseBeforeExperiment = true;
 
 settingsStruct = struct();
 % settingsStruct.display.destinationFactorNew = GL_ONE;
@@ -90,6 +90,9 @@ settingsStruct.session.subject=subject;
 settingsStruct.stimulus.fixWinRadius = 1.5;
 settingsStruct.stimulus.fixPointRadius = .3;
 settingsStruct.stimulus.holdDuration = 15; % frames (counter, not continuous)
+settingsStruct.stimulus.RfCenterXy = [2 -2];
+settingsStruct.stimulus.DotCenterAngle(1) = 0;
+settingsStruct.stimulus.DotCenterAngle(2) = -90;
 
 settingsStruct.pldaps.draw.cursor.use = true;
 
@@ -114,7 +117,7 @@ end
 settingsStruct.eyelink.use = false;
 settingsStruct.mouse.useAsEyepos = true;
 
-p = pldaps(@stimuli.dotmotion.defaultParameters, subject, settingsStruct);
+p = pldaps(@stimuli.dotselection.OneInRF, subject, settingsStruct);
 
 p.run
 
