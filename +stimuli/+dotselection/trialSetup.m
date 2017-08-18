@@ -6,9 +6,18 @@ function trialSetup(p, sn)
 
 p.trial.pldaps.goodtrial = 1;
 
+% --- Useful constants
 ppd   = p.trial.display.ppd;        % pixels per degree (linear approximation)
 fps   = p.trial.display.frate;      % frames per second
 ctr   = p.trial.display.ctr(1:2);   % center of the screen
+
+% --- Random seed
+p.trial.(sn).rngs.conditionerRNG = RandStream(p.trial.(sn).rngs.randomNumberGenerater, 'seed', p.trial.(sn).rngs.trialSeeds(p.trial.pldaps.iTrial));
+setupRNG = p.trial.(sn).rngs.conditionerRNG;
+
+
+% -------------------------------------------------------------------------
+% FIXATION POINT TIMING / PROPERTIES
 
 % --- Set Fixation Point Properties    
 sz = p.trial.(sn).fixPointRadius * ppd;
@@ -16,64 +25,101 @@ p.trial.(sn).hFix(1).cSize      = sz;
 p.trial.(sn).hFix(1).sSize      = 2*sz;
 p.trial.(sn).hFix(1).cColour    = zeros(1,3);
 p.trial.(sn).hFix(1).sColour    = ones(1,3);
-p.trial.(sn).hFix(1).position   = [0,0] * ppd + p.trial.display.ctr(1:2);
+p.trial.(sn).hFix(1).position   = p.trial.(sn).fixPointXy * ppd + p.trial.display.ctr(1:2);
 
 p.trial.(sn).hFix(2).cSize      = sz;
 p.trial.(sn).hFix(2).sSize      = 2*sz;
 p.trial.(sn).hFix(2).cColour    = p.trial.display.bgColor + p.trial.(sn).fixPointDim;
 p.trial.(sn).hFix(2).sColour    = p.trial.display.bgColor + p.trial.(sn).fixPointDim;
-p.trial.(sn).hFix(2).position   = [0,0] * ppd + ctr;
+p.trial.(sn).hFix(2).position   = p.trial.(sn).fixPointXy * ppd + ctr;
 
-% --- Random seed
-p.trial.(sn).rngs.conditionerRNG=RandStream(p.trial.(sn).rngs.randomNumberGenerater, 'seed', p.trial.(sn).rngs.trialSeeds(p.trial.pldaps.iTrial));
-setupRNG=p.trial.(sn).rngs.conditionerRNG;
 
-% fixation duration
+
+% --- Pre-Stim Fixation duration (uniform distribution)
 rnd=rand(setupRNG);
-p.trial.(sn).fixDuration = (1 - rnd) * p.trial.(sn).minFixDuration + rnd * p.trial.(sn).maxFixDuration;
-% cue delay
-rnd=rand(setupRNG);
-p.trial.(sn).cueDelay = (1-rnd) * p.trial.(sn).minCueDelay + rnd * p.trial.(sn).maxCueDelay;
+p.trial.(sn).fixPreStimDuration = (1 - rnd) * p.trial.(sn).minFixPreStim + rnd * p.trial.(sn).maxFixPreStim;
 
-% --- setup trial difficulty (FIX ME: move these to a proper condition struct)
+% --- Fix Hold after stimulus onset (truncated exponential)
+mu = p.trial.(sn).fixHoldTau; % exponential decay (in seconds)
+r  = inf; %initialize Hold Duration
+
+% stop the while loop from running for ever
+infLoopStopper = 100; itr = 1; 
+ 
+% re-generate exponential random numbers that are less than the truncation
+while r > p.trial.(sn).maxFixPostStim
+    rnd = rand(setupRNG);
+    r   = -mu .* log(rnd) + p.trial.(sn).minFixPostStim; % new exponential random number
+    if itr > infLoopStopper
+        r = p.trial.(sn).maxFixPostStim;
+        break
+    end
+        
+    itr = itr + 1;
+end
+
+p.trial.(sn).fixPostStimDuration = r;
+
+% -------------------------------------------------------------------------
+% DOTS: PROPERTIES
+
+% --- setup trial difficulty
 if p.trial.(sn).numBandwidths > 1
     rnd=randi(p.trial.(sn).numBandwidths, 1) / p.trial.(sn).numBandwidths;
     p.trial.(sn).bandwdth = (1-rnd) * p.trial.(sn).minBandwidth + rnd * p.trial.(sn).maxBandwidth; 
 end
 
 % --- setup dots
-fnames = {'numDots', 'bandwdth', 'mode', 'dist', 'lifetime'};
-for f = fnames
-    for kDots = 1:numel(p.trial.(sn).hDots)
-        p.trial.(sn).hDots(kDots).(f{1}) = p.trial.(sn).(f{1});
-    end
-end
-
 numDotApertures = numel(p.trial.(sn).hDots);
-for kDots = 1:numDotApertures
-    p.trial.(sn).hDots(kDots).size  = p.trial.(sn).dotSize * ppd; % pixels
-    p.trial.(sn).hDots(kDots).speed        = p.trial.(sn).dotSpeed * ppd / fps; % pixels/frame
-    p.trial.(sn).hDots(kDots).maxRadius    = p.trial.(sn).stimWinRadius * ppd;
+assert(numDotApertures==2, 'This code is not designed for more than 2 apertures')
 
-    [th, rho] = cart2pol(p.trial.(sn).RfCenterXy);
+
+for kDots = 1:numDotApertures
+    
+    % dot mode (coherence or sample from distribution)
+    p.trial.(sn).hDots(kDots).mode      = p.trial.(sn).dotMode;
+    
+    % dot distribution
+    p.trial.(sn).hDots(kDots).dist      = p.trial.(sn).dotDist;
+    
+    % dot Range / Bandwidth
+    p.trial.(sn).hDots(kDots).bandwdth  = p.trial.(sn).dotBandwidth;
+    
+    % dot lifetime
+    p.trial.(sn).hDots(kDots).lifetime  = p.trial.(sn).dotLifetime;
+    
+    % dot size (in pixels)
+    p.trial.(sn).hDots(kDots).size      = p.trial.(sn).dotSize * ppd; % pixels
+    
+    % dot speed (in pixels/frame)
+    p.trial.(sn).hDots(kDots).speed     = p.trial.(sn).dotSpeed * ppd / fps; % pixels/frame
+    
+    % % dot color
+    p.trial.(sn).hDots(kDots).colour       = p.trial.display.bgColor + p.trial.(sn).dotContrast;
+    
+    % aperture radius (pixels)
+    p.trial.(sn).hDots(kDots).maxRadius = p.trial.(sn).dotApertureRadius * ppd;
+    
+    % number of dots (integer value, calculate from dot density)
+    p.trial.(sn).hDots(kDots).numDots = ceil(p.trial.(sn).dotDensity * pi * p.trial.(sn).dotApertureRadius^2 / fps);
+    
+    % calculate position
+    [th, rho] = cart2pol(p.trial.(sn).RfCenterXy(1),p.trial.(sn).RfCenterXy(2));
     
     th = th + p.trial.(sn).DotCenterAngle(kDots)/180*pi;
     [xDeg, yDeg] = pol2cart(th, rho);
     p.trial.(sn).hDots(kDots).position     = [xDeg, -1*yDeg] * ppd + ctr;
-    p.trial.(sn).hDots(kDots).colour       = p.trial.display.bgColor + p.trial.(sn).dotContrast;
-end
-
-% --- setup conditions
-n = p.trial.(sn).numDirs; % number of directions/choice targets
-
-
-for kDot = 1:numDotApertures
-    if kDot > 1 && p.trial.(sn).yokeDirections
-        p.trial.(sn).direction(kDot) = wrapTo360(p.trial.(sn).direction(kDot-1) - 180);
+    
+    % direction
+    n = p.trial.(sn).numDirs; % number of directions/choice targets
+    
+    if kDots > 1 && p.trial.(sn).yokeDirections
+        p.trial.(sn).direction(kDots) = wrapTo360(p.trial.(sn).direction(kDots-1) - 180);
     else
-        p.trial.(sn).direction(kDot) = ceil(rand(setupRNG)*n)/n*360;
+        p.trial.(sn).direction(kDots) = ceil(rand(setupRNG)*n)/n*360;
     end
-    p.trial.(sn).hDots(kDot).direction(1) = p.trial.(sn).direction(kDot);
+    p.trial.(sn).hDots(kDots).direction(1) = p.trial.(sn).direction(kDots);
+    
 end
 
 % (re-)initialize dots
@@ -82,72 +128,36 @@ for kDot = 1:numDotApertures
     p.trial.(sn).hDots(kDot).beforeTrial();
 end
 
+% --- setup reward for the trial
+p.trial.(sn).Dots1Rewarded = rand(setupRNG) < p.trial.(sn).rewardDot1Rate;
+p.trial.(sn).Dots2Rewarded = rand(setupRNG) < p.trial.(sn).rewardDot2Rate;
+
 % --- Face for aditional reward
-p.trial.(sn).hFace.texSize  = 2.5 * p.trial.(sn).cueApertureRadius * ppd;
-p.trial.(sn).hFace.position = [x; -1*y]' + ctr;
+p.trial.(sn).hFace.texSize  = 2 * ppd;
+p.trial.(sn).hFace.position = ctr;
 p.trial.(sn).hFace.id       = p.trial.(sn).faceIndex;
 
-% --- Setup dot motion trial
+% --- Reward
+p.trial.(sn).hReward.defaultAmount = p.trial.behavior.reward.defaultAmount;
+p.trial.(sn).hReward.iTrial        = p.trial.pldaps.iTrial;
+
+% --- Setup Trial Object (This runs all the state transitions)
 % the @trial object (initially in state 0)
-% hFix,hDots,hChoice,hCue,hFace,hReward,
 p.trial.(sn).hTrial = stimuli.dotselection.dotMotionTrial( ...
-  p.trial.(sn).hFix,p.trial.(sn).hDots,p.trial.(sn).hFace, p, ...
-  'fixWinRadius',p.trial.(sn).fixWinRadius, ...
-  'fixGracePeriod',p.trial.(sn).fixGracePeriod, ...
-  'fixDuration',p.trial.(sn).fixDuration, ...
-  'fixFlashCnt',p.trial.(sn).fixFlashCnt, ...
-  'stimDuration',p.trial.(sn).stimDuration, ...
-  'holdDuration',p.trial.(sn).holdDuration, ...
-  'cueDelay',p.trial.(sn).cueDelay, ...
-  'choiceTargetDelay',p.trial.(sn).choiceTargetDelay, ...
-  'choiceWinMinRadius',p.trial.(sn).choiceWinMinRadius,...
-  'choiceWinMaxRadius',p.trial.(sn).choiceWinMaxRadius,...
-  'choiceDuration',p.trial.(sn).choiceDuration, ...
-  'rewardWindow',p.trial.(sn).rewardWindow, ... % think about this parameter name
-  'choiceTimeout',p.trial.(sn).choiceTimeout, ...
-  'trialTimeout',p.trial.(sn).trialTimeout, ...
+  p.trial.(sn).hFix, ...
+  p.trial.(sn).hDots,...
+  p.trial.(sn).hFace, ...
+  p.trial.(sn).hReward, ...
+  'fixWinRadius',    p.trial.(sn).fixWinRadius, ...
+  'fixGracePeriod',  p.trial.(sn).fixGracePeriod, ...
+  'fixHoldPreStim',  p.trial.(sn).fixPreStimDuration, ...
+  'fixFlashCnt',     p.trial.(sn).fixFlashCnt, ...
+  'fixHoldPostStim', p.trial.(sn).fixPostStimDuration, ...
+  'choiceHoldDuration',  p.trial.(sn).choiceHoldDuration, ...
+  'rewardWindow',    p.trial.(sn).rewardWindow, ... % think about this parameter name
+  'choiceTimeout',   p.trial.(sn).choiceTimeout, ...
+  'trialTimeout',    p.trial.(sn).trialTimeout, ...
+  'DotsRewarded',   [p.trial.(sn).Dots1Rewarded p.trial.(sn).Dots2Rewarded], ...
   'iti',0, ...
-  'maxRewardCnt',p.trial.(sn).maxRewardCnt, ...
-  'bonusDirection',p.trial.(sn).bonusDirection, ...
-  'bonusWindow',p.trial.(sn).bonusWindow, ...
-  'bonusRewardCnt',p.trial.(sn).bonusRewardCnt, ... 
-  'viewpoint',false);
-end
-
-
-function img = MakeGabor(rPix,bkgd,cycles,phase,range)
-  % as much as it pains me, this code is cut and pasted from
-  % SupportFunctions/MakeGabor.m...
-  %
-  % we don't use MakeGabor.m directly because it wants to create the
-  % ptb texture but we just want an image that we can pass to the
-  % @textures class
-
-  % Find diameter
-  dPix = 2*rPix+1;
-  % Create a meshgrid
-  [X,Y] = meshgrid(-rPix:rPix);
-
-  % Standard deviation of gaussian (e1)
-  sigma = dPix/8;
-  % Create the gaussian (e1)
-  e1 = exp(-.5*(X.^2 + Y.^2)/sigma^2);
-
-  % Convert cycles to max radians (s1)
-  maxRadians = pi*cycles;
-  % Convert phase from degrees to radians (s1)
-  phase = pi*phase/180;
-  % Create the sinusoid (s1)
-  s1 = sin(maxRadians*X/rPix + phase);
-
-  % Create the gabor (g1)
-%   g1 = s1.*e1;
-  g1 = s1;
-  
-  % Convert to uint8
-  g1 = uint8(bkgd + g1*range);
-  
-  % stick the gaussian envelope on the alpha channel...
-  img = repmat(g1,1,1,3);
-  img(:,:,4) = uint8(255.*e1);
-end
+  'maxRewardCnt',   p.trial.(sn).maxRewardCnt, ...
+  'viewpoint',      false);

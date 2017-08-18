@@ -14,8 +14,8 @@ function p=runTrial(p,state, sn)
 % state2_FixPreStim   - hold fixation before showing dots
 % state3_ShowDots     - self explanatory
 % state4_ChoiceGracePeriod  - grace period after leaving fixation window
-% state5_Choice       - choice is counted
-% state6_HoldChoice   - hold choice to be evaluated
+% state5_Choice             - choice is counted
+% state6_HoldChoice         - hold choice to be evaluated
 % state7_BreakFixTimeout    - penalty for breaking fixation
 % state8_InterTrialInterval - time at the end of the trial
 %
@@ -40,9 +40,12 @@ switch state
             p.trial.flagNextTrial=true;
         end
         
-        ctr = p.trial.display.ctr(1:2);
+%         ctr = p.trial.display.ctr(1:2);
+        ctr = p.trial.(sn).hFix(1).position; % eye position relative to fixation
         p.trial.(sn).hTrial.x = (p.trial.eyeX - ctr(1)) / p.trial.display.ppd;
         p.trial.(sn).hTrial.y = -(p.trial.eyeY - ctr(2)) / p.trial.display.ppd;
+        
+%         [p.trial.(sn).hTrial.x p.trial.(sn).hTrial.y]
 
         % --- @dotMotionTrial/afterFrame handles all task state transitions
         p.trial.(sn).hTrial.afterFrame(p.trial.ttime);
@@ -67,24 +70,31 @@ switch state
 %         kron([1,1],[50 50]) 
         targColor=p.trial.display.clut.bg_green;
 
-        if p.trial.(sn).hTrial.showChoice
-            % choice window
-            th=p.trial.(sn).direction:360+p.trial.(sn).direction;
-            x=cosd(th);
-            y=-sind(th);
-            winpolyx=[p.trial.(sn).choiceWinMinRadius*x p.trial.(sn).choiceWinMaxRadius*fliplr(x)]*p.trial.display.ppd;
-            winpolyy=[p.trial.(sn).choiceWinMinRadius*y p.trial.(sn).choiceWinMaxRadius*fliplr(y)]*p.trial.display.ppd;
-            
-            Screen('FramePoly', p.trial.display.overlayptr, fixClr, [winpolyx(:)+ctr(1), winpolyy(:)+ctr(2)]);
-            
-            % reward window
-            th=p.trial.(sn).direction-p.trial.(sn).rewardWindow:p.trial.(sn).direction+p.trial.(sn).rewardWindow;
-            x=cosd(th);
-            y=-sind(th);
-            winpolyx=[p.trial.(sn).choiceWinMinRadius*x p.trial.(sn).choiceWinMaxRadius*fliplr(x) p.trial.(sn).choiceWinMinRadius*x(1)]*p.trial.display.ppd;
-            winpolyy=[p.trial.(sn).choiceWinMinRadius*y p.trial.(sn).choiceWinMaxRadius*fliplr(y) p.trial.(sn).choiceWinMinRadius*y(1)]*p.trial.display.ppd;
-            ctr=p.trial.display.ctr(1:2);
-            Screen('FramePoly', p.trial.display.overlayptr, targColor, [winpolyx(:)+ctr(1), winpolyy(:)+ctr(2)]);
+%         if p.trial.(sn).hTrial.showChoice
+%             % choice window
+%             th=p.trial.(sn).direction:360+p.trial.(sn).direction;
+%             x=cosd(th);
+%             y=-sind(th);
+%             winpolyx=[p.trial.(sn).choiceWinMinRadius*x p.trial.(sn).choiceWinMaxRadius*fliplr(x)]*p.trial.display.ppd;
+%             winpolyy=[p.trial.(sn).choiceWinMinRadius*y p.trial.(sn).choiceWinMaxRadius*fliplr(y)]*p.trial.display.ppd;
+%             
+%             Screen('FramePoly', p.trial.display.overlayptr, fixClr, [winpolyx(:)+ctr(1), winpolyy(:)+ctr(2)]);
+%             
+%             % reward window
+%             th=p.trial.(sn).direction-p.trial.(sn).rewardWindow:p.trial.(sn).direction+p.trial.(sn).rewardWindow;
+%             x=cosd(th);
+%             y=-sind(th);
+%             winpolyx=[p.trial.(sn).choiceWinMinRadius*x p.trial.(sn).choiceWinMaxRadius*fliplr(x) p.trial.(sn).choiceWinMinRadius*x(1)]*p.trial.display.ppd;
+%             winpolyy=[p.trial.(sn).choiceWinMinRadius*y p.trial.(sn).choiceWinMaxRadius*fliplr(y) p.trial.(sn).choiceWinMinRadius*y(1)]*p.trial.display.ppd;
+%             ctr=p.trial.display.ctr(1:2);
+%             Screen('FramePoly', p.trial.display.overlayptr, targColor, [winpolyx(:)+ctr(1), winpolyy(:)+ctr(2)]);
+%         end
+
+        if p.trial.(sn).hTrial.showDots
+            for kDots = 1:2
+                fixRect = [p.trial.(sn).hTrial.hDots(kDots).position p.trial.(sn).hTrial.hDots(kDots).position] + kron(p.trial.(sn).hTrial.hDots(kDots).maxRadius + p.trial.(sn).hTrial.rewardWindow * p.trial.display.ppd,[-1, -1, +1, +1]);
+                Screen('FrameOval', p.trial.display.overlayptr, fixClr, fixRect);
+            end
         end
         
         if p.trial.(sn).hTrial.showFix
@@ -104,6 +114,12 @@ switch state
     
 	% --- Cleanup and save all parameters
     case p.trial.pldaps.trialStates.trialCleanUpandSave
+        
+    % --- handles that depend on pldaps being totally set up
+    case p.trial.pldaps.trialStates.experimentPostOpenScreen
+        
+        % --- Reward
+        p.trial.(sn).hReward    = stimuli.reward(p);
         
 end % switch
 

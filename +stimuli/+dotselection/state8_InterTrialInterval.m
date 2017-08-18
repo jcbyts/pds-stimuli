@@ -27,16 +27,11 @@ classdef state8_InterTrialInterval < stimuli.state
 
       if hTrial.rewardCnt > 0
         s.showFace = true;
-      end
-
-      if hTrial.showChoice
-        hTrial.hChoice.beforeFrame();
+        hTrial.showDots = false;
       end
       
       if s.showFace
         hTrial.hFace.beforeFrame(); % show face...
-      else
-        hTrial.hCue.beforeFrame(); % draw the *correct* choice cue
       end
     end
     
@@ -52,8 +47,7 @@ classdef state8_InterTrialInterval < stimuli.state
 
       if (hTrial.rewardCnt > 0)
         if t > (s.tStart + 0.2*s.rewardCnt)
-%           hTrial.hReward.deliver();
-          pds.behavior.reward.give(hTrial.hPldaps)
+          hTrial.hReward.give();
 
           s.rewardCnt = s.rewardCnt + 1;
           
@@ -70,15 +64,6 @@ classdef state8_InterTrialInterval < stimuli.state
         end
       end
 
-%       % FIXME: Urgh!
-%       if ~s.plotFlag,
-% %         eval(hTrial.A.plotCmd);
-%         s.plotFlag = true;
-%         
-%         if hTrial.viewpoint,
-%           vpx_SendCommandString(sprintf('dataFile_InsertString "TRIALEND:TRIALNO:%i"',hTrial.trialNum));
-%         end
-%       end
     end
     
   end % methods

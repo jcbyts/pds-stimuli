@@ -9,8 +9,10 @@ function updateConditions(p, sn)
 
 % p.trial.pldaps.iTrial
 
-c.Nr=1; %one condition;
-p.conditions=repmat({c},1,200);
+if isempty(p.conditions)
+    c.Nr=1; %one condition;
+    p.conditions=repmat({c},1,200);
+end
 %  cc.clockwise = [false, true];%0 1 
 %     %have boolean switch whether to keep the motion vector length constant
 %  cc.randomizeStart=[1];%0 1 

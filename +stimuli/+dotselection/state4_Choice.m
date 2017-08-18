@@ -1,4 +1,4 @@
-classdef state5_Choice < stimuli.state
+classdef state4_Choice < stimuli.state
   % state 5 - choice
   
   % 07-07-2016 - Shaun L. Cloherty <s.cloherty@ieee.org>
@@ -8,10 +8,10 @@ classdef state5_Choice < stimuli.state
   end
   
   methods (Access = public)
-    function s = state5_Choice(hTrial,varargin)
+    function s = state4_Choice(hTrial,varargin)
       fprintf(1,'%s\n',mfilename);
       
-      s = s@stimuli.state(5,hTrial); % call the parent constructor
+      s = s@stimuli.state(4,hTrial); % call the parent constructor
     end
     
     function beforeFrame(s)
@@ -57,7 +57,7 @@ classdef state5_Choice < stimuli.state
       for k = 1:2
           if r(k) < hTrial.hDots(k).maxRadius
               hTrial.Choice = k;
-              hTrial.setState(6);
+              hTrial.setState(5);
               return
           end
       end
