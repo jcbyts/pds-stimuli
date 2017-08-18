@@ -33,16 +33,25 @@ classdef state4_Choice < stimuli.state
       
       if isnan(s.tStart) % <-- first frame
         s.tStart = t;
+        hTrial.setTxTime(t);
       end
       
-      if t < (s.tStart + hTrial.choiceGracePeriod)
-        return;
-      end
+
       
       if hTrial.showDots
           for k = 1:2
               hTrial.hDots(k).afterFrame();
-              r(k) = norm([hTrial.x - hTrial.hDots(k).position(1),hTrial.y - hTrial.hDots(k).position(2)]);
+              r(k) = norm([hTrial.x*hTrial.ppd + hTrial.ctr(1) - hTrial.hDots(k).position(1),-hTrial.y*hTrial.ppd + hTrial.ctr(2) - hTrial.hDots(k).position(2)]);
+          end
+      end
+      
+      r
+      
+      for k = 1:2
+          if r(k) < hTrial.hDots(k).maxRadius
+              hTrial.choice = k;
+              hTrial.setState(5);
+              return
           end
       end
      
@@ -54,13 +63,7 @@ classdef state4_Choice < stimuli.state
       end
        
       
-      for k = 1:2
-          if r(k) < hTrial.hDots(k).maxRadius
-              hTrial.Choice = k;
-              hTrial.setState(5);
-              return
-          end
-      end
+      
       
     end
     

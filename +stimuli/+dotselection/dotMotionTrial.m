@@ -52,6 +52,8 @@ classdef dotMotionTrial < stimuli.trial
     choiceTimeout@double;       % seconds
     trialTimeout@double;        % seconds
     iti@double;                 % inter-trial interval (seconds)
+    ppd@double
+    ctr@double
     maxRewardCnt@double;
     
     DotsRewarded@logical
@@ -61,7 +63,7 @@ classdef dotMotionTrial < stimuli.trial
   end
   
   methods (Access = public)
-    function o = dotMotionTrial(hFix,hDots,hFace,hReward,varargin)
+    function o = dotMotionTrial(hFix,hDots,hFace,hReward,ppd,ctr,varargin)
 %         dotMotionTrial(hFix,hDots,hFace,hReward,varargin)
 
       o.hFix    = hFix;
@@ -117,7 +119,9 @@ classdef dotMotionTrial < stimuli.trial
       end
       
       args = p.Results;
-    
+        
+      o.ppd = ppd;
+      o.ctr = ctr;
       o.fixWinRadius        = args.fixWinRadius;
       o.fixGracePeriod      = args.fixGracePeriod;
       o.fixHoldPreStim      = args.fixHoldPreStim;
