@@ -24,13 +24,19 @@ classdef state5_HoldChoice < stimuli.state
       
       hTrial = s.hTrial;
       
-      if hTrial.showChoice
-        hTrial.hChoice.beforeFrame();
-      end
       
-      if hTrial.showCue
-        hTrial.hCue(1).beforeFrame(); % draw cue
+      if hTrial.showDots
+          for k = 1:2
+              hTrial.hDots(k).beforeFrame();
+          end
       end
+%       if hTrial.showChoice
+%         hTrial.hChoice.beforeFrame();
+%       end
+      
+%       if hTrial.showCue
+%         hTrial.hCue(1).beforeFrame(); % draw cue
+%       end
     end
     
     function afterFrame(s,t)
@@ -42,10 +48,14 @@ classdef state5_HoldChoice < stimuli.state
         s.tStart = t;
       end
       
+      if t < (s.tStart + hTrial.choiceGracePeriod)
+          return;
+      end
+      
       if t > (s.tStart + hTrial.choiceHoldDuration)
         % trial complete... move to state 8 - reward/inter-trial interval
         
-        hTrial.rewardCnt = hTrial.maxRewardCnt * hTrial.DotsRewarded(hTrial.Choice);
+        hTrial.rewardCnt = hTrial.maxRewardCnt * hTrial.DotsRewarded(hTrial.choice);
 %         % record the choice eye position
 %         hTrial.choiceX = mean(s.choiceX);
 %         hTrial.choiceY = mean(s.choiceY);
@@ -53,9 +63,9 @@ classdef state5_HoldChoice < stimuli.state
         return;
       end
       
-      r = norm([hTrial.x - hTrial.hDots(hTrial.Choice).position(1), hTrial.y - hTrial.hDots(hTrial.Choice).position(2)]);
+      r = norm([hTrial.x - hTrial.hDots(hTrial.choice).position(1), hTrial.y - hTrial.hDots(hTrial.choice).position(2)]);
       
-      if r > hTrial.rewardWindow + hTrial.hDots(hTrial.Choice).maxRadius
+      if r > hTrial.rewardWindow + hTrial.hDots(hTrial.choice).maxRadius
         % failed to hold choice... move to state 7 - break fix penalty
         hTrial.error = 5;
         hTrial.setState(7);

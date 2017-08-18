@@ -1,4 +1,4 @@
-function runFaceForageHartley(subject, pauseBeforeStart)
+function runFaceForageCSD(subject, pauseBeforeStart)
 
 if nargin < 2
     pauseBeforeStart = true;
@@ -33,7 +33,7 @@ settingsStruct.eyemarker.use=false;
 settingsStruct.pldaps.useModularStateFunctions = true;
 settingsStruct.pldaps.trialMasterFunction='runModularTrial';
 settingsStruct.pldaps.save.mergedData=0;
-settingsStruct.behavior.reward.defaultAmount= 0.05; %.015;
+settingsStruct.behavior.reward.defaultAmount= 0.015; %.015;
 
 settingsStruct.session.subject=subject;
 

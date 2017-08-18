@@ -24,21 +24,24 @@ classdef state8_InterTrialInterval < stimuli.state
 %       fprintf(1,'dotMotionState8.beforeFrame()\n');
       
       hTrial = s.hTrial;
-
-      if hTrial.rewardCnt > 0
-        s.showFace = true;
-        hTrial.showDots = false;
-      end
-      
-      if s.showFace
-        hTrial.hFace.beforeFrame(); % show face...
-      end
+        
+      hTrial.showDots = false;
+%       
+%       if hTrial.rewardCnt > 0
+%         s.showFace = true;
+%         
+%       end
+%       
+%       if s.showFace
+%         hTrial.hFace.beforeFrame(); % show face...
+%       end
     end
     
     function afterFrame(s,t)
 %       fprintf(1,'dotMotionState8.afterFrame()\n');
       
       hTrial = s.hTrial;
+      hTrial.showDots = false;
           
       if isnan(s.tStart) % <-- first frame
         s.tStart = t;

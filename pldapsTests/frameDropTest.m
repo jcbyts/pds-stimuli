@@ -33,6 +33,7 @@ figure(1); clf
 plot(p.data{1}.timing.frameStateChangeTimes'*1000, '-')
 %%
 for k=1:numel(p.data)
+    figure(1); clf
     plot(p.data{k}.timing.frameStateChangeTimes'*1000, '-')
     title(sprintf('Trial: %d', k))
     pause

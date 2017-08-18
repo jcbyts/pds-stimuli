@@ -25,15 +25,19 @@ p.defaultParameters.pldaps.trialFunction='stimuli.dotselection.runTrial';
 % --- Stimulus parameters
 p.trial.(sn).bgColour 	   = .5; % pldaps controls this when the screen is opened
 
+if ~isfield(p.trial.(sn), 'RfCenterXy')
+    p.trial.(sn).RfCenterXy        = [5, -5];
+end
+
 % --- Dot parameters
 p.trial.(sn).dotSize           = 0.1; 	% dot size (diameter; deg)
 p.trial.(sn).dotSpeed 		   = 8.0; 	% dot speed (deg/sec) 
-p.trial.(sn).dotContrast       = -0.15; % -.5 to .5
+p.trial.(sn).dotContrast       = -0.5; % -.5 to .5
 p.trial.(sn).dotMode           = 1;     % motion sampled from a distribution
 p.trial.(sn).dotDist           = 1;     % make it a gaussian distribution
 p.trial.(sn).dotBandwidth       = 0.0;
 p.trial.(sn).dotDensity 	   = 100;   % dots / deg^2 / sec
-p.trial.(sn).dotApertureRadius = 2;     % degrees
+p.trial.(sn).dotApertureRadius = norm(p.trial.(sn).RfCenterXy)/2;     % degrees
 p.trial.(sn).dotLifetime       = 5;     % frames
 
 p.trial.(sn).maxBandwidth 	   = 0.0;
@@ -41,9 +45,7 @@ p.trial.(sn).minBandwidth      = 0.0;
 p.trial.(sn).numBandwidths     = 1;
 
 p.trial.(sn).numDirs 		   = 8;
-if ~isfield(p.trial.(sn), 'RfCenterXy')
-    p.trial.(sn).RfCenterXy        = [5, -5];
-end
+
 if ~isfield(p.trial.(sn), 'DotCenterAngle')
     p.trial.(sn).DotCenterAngle(1) = 0;
     p.trial.(sn).DotCenterAngle(2) = 180;
@@ -60,11 +62,11 @@ p.trial.(sn).fixFlashCnt 	  = round(0.250*p.trial.display.frate);
 p.trial.(sn).fixPointXy       = [0, 0]; % degrees (relative to center of screen)
 
 % --- Reward
-p.trial.(sn).rewardDot1Rate     = .85;
-p.trial.(sn).rewardDot2Rate     = .85;
+p.trial.(sn).rewardDot1Rate     = .75;
+p.trial.(sn).rewardDot2Rate     = .75;
 
 p.trial.(sn).rewardWindow       = 0.0; % buffer around dot aperture
-p.trial.(sn).maxRewardCnt       = 4;
+p.trial.(sn).maxRewardCnt       = 2;
 
 % --- Face
 p.trial.(sn).faceIndex          = 1;
@@ -73,12 +75,12 @@ p.trial.(sn).faceIndex          = 1;
 p.trial.(sn).fixGracePeriod     = 0.050;
 p.trial.(sn).minFixPreStim      = 0.200;
 p.trial.(sn).maxFixPreStim      = 0.400;
-p.trial.(sn).minFixPostStim     = 0.100; % Dots max duration
+p.trial.(sn).minFixPostStim     = 0.100;
 p.trial.(sn).maxFixPostStim     = 0.6;   % seconds (wrt dot motion onset)
 p.trial.(sn).fixHoldTau         = 0.2;   % seconds (time constant of exponential decay)
 p.trial.(sn).choiceGracePeriod  = 1.4;   % grace period (aka flight time; sec)
 p.trial.(sn).choiceHoldDuration = 0.025; % seconds (minimum choice hold duration)
-p.trial.(sn).choiceTimeout 		= 1.0;   % seconds
+p.trial.(sn).choiceTimeout 		= 2.0;   % seconds
 p.trial.(sn).trialTimeout 		= 1.0;   % seconds
 
 

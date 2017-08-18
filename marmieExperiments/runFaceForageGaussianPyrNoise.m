@@ -30,7 +30,7 @@ settingsStruct.eyemarker.use=false;
 settingsStruct.pldaps.useModularStateFunctions = true;
 settingsStruct.pldaps.trialMasterFunction='runModularTrial';
 settingsStruct.pldaps.save.mergedData=0;
-settingsStruct.behavior.reward.defaultAmount=0.05; %.015;
+settingsStruct.behavior.reward.defaultAmount=0.025; %.015;
 
 settingsStruct.session.subject=subject;
 
@@ -139,7 +139,7 @@ p = pldaps(behavior, settingsStruct);
 
 % --- Condition 1: Face Forage with Gaussian Pyramid Noise
 sn  = 'stimulus';
-iCond = 1;
+iCond = 2;
 c{iCond} = struct(sn, struct());
 c{iCond}.Nr = iCond;
 c{iCond}.(sn).MotN       = 2;  % number of face objects
@@ -165,9 +165,41 @@ c{iCond}.gaussianNoiseBlobs.use      = true;
 c{iCond}.gaussianNoiseBlobs.contrast = gaussianContrast;
 c{iCond}.hartley.use                 = false;
 c{iCond}.csdFlash.use                = false;
+%% higher resolution
+sn  = 'stimulus';
+iCond = 1;
+c{iCond} = struct(sn, struct());
+c{iCond}.Nr = iCond;
+c{iCond}.(sn).MotN       = 2;  % number of face objects
+c{iCond}.(sn).minSpeed   = 3;  % minumum speed of face objects
+c{iCond}.(sn).maxSpeed   = 8;
+c{iCond}.(sn).motionType = 'randomwalk'; % randomwalk or linear
+c{iCond}.(sn).type       = 'face';       % face or grating
+c{iCond}.(sn).appearGazeContingent = false;
+c{iCond}.(sn).appearRangePar = 2;
+c{iCond}.(sn).appearCenter = [0 -2];
+c{iCond}.(sn).appearTau = 1;
+c{iCond}.(sn).maxContrast = 0.3;
+c{iCond}.(sn).radius = 1;
+c{iCond}.(sn).onLifetime  = 120;
+c{iCond}.(sn).offLifetime = 240;
+% if type is 'grating', these parameters will be used
+c{iCond}.(sn).gratingParams = {'sf', [.25 .5 1], 'orientation', 0:(180/12):(180-(180/12)), ...
+    'phase', 0:(360/4):(360 - (360/4)), 'isgabor', true};
+% --- modules
+c{iCond}.natImgBackground.use        = false;
+c{iCond}.natImgBackground.on         = false;
+c{iCond}.gaussianNoiseBlobs.use      = true;
+c{iCond}.gaussianNoiseBlobs.contrast = 1;
+c{iCond}.gaussianNoiseBlobs.sigma0   = .1;
+c{iCond}.gaussianNoiseBlobs.N = 200;
+
+c{iCond}.hartley.use                 = false;
+c{iCond}.csdFlash.use                = false;
+
 % % 
 % --- Condition 2: Face Forage on Natural background
-iCond = 2;
+iCond = 3;
 c{iCond} = struct(sn, struct());
 c{iCond}.Nr = iCond;
 c{iCond}.(sn).MotN       = 3;  % number of face objects

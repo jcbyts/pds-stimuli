@@ -35,7 +35,7 @@ classdef butterfly < handle
         ctrHold                 % frame counter for fixation
         ctrOn                   % how long object has been on
         ctrOff                  % how long object has been off
-        holdDuration@double=15  % how many frames to hold before reward
+        holdDuration@double=200  % how many frames to hold before reward
         motionType              % governs movement 
         
         rewardWindow@double = 1;
@@ -289,7 +289,7 @@ classdef butterfly < handle
         end
         
         function update(m)
-            
+            disp(m.ctrHold)
            % --- update objects
             m.objects.position = [m.ppd*m.x(:) + m.ctr(1) -m.ppd*m.y(:) + m.ctr(2)];
 %             m.objects.texSize  = cell2mat(cellfun(@(x) x.size, m.objects.texture(m.texid), 'UniformOutput', false)');
@@ -300,7 +300,7 @@ classdef butterfly < handle
             turnOn  = m.ctrOff > m.offLifetime;
             
             % --- check hold status
-            heldIx = m.ctrHold >= m.holdDuration;
+            heldIx = m.ctrHold >= 40; %m.holdDuration;
             if any(heldIx)
                 m.hReward.give();
                 m.initObjects(heldIx);
