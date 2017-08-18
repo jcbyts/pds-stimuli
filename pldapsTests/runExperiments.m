@@ -1,6 +1,6 @@
-%% Sample experiments
+8%% Sample experiments
 
-subject = 'test'; % Ellie (Capitalized E)
+subject = 'Ellie'; % Ellie (Capitalized E)
 pauseBeforeExperiment = 0;
 
 
@@ -31,9 +31,9 @@ runFaceForageHartley(subject, pauseBeforeExperiment);
 %% Face Forage with CSD flash
 runFaceForageCSD(subject, pauseBeforeExperiment);
 
-%% MT mapping: Dot motion FACE FORAGE
+%% MT mapping: Dot motion
 runFaceForageDotMapping(subject, pauseBeforeExperiment, ...
-    'targetSpeed', 10, ...       % degrees/sec
+    'targetSpeed', 2, ...       % degrees/sec
     'dotSpeeds', [15 20 25], ... % degrees/sec
     'apertureSize', 1, ...       % degrees
     'dotContrast', .2, ...      % ~Michelson contrast
@@ -42,7 +42,7 @@ runFaceForageDotMapping(subject, pauseBeforeExperiment, ...
     'numDirections', 12, ... 
     'gazeContingent', false, ...
     'holdDuration', 15, ... % frames
-    'task', 'faceforage', ... % oddball, faceinvaders, fixflash
+    'task', 'fixflash', ... % oddball, faceinvaders, fixflash
     'randomizeDirections', true);
 
 %%
