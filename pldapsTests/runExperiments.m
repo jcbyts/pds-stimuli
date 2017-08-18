@@ -47,7 +47,7 @@ runFaceForageDotMapping(subject, pauseBeforeExperiment, ...
 
 %% Motion saccade task
 
-
+subject = 'test';
 settingsStruct = struct();
 % settingsStruct.display.destinationFactorNew = GL_ONE;
 
@@ -97,4 +97,18 @@ end
 p = pldaps(@stimuli.dotselection.OneInRF, subject, settingsStruct);
 
 p.run
+
+%%
+runDotHandMapping(subject, pauseBeforeExperiment, ...
+    'targetSpeed', 2, ...       % degrees/sec
+    'dotSpeeds', [15 20 25], ... % degrees/sec
+    'apertureSize', 20, ...       % degrees
+    'dotContrast', .2, ...      % ~Michelson contrast
+    'onDuration', 10, ...  % in frames
+    'offDuration', 30, ... % in frames
+    'numDirections', 12, ... 
+    'gazeContingent', false, ...
+    'holdDuration', 15, ... % frames
+    'task', 'fixflash', ... % oddball, faceinvaders, fixflash
+    'randomizeDirections', true);
 
