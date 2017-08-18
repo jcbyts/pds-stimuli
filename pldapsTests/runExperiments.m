@@ -45,10 +45,8 @@ runFaceForageDotMapping(subject, pauseBeforeExperiment, ...
     'task', 'fixflash', ... % oddball, faceinvaders, fixflash
     'randomizeDirections', true);
 
-%%
+%% Motion saccade task
 
-subject = 'test';
-pauseBeforeExperiment = true;
 
 settingsStruct = struct();
 % settingsStruct.display.destinationFactorNew = GL_ONE;
@@ -67,7 +65,7 @@ settingsStruct.session.subject=subject;
 settingsStruct.stimulus.fixWinRadius = 1.5;
 settingsStruct.stimulus.fixPointRadius = .3;
 settingsStruct.stimulus.holdDuration = 15; % frames (counter, not continuous)
-settingsStruct.stimulus.RfCenterXy = [2 -2];
+settingsStruct.stimulus.RfCenterXy = [3.5 -3.5];
 settingsStruct.stimulus.DotCenterAngle(1) = 0;
 settingsStruct.stimulus.DotCenterAngle(2) = -90;
 
@@ -80,19 +78,21 @@ else
     settingsStruct.pldaps.pause.preExperiment = false;
 end
 
-% try
-%     cm = getpref('marmoview_calibration', subject);
-%     cm2 = cm(:,:,1)';
-%     cm2(:,:,2) = cm(:,:,2)';
-%     
-%     settingsStruct.eyelink.calibration_matrix = cm2;
-%     settingsStruct.eyelink.useRawData = true;
-% catch me
-%     throw(me)
-% end
+try
+    cm = getpref('marmoview_calibration', subject);
+    cm2 = cm(:,:,1)';
+    cm2(:,:,2) = cm(:,:,2)';
+    
+    settingsStruct.eyelink.calibration_matrix = cm2;
+    settingsStruct.eyelink.useRawData = true;
+catch me
+    throw(me)
+end
 
-settingsStruct.eyelink.use = false;
-settingsStruct.mouse.useAsEyepos = true;
+if strcmp(subject, 'test')
+    settingsStruct.eyelink.use = false;
+    settingsStruct.mouse.useAsEyepos = true;
+end
 
 p = pldaps(@stimuli.dotselection.OneInRF, subject, settingsStruct);
 
