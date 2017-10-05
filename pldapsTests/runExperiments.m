@@ -104,7 +104,16 @@ p = pldaps(@stimuli.dotselection.OneInRF, subject, settingsStruct);
 
 p.run
 
-
+%% Spatial Mapping
+runSpatialMapping(subject, pauseBeforeExperiment, ...
+    'lifetime', 10, ...       % degrees/sec
+    'N', 3, ... % degrees/sec
+    'size', 1, ...       % degrees
+    'task', 'faceforage', ... %'faceforage', ... % oddball, faceinvaders, fixflash
+    'contrast', .5, ...
+    'targetSpeed', 2, ...       % degrees/sec
+    'onDuration', 60, ...  % in frames
+    'offDuration',60); 
 %% Hand Mapping of MT RF ... large field
 runDotHandMapping(subject, pauseBeforeExperiment, ...
     'targetSpeed', 2, ...       % degrees/sec
