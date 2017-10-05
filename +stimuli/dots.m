@@ -255,8 +255,11 @@ classdef dots < handle
             %   4 - square dots (built-in shader)
             dotType = 1;
             
+            idx = sqrt(o.x.^2 + o.y.^2) > 50;
             if o.visible
-                Screen('DrawDots',o.winPtr,[o.x(:), -1*o.y(:)]', o.size, dotColour, o.position, dotType);
+                xx = o.x(idx);
+                yy = o.y(idx);
+                Screen('DrawDots',o.winPtr,[xx(:), -1*yy(:)]', o.size, dotColour, o.position, dotType);
                 %         disp('draw dots called')
             end
             

@@ -60,6 +60,18 @@ classdef state5_HoldChoice < stimuli.state
 %         hTrial.choiceX = mean(s.choiceX);
 %         hTrial.choiceY = mean(s.choiceY);
         hTrial.setState(8);
+        
+        % settingsStruct.rewardcount = zeros(1,2);   %two targets, only two states
+        % settingsStruct.rewardtravel = 4;   % must choose this many times before move
+        % settingsStruct.rewardtransition = 1.0;  %p
+        
+        %********* added by JM
+        if (hTrial.rewardCnt > 0)
+           s.hTrial.rewardcount(hTrial.choice) = s.hTrial.rewardcount(hTrial.choice) + 1;    
+        end
+        %******************
+        % s.hTrial
+        
         return;
       end
       

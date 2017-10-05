@@ -1,8 +1,11 @@
-8%% Sample experiments
+%% Sample experiments
 
 subject = 'Ellie'; % Ellie (Capitalized E)
 pauseBeforeExperiment = 0;
 
+%% Test subject case
+subject = 'test'; 
+pauseBeforeExperiment = 0;
 
 %% Free View Natural Images
 
@@ -11,6 +14,7 @@ runNaturalImageFreeView(subject, pauseBeforeExperiment)
 %% Fix Flash With Gaussian Pyramid Noise
 
 runFixFlashWithGaussianPyrNoise(subject, pauseBeforeExperiment);
+
 
 %% Fix Flash With Hartley
 
@@ -34,16 +38,18 @@ runFaceForageCSD(subject, pauseBeforeExperiment);
 %% MT mapping: Dot motion
 runFaceForageDotMapping(subject, pauseBeforeExperiment, ...
     'targetSpeed', 2, ...       % degrees/sec
-    'dotSpeeds', [15 20 25], ... % degrees/sec
-    'apertureSize', 1, ...       % degrees
-    'dotContrast', .2, ...      % ~Michelson contrast
-    'onDuration', 6, ...  % in frames
+    'dotSpeeds', [15], ... % degrees/sec
+    'apertureSize', 4, ...       % degrees
+    'dotContrast', .1, ...      % ~Michelson contrast
+    'onDuration', 12, ...  % in frames
     'offDuration', 1, ... % in frames
-    'numDirections', 12, ... 
+    'numDirections', 12, ...% 
     'gazeContingent', false, ...
     'holdDuration', 15, ... % frames
-    'task', 'fixflash', ... % oddball, faceinvaders, fixflash
+    'task', 'faceforage', ... % oddball, faceinvaders, fixflash
     'randomizeDirections', true);
+   % 'task', 'fixflash', ... % oddball, faceinvaders, fixflash
+   % 'randomizeDirections', true);
 
 %% Motion saccade task
 
@@ -51,6 +57,7 @@ subject = 'test';
 settingsStruct = struct();
 % settingsStruct.display.destinationFactorNew = GL_ONE;
 
+pauseBeforeExperiment = 0;
 settingsStruct.display.colorclamp = 1;
 settingsStruct.display.normalizeColor = 1;
 
@@ -65,12 +72,11 @@ settingsStruct.session.subject=subject;
 settingsStruct.stimulus.fixWinRadius = 1.5;
 settingsStruct.stimulus.fixPointRadius = .3;
 settingsStruct.stimulus.holdDuration = 15; % frames (counter, not continuous)
-settingsStruct.stimulus.RfCenterXy = [3.5 -3.5];
+settingsStruct.stimulus.RfCenterXy = [4 -4];
 settingsStruct.stimulus.DotCenterAngle(1) = 0;
 settingsStruct.stimulus.DotCenterAngle(2) = -90;
 
 settingsStruct.pldaps.draw.cursor.use = true;
-
 
 if pauseBeforeExperiment
     settingsStruct.pldaps.pause.preExperiment = true;
@@ -98,14 +104,85 @@ p = pldaps(@stimuli.dotselection.OneInRF, subject, settingsStruct);
 
 p.run
 
-%%
+
+%% Hand Mapping of MT RF ... large field
 runDotHandMapping(subject, pauseBeforeExperiment, ...
     'targetSpeed', 2, ...       % degrees/sec
-    'dotSpeeds', [15 20 25], ... % degrees/sec
+    'dotSpeeds', [15,25], ... % degrees/sec
+    'apertureSize', 20, ...       % degrees
+    'dotContrast', -.5, ...      % ~Michelson contrast
+    'onDuration', 60, ...  % in frames
+    'offDuration',60, ... % in frames
+    'numDirections',12, ... m
+    'gazeContingent', false, ...
+    'holdDuration', 30, ... % frames
+    'task', 'fixflash', ... %'faceforage', ... % oddball, faceinvaders, fixflash
+    'randomizeDirections', true); % step through directions clockwise or counter
+
+%% Hand Mapping of MT RF ... large field, single direction you change by H and R key
+runDotHandMapping(subject, pauseBeforeExperiment, ...
+    'targetSpeed', 2, ...       % degrees/sec
+    'dotSpeeds', [15], ... % degrees/sec
     'apertureSize', 20, ...       % degrees
     'dotContrast', .2, ...      % ~Michelson contrast
-    'onDuration', 10, ...  % in frames
+    'onDuration', 120, ...  % in frames
+    'offDuration', 80, ... % in frames
+    'numDirections',1, ... % use H and R keystrokes to change direction
+    'gazeContingent', false, ...
+    'holdDuration', 30, ... % frames
+    'task', 'faceforage', ... % oddball, faceinvaders, fixflash
+    'randomizeDirections', false); % step through directions clockwise or counter
+
+%% Hand Mapping for MST with giant RF ... large field
+runDotHandMapping(subject, pauseBeforeExperiment, ...
+    'targetSpeed', 2, ...       % degrees/sec
+    'dotSpeeds', [15], ... % degrees/sec
+    'apertureSize', 20, ...       % degrees
+    'dotContrast', .2, ...      % ~Michelson contrast
+    'onDuration', 12, ... %60, ...  % in frames
+    'offDuration', 1, ... %60, ... % in frames
+    'numDirections', 12, ... %12, ... 
+    'gazeContingent', false, ...
+    'holdDuration', 15, ... % frames
+    'task', 'faceforage', ... % oddball, faceinvaders, fixflash
+    'randomizeDirections', false); % step through directions clockwise or counter
+
+%% Hand Mapping of MT RF ... positioning of single aperture manually - SMALL
+runDotHandMapping(subject, pauseBeforeExperiment, ...
+    'targetSpeed', 2, ...       % degrees/sec
+    'dotSpeeds', [15], ... % degrees/sec
+    'apertureSize', 5, ...       % degrees
+    'dotContrast', .2, ...      % ~Michelson contrast 
+    'onDuration', 30, ...  % in frames
     'offDuration', 30, ... % in frames
+    'numDirections', 1, ... 
+    'gazeContingent', false, ...
+    'holdDuration', 15, ... % frames
+    'task', 'fixflash', ... % oddball, faceinvaders, fixflash
+    'randomizeDirections', false);
+
+%% Hand Mapping of MT RF ... positioning of single aperture manually - SMALL
+runDotHandMapping(subject, pauseBeforeExperiment, ...
+    'targetSpeed', 2, ...       % degrees/sec
+    'dotSpeeds', [15], ... % degrees/sec
+    'apertureSize', 5, ...       % degrees
+    'dotContrast', 1.0, ...      % ~Michelson contrast 
+    'onDuration', 120, ...  % in frames
+    'offDuration', 60, ... % in frames
+    'numDirections', 1, ... 
+    'gazeContingent', false, ...
+    'holdDuration', 15, ... % frames
+    'task', 'fixflash', ... % oddball, faceinvaders, fixflash
+    'randomizeDirections', false);
+
+%% Fixed Mapping of MT ... move to RF, pause, then start record and resume
+runDotHandMapping(subject, pauseBeforeExperiment, ...
+    'targetSpeed', 2, ...       % degrees/sec
+    'dotSpeeds', [15], ... % degrees/sec
+    'apertureSize', 3, ...       % degrees
+    'dotContrast', .2, ...      % ~Michelson contrast 
+    'onDuration', 24, ...  % in frames
+    'offDuration', 36, ... % in frames
     'numDirections', 12, ... 
     'gazeContingent', false, ...
     'holdDuration', 15, ... % frames

@@ -10,8 +10,8 @@ switch state
         
     case p.trial.pldaps.trialStates.framePrepareDrawing
         
-        
     case p.trial.pldaps.trialStates.frameUpdate
+        
         
         p.trial.(sn).hDots.afterFrame();
         
@@ -55,6 +55,8 @@ switch state
             end
             
             if p.trial.onCtr==1
+              if (p.trial.(sn).numDirections > 1)
+                    
                 if p.trial.(sn).randomizeDirection
                     p.trial.(sn).hDots.direction = (randi(p.trial.(sn).numDirections)-1)*(360)/p.trial.(sn).numDirections;
                 else
@@ -66,15 +68,14 @@ switch state
                 p.trial.(sn).hDots.dx(1:end) = dx;
                 p.trial.(sn).hDots.dy(1:end) = dy;
 %                 disp(p.trial.(sn).hDots.direction)
+              end
             end
-            
         end
         
         p.trial.(sn).x(p.trial.iFrame) = p.trial.(sn).hDots.position(1);
         p.trial.(sn).y(p.trial.iFrame) = p.trial.(sn).hDots.position(2);
         p.trial.(sn).direction(p.trial.iFrame) =  p.trial.(sn).hDots.direction;
         p.trial.(sn).on(p.trial.iFrame) = on;
-        
         p.trial.(sn).speed(p.trial.iFrame) = p.trial.(sn).hDots.speed;
         p.trial.(sn).size(p.trial.iFrame)  = p.trial.(sn).hDots.maxRadius;
         
@@ -104,11 +105,23 @@ switch state
             end
             
             if  p.trial.keyboard.firstPressQ(p.trial.keyboard.codes.rKey)
-                p.trial.(sn).randomizeDirection = ~p.trial.(sn).randomizeDirection;
+                % p.trial.(sn).randomizeDirection = ~p.trial.(sn).randomizeDirection;
+                p.trial.(sn).hDots.direction = p.trial.(sn).hDots.direction + ...
+                                               (360/12);
+                dx = p.trial.(sn).hDots.speed * cosd(p.trial.(sn).hDots.direction);
+                dy = p.trial.(sn).hDots.speed * sind(p.trial.(sn).hDots.direction);
+                p.trial.(sn).hDots.dx(1:end) = dx;
+                p.trial.(sn).hDots.dy(1:end) = dy;
             end
             
             if  p.trial.keyboard.firstPressQ(p.trial.keyboard.codes.hKey)
-                p.trial.(sn).handMap = ~p.trial.(sn).handMap;
+                % p.trial.(sn).handMap = ~p.trial.(sn).handMap;
+                p.trial.(sn).hDots.direction = p.trial.(sn).hDots.direction - ...
+                                               (360/12);
+                dx = p.trial.(sn).hDots.speed * cosd(p.trial.(sn).hDots.direction);
+                dy = p.trial.(sn).hDots.speed * sind(p.trial.(sn).hDots.direction);
+                p.trial.(sn).hDots.dx(1:end) = dx;
+                p.trial.(sn).hDots.dy(1:end) = dy;
             end
             
             if  p.trial.keyboard.firstPressQ(p.trial.keyboard.codes.gKey)
@@ -118,24 +131,20 @@ switch state
             if  p.trial.keyboard.firstPressQ(p.trial.keyboard.codes.zerKey)
                 
             
-                p.trial.(sn).hDots.dx = p.trial.(sn).hDots.dx*1.5;
-                p.trial.(sn).hDots.dy = p.trial.(sn).hDots.dy*1.5;
+                p.trial.(sn).hDots.dx = p.trial.(sn).hDots.dx*(3/2);
+                p.trial.(sn).hDots.dy = p.trial.(sn).hDots.dy*(3/2);
                 [~, rho] = cart2pol(p.trial.(sn).hDots.dx, p.trial.(sn).hDots.dy);
                 p.trial.(sn).hDots.speed = mean(rho);
             
             end
             
             if  p.trial.keyboard.firstPressQ(p.trial.keyboard.codes.ninKey)
-                p.trial.(sn).hDots.dx = p.trial.(sn).hDots.dx*.75;
-                p.trial.(sn).hDots.dy = p.trial.(sn).hDots.dy*.75;
+                p.trial.(sn).hDots.dx = p.trial.(sn).hDots.dx*(2/3);
+                p.trial.(sn).hDots.dy = p.trial.(sn).hDots.dy*(2/3);
                 [~, rho] = cart2pol(p.trial.(sn).hDots.dx, p.trial.(sn).hDots.dy);
                 p.trial.(sn).hDots.speed = mean(rho);
             end
         end
-        
-    case p.trial.pldaps.trialStates.frameDraw
-        
-        
         
         if p.trial.(sn).gazeContingent
             p.trial.(sn).hDots.position = [p.trial.eyeX+p.trial.(sn).dotx p.trial.eyeY+p.trial.(sn).doty];
@@ -148,9 +157,16 @@ switch state
         end
         
         
+    case p.trial.pldaps.trialStates.frameDraw
+        
+        
+        
+        
+        
+        
     case p.trial.pldaps.trialStates.trialSetup
         
-        p.trial.display.sourceFactorNew = GL_ONE;
+%         p.trial.display.sourceFactorNew = GL_ONE;
         p.trial.display.destinationFactorNew = GL_ONE;
         Screen('BlendFunction', p.trial.display.ptr, p.trial.display.sourceFactorNew, p.trial.display.destinationFactorNew);
         
@@ -159,9 +175,18 @@ switch state
         setupRNG=p.trial.(sn).rngs.conditionerRNG;
         
         p.trial.(sn).hDots = stimuli.dots(p.trial.display.ptr);
+        p.trial.(sn).speed = randsample(p.trial.(sn).dotSpeeds, 1);
         p.trial.(sn).hDots.speed = p.trial.(sn).speed * p.trial.display.ppd / p.trial.display.frate;
-        p.trial.(sn).hDots.size  = .1 * p.trial.display.ppd;
-        p.trial.(sn).hDots.direction = 0;
+        p.trial.(sn).hDots.size  = .3 * p.trial.display.ppd;
+        
+        if (p.trial.(sn).numDirections > 1)
+            p.trial.(sn).hDots.direction = 0;
+        else
+            p.trial.(sn).hDots.direction = p.trial.(sn).direction;
+            p.trial.(sn).direction
+            disp('check new trial')
+        end
+        
         p.trial.(sn).hDots.maxRadius = p.trial.(sn).apertureSize*p.trial.display.ppd;
         p.trial.(sn).hDots.lifetime = inf;
         p.trial.(sn).hDots.mode = 0;
@@ -170,14 +195,14 @@ switch state
         p.trial.(sn).hDots.coherence = 1;
         p.trial.(sn).hDots.position = [0 0];
         p.trial.(sn).hDots.colour = repmat(p.trial.(sn).dotContrast, 1, 3);
-        p.trial.(sn).hDots.numDots = ceil(1*pi*p.trial.(sn).apertureSize^2);
+        p.trial.(sn).hDots.numDots = ceil(.3*pi*p.trial.(sn).apertureSize^2);
         
         p.trial.(sn).hDots.beforeTrial();
         
         nFrames = p.trial.pldaps.maxTrialLength * p.trial.display.frate;
         p.trial.(sn).x  = nan(nFrames,1);
         p.trial.(sn).y  = nan(nFrames,1);
-        p.trial.(sn).on = nan(nFrames,1);
+        p.trial.(sn).on = false(nFrames,1);
         p.trial.(sn).direction = nan(nFrames,1);
         p.trial.(sn).speed = nan(nFrames,1);
         p.trial.(sn).size  = nan(nFrames,1);
@@ -208,8 +233,12 @@ switch state
             p.trial.(sn).numDirections=12;
         end
         
-        if ~isfield(p.trial.(sn), 'speed')
-            p.trial.(sn).speed=20;
+        if ~isfield(p.trial.(sn), 'dotSpeeds')
+            p.trial.(sn).dotSpeeds=20;
+        end
+        
+        if ~isfield(p.trial.(sn), 'direction')
+            p.trial.(sn).direction=0;
         end
         
         if ~isfield(p.trial.(sn), 'randomizeDirection')
@@ -238,9 +267,7 @@ switch state
         
         if ~isfield(p.trial.(sn), 'handMap')
             p.trial.(sn).handMap = false;
-        end
-        
-        
+        end      
         
         p.trial.(sn).rngs.randomNumberGenerater='mt19937ar';
         p.trial.(sn).rngs.trialSeeds = randi(2^32, [3e3 1]);
@@ -266,6 +293,7 @@ switch state
              p.conditions{i}.(sn).gazeContingent =  p.trial.(sn).gazeContingent;
              p.conditions{i}.(sn).handMap        =  p.trial.(sn).handMap;
              p.conditions{i}.(sn).speed          =  p.trial.(sn).hDots.speed*p.trial.display.frate/p.trial.display.ppd;
+             p.conditions{i}.(sn).direction      =  p.trial.(sn).hDots.direction;
          end
         
 end

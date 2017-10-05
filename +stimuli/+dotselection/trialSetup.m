@@ -129,8 +129,13 @@ for kDot = 1:numDotApertures
 end
 
 % --- setup reward for the trial
+
+%********* This is where we could build in a contingency on past choices
+
 p.trial.(sn).Dots1Rewarded = rand(setupRNG) < p.trial.(sn).rewardDot1Rate;
 p.trial.(sn).Dots2Rewarded = rand(setupRNG) < p.trial.(sn).rewardDot2Rate;
+
+%****************************
 
 % --- Face for aditional reward
 p.trial.(sn).hFace.texSize  = 2 * ppd;
@@ -140,6 +145,8 @@ p.trial.(sn).hFace.id       = p.trial.(sn).faceIndex;
 % --- Reward
 p.trial.(sn).hReward.defaultAmount = p.trial.behavior.reward.defaultAmount;
 p.trial.(sn).hReward.iTrial        = p.trial.pldaps.iTrial;
+
+p.trial.(sn).rewardcount
 
 % --- Setup Trial Object (This runs all the state transitions)
 % the @trial object (initially in state 0)
@@ -162,4 +169,7 @@ p.trial.(sn).hTrial = stimuli.dotselection.dotMotionTrial( ...
   'DotsRewarded',   [p.trial.(sn).Dots1Rewarded p.trial.(sn).Dots2Rewarded], ...
   'iti',0, ...
   'maxRewardCnt',   p.trial.(sn).maxRewardCnt, ...
-  'viewpoint',      false);
+  'viewpoint',      false, ...
+  'rewardcount',    p.trial.(sn).rewardcount, ...       % added JM
+  'rewardtravel',   p.trial.(sn).rewardtravel, ...      % added JM
+  'rewardtransit',  p.trial.(sn).rewardtransit);

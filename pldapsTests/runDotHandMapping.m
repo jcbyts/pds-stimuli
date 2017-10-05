@@ -6,7 +6,7 @@ ip.addParameter('onDuration', 60)
 ip.addParameter('offDuration', 60)
 ip.addParameter('holdDuration', 30)
 ip.addParameter('targetSpeed', 10)
-ip.addParameter('dotSpeeds', [15 20])
+ip.addParameter('dotSpeeds', [20])
 ip.addParameter('randomizeDirections', false)
 ip.addParameter('gazeContingent', false)
 ip.addParameter('task', 'fixflash')
@@ -25,9 +25,6 @@ if nargin < 2
     end
 end
 
-
-
-
 settingsStruct = struct();
 settingsStruct.display.destinationFactorNew = GL_ONE;
 
@@ -38,7 +35,7 @@ settingsStruct.eyemarker.use=false;
 settingsStruct.pldaps.useModularStateFunctions = true;
 settingsStruct.pldaps.trialMasterFunction='runModularTrial';
 settingsStruct.pldaps.save.mergedData=0;
-settingsStruct.behavior.reward.defaultAmount= 0.01; %.015;
+settingsStruct.behavior.reward.defaultAmount= 0.025; %.015;
 
 settingsStruct.session.subject=subject;
 
@@ -47,6 +44,7 @@ settingsStruct.stimulus.fixPointRadius = .3;
 settingsStruct.stimulus.holdDuration = 15; % frames (counter, not continuous)
 
 settingsStruct.pldaps.draw.cursor.use = true;
+
 
 switch ip.Results.task
         case 'fixflash'
@@ -163,7 +161,7 @@ else
 end
 settingsStruct.(sn).use=true;
 settingsStruct.(sn).stateFunction.acceptsLocationInput=true;
-settingsStruct.(sn).stateFunction.order=-5;
+settingsStruct.(sn).stateFunction.order=5;
 settingsStruct.(sn).stateFunction.requestedStates.experimentPostOpenScreen=true;
 % settingsStruct.eyemarker.stateFunction.requestedStates.experimentCleanUp=true;
 settingsStruct.(sn).stateFunction.requestedStates.trialSetup=true;
@@ -180,7 +178,6 @@ settingsStruct.(sn).dotContrast         = ip.Results.dotContrast;
 settingsStruct.(sn).apertureSize        = ip.Results.apertureSize;
 settingsStruct.(sn).dotx                = ip.Results.dotx;
 settingsStruct.(sn).doty                = ip.Results.doty;
-
 
 
 if pauseBeforeStart

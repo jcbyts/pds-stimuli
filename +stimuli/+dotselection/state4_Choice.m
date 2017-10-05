@@ -37,7 +37,7 @@ classdef state4_Choice < stimuli.state
       end
       
 
-      
+      %compute distance from center of the dotfield, store in r
       if hTrial.showDots
           for k = 1:2
               hTrial.hDots(k).afterFrame();
@@ -45,7 +45,7 @@ classdef state4_Choice < stimuli.state
           end
       end
       
-      r
+      % r
       
       for k = 1:2
           if r(k) < hTrial.hDots(k).maxRadius

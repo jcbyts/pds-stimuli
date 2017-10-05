@@ -60,6 +60,10 @@ classdef dotMotionTrial < stimuli.trial
     
     rewardCnt@double = 0;
     reward@double = []; % look-up table for reward schedule
+    
+    rewardcount@double = [];
+    rewardtransit@double;
+    rewardtravel@double;
   end
   
   methods (Access = public)
@@ -110,6 +114,11 @@ classdef dotMotionTrial < stimuli.trial
       p.addParameter('DotsRewarded',[false false]);
       p.addParameter('viewpoint',false,@islogical);
       
+      
+      p.addParameter('rewardcount',[0 0]);
+      p.addParameter('rewardtravel',[4]);
+      p.addParameter('rewardtransit',[1]);
+      
       p.parse(args{:});
       try
         p.parse(args{:});
@@ -148,6 +157,16 @@ classdef dotMotionTrial < stimuli.trial
       
       % how much reward to give throughout the trial
       o.reward              = o.maxRewardCnt;
+      
+      % history of dot rewards
+      o.rewardcount        = args.rewardcount;
+      
+      % how many rewards before switch to other
+      o.rewardtravel       = args.rewardtravel;
+      
+      % transition to rewarding other target
+      o.rewardtransit        = args.rewardtransit;
+      
 
     end
     

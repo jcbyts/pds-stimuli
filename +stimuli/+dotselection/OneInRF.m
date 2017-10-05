@@ -36,9 +36,9 @@ p.trial.(sn).dotContrast       = -0.5; % -.5 to .5
 p.trial.(sn).dotMode           = 1;     % motion sampled from a distribution
 p.trial.(sn).dotDist           = 1;     % make it a gaussian distribution
 p.trial.(sn).dotBandwidth       = 0.0;
-p.trial.(sn).dotDensity 	   = 100;   % dots / deg^2 / sec
-p.trial.(sn).dotApertureRadius = norm(p.trial.(sn).RfCenterXy)/2;     % degrees
-p.trial.(sn).dotLifetime       = 5;     % frames
+p.trial.(sn).dotDensity 	   = 400;   % dots / deg^2 / sec
+p.trial.(sn).dotApertureRadius = norm(p.trial.(sn).RfCenterXy)/3;     % degrees
+p.trial.(sn).dotLifetime       = 12;     % frames
 
 p.trial.(sn).maxBandwidth 	   = 0.0;
 p.trial.(sn).minBandwidth      = 0.0;
@@ -62,8 +62,8 @@ p.trial.(sn).fixFlashCnt 	  = round(0.250*p.trial.display.frate);
 p.trial.(sn).fixPointXy       = [0, 0]; % degrees (relative to center of screen)
 
 % --- Reward
-p.trial.(sn).rewardDot1Rate     = .75;
-p.trial.(sn).rewardDot2Rate     = .75;
+p.trial.(sn).rewardDot1Rate     = 0.85;
+p.trial.(sn).rewardDot2Rate     = 0.85;
 
 p.trial.(sn).rewardWindow       = 0.0; % buffer around dot aperture
 p.trial.(sn).maxRewardCnt       = 2;
@@ -83,6 +83,11 @@ p.trial.(sn).choiceHoldDuration = 0.025; % seconds (minimum choice hold duration
 p.trial.(sn).choiceTimeout 		= 2.0;   % seconds
 p.trial.(sn).trialTimeout 		= 1.0;   % seconds
 
+%*********** added by Jude
+p.trial.(sn).rewardcount = zeros(1,2);   %two targets, only two states
+p.trial.(sn).rewardtravel = 4;   % must choose this many times before move
+p.trial.(sn).rewardtransit = 1.0;  %prob to transition reward state
+%*********************************
 
 % -------------------------------------------------------------------------
 % --- setup stimuli and prepare to run

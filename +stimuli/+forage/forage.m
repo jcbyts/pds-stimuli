@@ -29,7 +29,7 @@ if nargin==1
     %----------------------------------------------------------------------
     % Default Conditions
     if ~isfield(p.trial.pldaps, 'maxTrialLength')
-        p.trial.pldaps.maxTrialLength = 20;
+        p.trial.pldaps.maxTrialLength = 5; %20;
     end
     
     p.trial.pldaps.maxFrames        = p.trial.pldaps.maxTrialLength*p.trial.display.frate;

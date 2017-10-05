@@ -41,7 +41,14 @@ switch state
 %         pos = p.trial.display.ctr(1:2);
         p.trial.(sn).hTrial.x = (p.trial.eyeX - pos(1)) / p.trial.display.ppd;
         p.trial.(sn).hTrial.y = -(p.trial.eyeY - pos(2)) / p.trial.display.ppd;
+        
+        
 
+        pos = [p.trial.stimulus.hFix(:).position];
+        %             pos = p.trial.display.ctr;
+        fixRect = pos + kron(p.trial.(sn).fixWinRadius * p.trial.display.ppd,[-1, -1, +1, +1]);
+        Screen('FillOval', p.trial.display.overlayptr, [0 0 0], fixRect);
+        
         % --- @dotMotionTrial/afterFrame handles all task state transitions
         p.trial.(sn).hTrial.afterFrame(p.trial.ttime);
         if p.trial.(sn).hTrial.holdDuration > 10
@@ -71,6 +78,8 @@ switch state
             fixRect = pos + kron(p.trial.(sn).fixWinRadius * p.trial.display.ppd,[-1, -1, +1, +1]);
             Screen('FrameOval', p.trial.display.overlayptr, fixClr, fixRect);
         end
+        
+        
     
 	% --- Called before the main trial loop. Sets up all parameters
     case p.trial.pldaps.trialStates.trialSetup

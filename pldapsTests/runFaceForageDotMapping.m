@@ -6,7 +6,7 @@ ip.addParameter('onDuration', 60)
 ip.addParameter('offDuration', 60)
 ip.addParameter('holdDuration', 30)
 ip.addParameter('targetSpeed', 10)
-ip.addParameter('dotSpeeds', [15 20])
+ip.addParameter('dotSpeeds', [15])
 ip.addParameter('randomizeDirections', false)
 ip.addParameter('gazeContingent', false)
 ip.addParameter('task', 'fixflash')
@@ -26,9 +26,8 @@ if nargin < 2
 end
 
 
-
-
 settingsStruct = struct();
+settingsStruct.display.sourceFactorNew = GL_ONE;
 settingsStruct.display.destinationFactorNew = GL_ONE;
 
 settingsStruct.display.colorclamp = 1;
@@ -38,12 +37,14 @@ settingsStruct.eyemarker.use=false;
 settingsStruct.pldaps.useModularStateFunctions = true;
 settingsStruct.pldaps.trialMasterFunction='runModularTrial';
 settingsStruct.pldaps.save.mergedData=0;
-settingsStruct.behavior.reward.defaultAmount= 0.01; %.015;
+settingsStruct.behavior.reward.defaultAmount= 0.03; %.015;
 
 settingsStruct.session.subject=subject;
 
 settingsStruct.stimulus.fixWinRadius = 1.5;
 settingsStruct.stimulus.fixPointRadius = .3;
+settingsStruct.stimulus.fixPointSafety = 2.5;  % radius of gray occlusion
+
 settingsStruct.stimulus.holdDuration = 15; % frames (counter, not continuous)
 
 settingsStruct.pldaps.draw.cursor.use = true;
@@ -58,6 +59,7 @@ switch ip.Results.task
         
 %         settingsStruct.stimulus.fixWinRadius   = 1.5;
         settingsStruct.stimulus.fixPointRadius = .3;
+        settingsStruct.stimulus.fixPointSafety = 2.5; 
         
     case 'faceforage'
         behavior = @stimuli.forage.faceForageRandomWalk;
@@ -219,11 +221,11 @@ c{iCond}.natImgBackground.on         = false;
 c{iCond}.DotMapping.use              = true;
 % % 
 % --- Condition 2: Behavior on Natural background
-iCond = 2;
-c{iCond}.stimulus = s.stimulus;
-c{iCond}.natImgBackground.use   = true;
-c{iCond}.natImgBackground.on    = true;
-c{iCond}.DotMapping.use         = false;
+% iCond = 2;
+% c{iCond}.stimulus = s.stimulus;
+% c{iCond}.natImgBackground.use   = true;
+% c{iCond}.natImgBackground.on    = true;
+% c{iCond}.DotMapping.use         = false;
 
 % --- setup number of conditions        
 condN = ones(1,iCond);
