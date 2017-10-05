@@ -289,7 +289,7 @@ classdef butterfly < handle
         end
         
         function update(m)
-            disp(m.ctrHold)
+%             disp(m.ctrHold)
            % --- update objects
             m.objects.position = [m.ppd*m.x(:) + m.ctr(1) -m.ppd*m.y(:) + m.ctr(2)];
 %             m.objects.texSize  = cell2mat(cellfun(@(x) x.size, m.objects.texture(m.texid), 'UniformOutput', false)');
