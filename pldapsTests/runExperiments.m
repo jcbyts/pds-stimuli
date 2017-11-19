@@ -113,6 +113,40 @@ runSpatialMapping(subject, pauseBeforeExperiment, ...
     'targetSpeed', 2, ...       % degrees/sec
     'onDuration', 30, ...  % in frames
     'offDuration',48); 
+
+%% Decoding stimulus: limited range
+runDotHandMapping(subject, pauseBeforeExperiment, ...
+    'priorMu', 180, ...
+    'priorKappa', 10, ...% Kappa parameter of von Mises is uniform if == 0, gets narrower as you increase
+    'targetSpeed', 2, ...       % degrees/sec
+    'dotSpeeds', [10, 10, 10, 10], ... % degrees/sec
+    'apertureSize', 20, ...       % degrees
+    'dotContrast', .2, ...      % ~Michelson contrast
+    'onDuration', 36, ...  % in frames
+    'offDuration',60, ... % in frames
+    'numDirections',50, ... m
+    'gazeContingent', false, ...
+    'holdDuration', 30, ... % frames
+    'task', 'faceforage', ... %'faceforage', ... % oddball, faceinvaders, fixflash
+    'randomizeDirections', true); % step through directions clockwise or counter
+%% Decoding stimulus: full range
+runDotHandMapping(subject, pauseBeforeExperiment, ...
+    'priorMu', 0, ...
+    'priorKappa', 0, ...% Kappa parameter of von Mises is uniform if == 0, gets narrower as you increase
+    'targetSpeed', 2, ...       % degrees/sec
+    'dotSpeeds', [10, 10, 10, 10], ... % degrees/sec
+    'apertureSize', 20, ...       % degrees
+    'dotContrast', .2, ...      % ~Michelson contrast
+    'onDuration', 36, ...  % in frames
+    'offDuration',60, ... % in frames
+    'numDirections',50, ... m
+    'gazeContingent', false, ...
+    'holdDuration', 30, ... % frames
+    'task', 'faceforage', ... %'faceforage', ... % oddball, faceinvaders, fixflash
+    'randomizeDirections', true); % step through directions clockwise or counter
+
+
+
 %% Hand Mapping of MT RF ... large field
 runDotHandMapping(subject, pauseBeforeExperiment, ...
     'targetSpeed', 2, ...       % degrees/sec

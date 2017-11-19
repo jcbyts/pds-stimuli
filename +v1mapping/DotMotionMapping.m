@@ -58,7 +58,8 @@ switch state
               if (p.trial.(sn).numDirections > 1)
                     
                 if p.trial.(sn).randomizeDirection
-                    p.trial.(sn).hDots.direction = (randi(p.trial.(sn).numDirections)-1)*(360)/p.trial.(sn).numDirections;
+                    p.trial.(sn).hDots.direction = p.trial.(sn).directionPrior.drawfromprior;
+%                     p.trial.(sn).hDots.direction = (randi(p.trial.(sn).numDirections)-1)*(360)/p.trial.(sn).numDirections;
                 else
                     p.trial.(sn).hDots.direction = p.trial.(sn).hDots.direction + (360)/p.trial.(sn).numDirections;
                 end
@@ -179,8 +180,11 @@ switch state
         p.trial.(sn).hDots.speed = p.trial.(sn).speed * p.trial.display.ppd / p.trial.display.frate;
         p.trial.(sn).hDots.size  = .3 * p.trial.display.ppd;
         
+        p.trial.(sn).directionPrior = directionprior(p.trial.(sn).numDirections, 'unimodal', p.trial.(sn).priorMu, p.trial.(sn).priorKappa);
+        
         if (p.trial.(sn).numDirections > 1)
-            p.trial.(sn).hDots.direction = 0;
+%             p.trial.(sn).hDots.direction = 0;
+            p.trial.(sn).hDots.direction = p.trial.(sn).directionPrior.drawfromprior;
         else
             p.trial.(sn).hDots.direction = p.trial.(sn).direction;
             p.trial.(sn).direction
@@ -268,6 +272,14 @@ switch state
         if ~isfield(p.trial.(sn), 'handMap')
             p.trial.(sn).handMap = false;
         end      
+        
+        if ~isfield(p.trial.(sn), 'priorMu')
+           p.trial.(sn).priorMu = 0; 
+        end
+        
+        if ~isfield(p.trial.(sn), 'priorKappa')
+           p.trial.(sn).priorKappa = 0; 
+        end
         
         p.trial.(sn).rngs.randomNumberGenerater='mt19937ar';
         p.trial.(sn).rngs.trialSeeds = randi(2^32, [3e3 1]);

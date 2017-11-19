@@ -14,6 +14,8 @@ ip.addParameter('dotx', 5)
 ip.addParameter('doty', 5)
 ip.addParameter('apertureSize', 10)
 ip.addParameter('dotContrast', -.2)
+ip.addParameter('priorMu', 0)
+ip.addParameter('priorKappa', 0)
 ip.addParameter('mappingStimulus', 2)
 
 ip.parse(varargin{:});
@@ -178,6 +180,8 @@ settingsStruct.(sn).dotContrast         = ip.Results.dotContrast;
 settingsStruct.(sn).apertureSize        = ip.Results.apertureSize;
 settingsStruct.(sn).dotx                = ip.Results.dotx;
 settingsStruct.(sn).doty                = ip.Results.doty;
+settingsStruct.(sn).priorMu             = ip.Results.priorMu;
+settingsStruct.(sn).priorKappa          = ip.Results.priorKappa;
 
 
 if pauseBeforeStart
