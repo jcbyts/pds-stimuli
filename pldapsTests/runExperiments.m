@@ -1,6 +1,6 @@
 %% Sample experiments
 
-subject = 'Ellie'; % Ellie (Capitalized E)
+subject = 'Ellie'; % Ellie (Capitalized)
 pauseBeforeExperiment = 0;
 
 %% Test subject case
@@ -8,7 +8,6 @@ subject = 'test';
 pauseBeforeExperiment = 0;
 
 %% Free View Natural Images
-
 runNaturalImageFreeView(subject, pauseBeforeExperiment)
 
 %% Fix Flash With Gaussian Pyramid Noise
@@ -106,26 +105,26 @@ p.run
 
 %% Spatial Mapping
 runSpatialMapping(subject, pauseBeforeExperiment, ...
-    'lifetime', 10, ...       % degrees/sec
-    'N', 3, ... % degrees/sec
-    'size', 1, ...       % degrees
+    'lifetime', 3, ...       % degrees/sec
+    'N', 4, ... % degrees/sec
+    'size', 2, ...       % degrees
     'task', 'faceforage', ... %'faceforage', ... % oddball, faceinvaders, fixflash
     'contrast', .5, ...
     'targetSpeed', 2, ...       % degrees/sec
-    'onDuration', 60, ...  % in frames
-    'offDuration',60); 
+    'onDuration', 30, ...  % in frames
+    'offDuration',48); 
 %% Hand Mapping of MT RF ... large field
 runDotHandMapping(subject, pauseBeforeExperiment, ...
     'targetSpeed', 2, ...       % degrees/sec
-    'dotSpeeds', [15,25], ... % degrees/sec
+    'dotSpeeds', [10, 10, 10, 10], ... % degrees/sec
     'apertureSize', 20, ...       % degrees
-    'dotContrast', -.5, ...      % ~Michelson contrast
-    'onDuration', 60, ...  % in frames
+    'dotContrast', .2, ...      % ~Michelson contrast
+    'onDuration', 36, ...  % in frames
     'offDuration',60, ... % in frames
     'numDirections',12, ... m
     'gazeContingent', false, ...
     'holdDuration', 30, ... % frames
-    'task', 'fixflash', ... %'faceforage', ... % oddball, faceinvaders, fixflash
+    'task', 'faceforage', ... %'faceforage', ... % oddball, faceinvaders, fixflash
     'randomizeDirections', true); % step through directions clockwise or counter
 
 %% Hand Mapping of MT RF ... large field, single direction you change by H and R key
