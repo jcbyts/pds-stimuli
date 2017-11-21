@@ -75,6 +75,13 @@ settingsStruct.stimulus.RfCenterXy = [4 -4];
 settingsStruct.stimulus.DotCenterAngle(1) = 0;
 settingsStruct.stimulus.DotCenterAngle(2) = -90;
 
+% The reward function I coded up will switch which target has the higher
+% reward reate randomly with a switch rate of .1, meaning each trial a
+% random number is drawn and if it is less than .1, the reward scheme will
+% switch
+settingsStruct.stimulus.rewardUpdateFun = @stimuli.dotselection.rewardUpdateSwitchRule;
+settingsStruct.stimulus.rewardUpdateArgs = {.1}; % low rate, high rate
+
 settingsStruct.pldaps.draw.cursor.use = true;
 
 if pauseBeforeExperiment
@@ -103,7 +110,19 @@ p = pldaps(@stimuli.dotselection.OneInRF, subject, settingsStruct);
 
 p.run
 
-%% Spatial Mapping
+%% Spatial Mapping (Range, Fixation)
+runSpatialMapping(subject, pauseBeforeExperiment, ...
+    'lifetime', 4, ...       % frames
+    'N', 1, ... % # of squares
+    'size', .5, ...       % degrees
+    'task', 'fixflash', ... %'faceforage', ... % oddball, faceinvaders, fixflash
+    'position', [0 0 5 -5], ... % degrees X,Y,X,Y Upper-Left, Bottom-Right (relative to center of screen)
+    'contrast', .5, ...
+    'targetSpeed', 2, ...       % degrees/sec
+    'onDuration', 30, ...  % in frames
+    'offDuration',48);
+
+%% Spatial Mapping (Full field, Free View)
 runSpatialMapping(subject, pauseBeforeExperiment, ...
     'lifetime', 3, ...       % degrees/sec
     'N', 4, ... % degrees/sec

@@ -115,6 +115,13 @@ switch state
 	% --- Cleanup and save all parameters
     case p.trial.pldaps.trialStates.trialCleanUpandSave
         
+        % this is where we update the reward rates
+        hasData = ~cellfun(@isempty, p.data(:));
+        choices = cellfun(@(x) x.stimulus.hTrial.choice, p.data(hasData));
+        choices = [choices p.trial.stimulus.hTrial.choice];
+        
+        [p.trial.(sn).rewardDot1Rate, p.trial.(sn).rewardDot2Rate] = p.trial.stimulus.rewardUpdateFun(choices, p.trial.(sn).rewardDot1Rate, p.trial.(sn).rewardDot2Rate, p.trial.stimulus.rewardUpdateArgs{:});
+        [p.trial.(sn).rewardDot1Rate, p.trial.(sn).rewardDot2Rate]
     % --- handles that depend on pldaps being totally set up
     case p.trial.pldaps.trialStates.experimentPostOpenScreen
         

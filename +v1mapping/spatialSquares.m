@@ -32,17 +32,25 @@ switch state
         p.trial.(sn).rngs.conditionerRNG=RandStream(p.trial.(sn).rngs.randomNumberGenerater, 'seed', p.trial.(sn).rngs.trialSeeds(p.trial.pldaps.iTrial));
         setupRNG=p.trial.(sn).rngs.conditionerRNG;
         
+        pxwin = pds.deg2px(reshape(p.trial.(sn).position, 2, 2), p.trial.display.viewdist, p.trial.display.w2px);
+        pxwin = pxwin(:)'.*[1 -1 1 -1] + p.trial.display.ctr;
+        pWidth  = pxwin(3)-pxwin(1);
+        pHeight = pxwin(4)-pxwin(2);
+        pUlX   = pxwin(1);
+        pUlY   = pxwin(2);
+        
+        
         p.trial.(sn).pos = nan(4, p.trial.(sn).N, p.trial.pldaps.maxFrames);
         lifetime = randi(setupRNG, p.trial.(sn).lifetime, p.trial.(sn).N, 1);
-        xpos = round(rand(setupRNG, p.trial.(sn).N, 1)*p.trial.display.pWidth);
-        ypos = round(rand(setupRNG, p.trial.(sn).N, 1)*p.trial.display.pHeight);
+        xpos = round(rand(setupRNG, p.trial.(sn).N, 1)*pWidth) + pUlX;
+        ypos = round(rand(setupRNG, p.trial.(sn).N, 1)*pHeight) + pUlY;
         szpix = p.trial.(sn).size * p.trial.display.ppd;
         rect = [xpos(:) ypos(:) xpos(:)+szpix ypos(:)+szpix];
         p.trial.(sn).pos(:,:,1) = rect';
         for iFrame = 2:p.trial.pldaps.maxFrames
             idx = lifetime == 1;
-            xpos = round(rand(setupRNG, sum(idx), 1)*p.trial.display.pWidth);
-            ypos = round(rand(setupRNG, sum(idx), 1)*p.trial.display.pHeight);
+            xpos = round(rand(setupRNG, sum(idx), 1)*pWidth) + pUlX;
+            ypos = round(rand(setupRNG, sum(idx), 1)*pHeight) + pUlY;
             rect(idx,:) = [xpos(:) ypos(:) xpos(:)+szpix ypos(:)+szpix];
             p.trial.(sn).pos(:,:,iFrame) = rect';
                 
@@ -76,6 +84,12 @@ switch state
         
         if ~isfield(p.trial.(sn), 'lifetime')
             p.trial.(sn).lifetime=3;
+        end
+        
+        if ~isfield(p.trial.(sn), 'position')
+            win = pds.px2deg([-p.trial.display.pWidth -p.trial.display.pHeight; p.trial.display.pWidth p.trial.display.pHeight]'/2, p.trial.display.viewdist, p.trial.display.px2w);
+            win = win(:)'.*[1 -1 1 -1];
+            p.trial.(sn).position = win;
         end
         
         p.trial.(sn).rngs.randomNumberGenerater='twister';

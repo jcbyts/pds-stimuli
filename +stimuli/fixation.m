@@ -76,15 +76,15 @@ classdef fixation < handle
   methods (Access = public)        
     function drawFixation(o)
         
-      r = floor(o.cSize*5);
-      
-      rect = kron([1,1],o.position) + kron(r(:),[-1, -1, +1, +1]);
-      col = -1*[1 1 1]; %
-      Screen('FillOval',o.winPtr,col,rect');
-      
-      rect = kron([1,1],o.position) + kron(r(:),[-1, -1, +1, +1]);
-      col = +1*[1 1 1]; %floor( (o.sColour + o.cColour)/2 ); %-1*[1 1 1]; %
-      Screen('FillOval',o.winPtr,col,rect');
+%       r = floor(o.cSize*5);
+%       
+%       rect = kron([1,1],o.position) + kron(r(:),[-1, -1, +1, +1]);
+%       col = -1*[1 1 1]; %
+%       Screen('FillOval',o.winPtr,col,rect');
+%       
+%       rect = kron([1,1],o.position) + kron(r(:),[-1, -1, +1, +1]);
+%       col = +1*[1 1 1]; %floor( (o.sColour + o.cColour)/2 ); %-1*[1 1 1]; %
+%       Screen('FillOval',o.winPtr,col,rect');
       
      
            

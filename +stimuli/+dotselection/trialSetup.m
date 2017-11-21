@@ -173,3 +173,5 @@ p.trial.(sn).hTrial = stimuli.dotselection.dotMotionTrial( ...
   'rewardcount',    p.trial.(sn).rewardcount, ...       % added JM
   'rewardtravel',   p.trial.(sn).rewardtravel, ...      % added JM
   'rewardtransit',  p.trial.(sn).rewardtransit);
+
+p.trial.(sn).hTrial.rewardForFixation = p.trial.(sn).rewardForFixation;

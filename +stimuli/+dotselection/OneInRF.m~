@@ -51,16 +51,6 @@ if ~isfield(p.trial.(sn), 'DotCenterAngle')
     p.trial.(sn).DotCenterAngle(2) = 180;
 end
 
-if ~isfield(p.trial.(sn), 'rewardUpdateFun')
-	p.trial.(sn).rewardUpdateFun = @stimuli.dotselection.rewardUpdateSwitchRule;
-end
-if ~isfield(p.trial.(sn), 'rewardUpdateArgs')
-    p.trial.(sn).rewardUpdateArgs = {.1}; % switch rate
-end
-
-if ~isfield(p.trial.(sn), 'rewardForFixation')
-    p.trial.(sn).rewardForFixation = false;
-end
 
 
 p.trial.(sn).yokeDirections    = false;
@@ -74,7 +64,7 @@ p.trial.(sn).fixFlashCnt 	  = round(0.250*p.trial.display.frate);
 p.trial.(sn).fixPointXy       = [0, 0]; % degrees (relative to center of screen)
 
 % --- Reward
-p.trial.(sn).rewardDot1Rate     = 0.1;
+p.trial.(sn).rewardDot1Rate     = 0.85;
 p.trial.(sn).rewardDot2Rate     = 0.85;
 
 p.trial.(sn).rewardWindow       = 0.0; % buffer around dot aperture

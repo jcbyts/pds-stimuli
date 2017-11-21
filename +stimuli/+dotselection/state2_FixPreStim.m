@@ -34,7 +34,9 @@ classdef state2_FixPreStim < stimuli.state
       end
       
       if t > (s.tStart + hTrial.fixHoldPreStim)
-        hTrial.hReward.give();
+          if hTrial.rewardForFixation
+            hTrial.hReward.give();
+          end
         hTrial.showDots = true;
         % move to state 3 - show stimulus
         hTrial.setState(3);

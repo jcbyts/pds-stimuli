@@ -6,7 +6,7 @@ classdef state5_HoldChoice < stimuli.state
   properties
     tStart = NaN;
     
-    choice      = 0;
+    %choice      = 0;
     choiceX     = 0;
     choiceY     = 0;
     frameCnt    = 0;
@@ -57,8 +57,8 @@ classdef state5_HoldChoice < stimuli.state
         
         hTrial.rewardCnt = hTrial.maxRewardCnt * hTrial.DotsRewarded(hTrial.choice);
 %         % record the choice eye position
-%         hTrial.choiceX = mean(s.choiceX);
-%         hTrial.choiceY = mean(s.choiceY);
+        hTrial.choiceX = mean(s.choiceX);
+        hTrial.choiceY = mean(s.choiceY);
         hTrial.setState(8);
         
         % settingsStruct.rewardcount = zeros(1,2);   %two targets, only two states

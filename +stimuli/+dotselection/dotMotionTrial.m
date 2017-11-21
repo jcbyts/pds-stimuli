@@ -32,6 +32,8 @@ classdef dotMotionTrial < stimuli.trial
     hFace@handle
     hReward@handle
     
+    rewardForFixation@logical = false;
+    
     % trial objects
     viewpoint@logical = false;
     

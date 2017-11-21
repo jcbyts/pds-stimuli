@@ -10,6 +10,7 @@ ip.addParameter('mappingStimulus', 2)
 ip.addParameter('onDuration', 60)
 ip.addParameter('offDuration', 60)
 ip.addParameter('holdDuration', 30)
+ip.addParameter('position', []) % empty is full-field
 ip.addParameter('targetSpeed', 10)
 
 ip.parse(varargin{:});
@@ -169,6 +170,10 @@ settingsStruct.(sn).lifetime            = ip.Results.lifetime;
 settingsStruct.(sn).N                   = ip.Results.N;
 settingsStruct.(sn).contrast            = ip.Results.contrast;
 settingsStruct.(sn).size                = ip.Results.size;
+if ~isempty(ip.Results.position)
+    assert(numel(ip.Results.position)==4, 'Position must be a 1 x 4 of xy Upper left, xy Bottom right, in degrees relative to center of screen')
+    settingsStruct.(sn).position = ip.Results.position;
+end
 
 
 if pauseBeforeStart
