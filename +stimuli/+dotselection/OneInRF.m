@@ -74,8 +74,12 @@ p.trial.(sn).fixFlashCnt 	  = round(0.250*p.trial.display.frate);
 p.trial.(sn).fixPointXy       = [0, 0]; % degrees (relative to center of screen)
 
 % --- Reward
+if ~isfield(p.trial.(sn), 'rewardDot1Rate')
 p.trial.(sn).rewardDot1Rate     = 0.1;
+end
+if ~isfield(p.trial.(sn), 'rewardDot2Rate')
 p.trial.(sn).rewardDot2Rate     = 0.85;
+end
 
 p.trial.(sn).rewardWindow       = 0.0; % buffer around dot aperture
 p.trial.(sn).maxRewardCnt       = 2;
@@ -85,10 +89,10 @@ p.trial.(sn).faceIndex          = 1;
 
 % --- Timing
 p.trial.(sn).fixGracePeriod     = 0.050;
-p.trial.(sn).minFixPreStim      = 0.200;
-p.trial.(sn).maxFixPreStim      = 0.400;
+p.trial.(sn).minFixPreStim      = 0.100;
+p.trial.(sn).maxFixPreStim      = 0.200;
 p.trial.(sn).minFixPostStim     = 0.100;
-p.trial.(sn).maxFixPostStim     = 0.6;   % seconds (wrt dot motion onset)
+p.trial.(sn).maxFixPostStim     = 0.2;   % seconds (wrt dot motion onset)
 p.trial.(sn).fixHoldTau         = 0.2;   % seconds (time constant of exponential decay)
 p.trial.(sn).choiceGracePeriod  = 1.4;   % grace period (aka flight time; sec)
 p.trial.(sn).choiceHoldDuration = 0.025; % seconds (minimum choice hold duration)
