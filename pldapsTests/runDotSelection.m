@@ -35,11 +35,11 @@ settingsStruct.stimulus.DotCenterAngle(2) = -90;
 % random number is drawn and if it is less than .1, the reward scheme will
 % switch
 settingsStruct.stimulus.rewardUpdateFun = @stimuli.dotselection.rewardUpdateSwitchRule;
-settingsStruct.stimulus.rewardUpdateArgs = {.1}; % low rate, high rate
+settingsStruct.stimulus.rewardUpdateArgs = {.125}; % low rate, high rate
 
 % initialize reward rate
-settingsStruct.stimulus.rewardDot1Rate = .1;
-settingsStruct.stimulus.rewardDot2Rate = .85;
+settingsStruct.stimulus.rewardDot1Rate = .85;   %right stimulus
+settingsStruct.stimulus.rewardDot2Rate = .10;  %left stimulus
 
 settingsStruct.pldaps.draw.cursor.use = true;
 

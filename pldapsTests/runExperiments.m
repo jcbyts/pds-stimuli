@@ -8,7 +8,7 @@ subject = 'test';
 pauseBeforeExperiment = 0;
 
 %% Free View Natural Images
-runNaturalImageFreeView(subject, pauseBeforeExperiment)
+runNaturalImageFreeView(subject, pauseBeforeExperiment);
 
 %% Fix Flash With Gaussian Pyramid Noise
 
@@ -34,7 +34,7 @@ runFaceForageHartley(subject, pauseBeforeExperiment);
 %% Face Forage with CSD flash
 runFaceForageCSD(subject, pauseBeforeExperiment);
 
-%% MT mapping: Dot motion
+%% MT mapping: Dot motion (don't need to run)
 runFaceForageDotMapping(subject, pauseBeforeExperiment, ...
     'targetSpeed', 2, ...       % degrees/sec
     'dotSpeeds', [15], ... % degrees/sec
@@ -79,9 +79,9 @@ runSpatialMapping(subject, pauseBeforeExperiment, ...
     'onDuration', 30, ...  % in frames
     'offDuration',48); 
 
-%% Decoding stimulus: limited range
+%% Decoding stimulus: limited range (this one first)
 runDotHandMapping(subject, pauseBeforeExperiment, ...
-    'priorMu', 180, ...
+    'priorMu', 60, ...
     'priorKappa', 10, ...% Kappa parameter of von Mises is uniform if == 0, gets narrower as you increase
     'targetSpeed', 2, ...       % degrees/sec
     'dotSpeeds', [10, 10, 10, 10], ... % degrees/sec
@@ -94,7 +94,7 @@ runDotHandMapping(subject, pauseBeforeExperiment, ...
     'holdDuration', 30, ... % frames
     'task', 'faceforage', ... %'faceforage', ... % oddball, faceinvaders, fixflash
     'randomizeDirections', true); % step through directions clockwise or counter
-%% Decoding stimulus: full range
+%% Decoding stimulus: full range (this one second)
 runDotHandMapping(subject, pauseBeforeExperiment, ...
     'priorMu', 0, ...
     'priorKappa', 0, ...% Kappa parameter of von Mises is uniform if == 0, gets narrower as you increase

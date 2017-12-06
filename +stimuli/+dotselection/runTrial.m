@@ -104,9 +104,10 @@ switch state
     
 	% --- Called before the main trial loop. Sets up all parameters
     case p.trial.pldaps.trialStates.trialSetup
-        
+         
         stimuli.dotselection.trialSetup(p, sn);
         
+       
 	% --- All Screen() calls go here
     case p.trial.pldaps.trialStates.frameDraw
         
@@ -121,7 +122,15 @@ switch state
         choices = [choices p.trial.stimulus.hTrial.choice];
         
         [p.trial.(sn).rewardDot1Rate, p.trial.(sn).rewardDot2Rate] = p.trial.stimulus.rewardUpdateFun(choices, p.trial.(sn).rewardDot1Rate, p.trial.(sn).rewardDot2Rate, p.trial.stimulus.rewardUpdateArgs{:});
-        [p.trial.(sn).rewardDot1Rate, p.trial.(sn).rewardDot2Rate]
+        
+       
+        %upload to conditions for next trial to live on
+        currTrial = size(p.data,2);
+        for iTrial = (currTrial+1):numel(p.conditions)
+             p.conditions{iTrial}.(sn).rewardDot1Rate = p.trial.(sn).rewardDot1Rate;
+             p.conditions{iTrial}.(sn).rewardDot2Rate = p.trial.(sn).rewardDot2Rate;
+        end
+        
     % --- handles that depend on pldaps being totally set up
     case p.trial.pldaps.trialStates.experimentPostOpenScreen
         

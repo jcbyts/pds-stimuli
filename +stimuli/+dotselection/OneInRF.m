@@ -7,6 +7,10 @@ if nargin < 2
 	sn='stimulus';
 end
 
+%disp('show existing struct for trial');
+%p.trial.sn
+%disp('done showing existing struct');
+
 % -------------------------------------------------------------------------
 % --- PLDAPS setup
 p = defaultBitNames(p);
@@ -75,10 +79,12 @@ p.trial.(sn).fixPointXy       = [0, 0]; % degrees (relative to center of screen)
 
 % --- Reward
 if ~isfield(p.trial.(sn), 'rewardDot1Rate')
-p.trial.(sn).rewardDot1Rate     = 0.1;
+   disp('Initializing rewardDot1Rate');
+   p.trial.(sn).rewardDot1Rate     = 0.1;
 end
 if ~isfield(p.trial.(sn), 'rewardDot2Rate')
-p.trial.(sn).rewardDot2Rate     = 0.85;
+   disp('Initializing rewardDot2Rate');
+   p.trial.(sn).rewardDot2Rate     = 0.85;
 end
 
 p.trial.(sn).rewardWindow       = 0.0; % buffer around dot aperture
