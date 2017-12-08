@@ -49,21 +49,22 @@ else
     settingsStruct.pldaps.pause.preExperiment = false;
 end
 
-try
-    cm = getpref('marmoview_calibration', subject);
-    cm2 = cm(:,:,1)';
-    cm2(:,:,2) = cm(:,:,2)';
-    
-    settingsStruct.eyelink.calibration_matrix = cm2;
-    settingsStruct.eyelink.useRawData = true;
-catch me
-    throw(me)
-end
-
 if strcmp(subject, 'test')
     settingsStruct.eyelink.use = false;
     settingsStruct.mouse.useAsEyepos = true;
+else
+    try
+        cm = getpref('marmoview_calibration', subject);
+        cm2 = cm(:,:,1)';
+        cm2(:,:,2) = cm(:,:,2)';
+        
+        settingsStruct.eyelink.calibration_matrix = cm2;
+        settingsStruct.eyelink.useRawData = true;
+    catch me
+        throw(me)
+    end
 end
+
 
 p = pldaps(@stimuli.dotselection.OneInRF, subject, settingsStruct);
 

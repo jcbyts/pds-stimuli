@@ -4,6 +4,19 @@ p=pldaps(@plain);
 p=openScreen(p);
 p=pds.datapixx.init(p);
 
+%%
+f = stimuli.fixationRsvp(p);
+
+
+%%
+f.switchRate = .05;
+f.cSize = 50;
+f.sSize = 60;
+for i = 1:1e3
+f.drawFixation
+Screen('Flip', p.trial.display.ptr);
+f.afterFrame
+end
 %% test hartley stimuli
 
 h=stimuli.hartley(p.trial.display.ptr, 'ppd', 1./p.trial.display.ppd);
@@ -13,7 +26,7 @@ h.setup
 
 %%
 
-h.kx=10;
+h.kx=0;
 h.ky=10;
 
 h.draw
@@ -35,6 +48,7 @@ p=pds.datapixx.init(p);
 % moviefilename='/home/marmorig/MyTestMovie.mov';
 moviefilename='/home/marmorig/HeadPokeTraining001.MP4';
 % moviefilename='/home/marmorig/test.avi';
+moviefilename='C:\Users\Jake\Downloads\scene.avi';
 % if p.trial.display.useOverlay==2
 h=stimuli.HDmovie(moviefilename, p.trial.display.ptr);
 h.frameIndex=[10000 11000];

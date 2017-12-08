@@ -3,8 +3,8 @@ classdef face < stimuli.textures
     %   Detailed explanation goes here
     
     properties
-        radius
-        maxContrast
+        radius=10
+        maxContrast=1
     end
     
     methods

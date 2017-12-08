@@ -199,7 +199,7 @@ try
     settingsStruct.eyelink.calibration_matrix = cm2;
     settingsStruct.eyelink.useRawData = true;
 catch me
-    throw(me)
+    disp(me)
 end
 
 if strcmp(subject, 'test')
