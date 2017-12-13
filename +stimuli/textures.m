@@ -1,4 +1,4 @@
-classdef textures < handle
+classdef textures < stimuli.target
     % Matlab class for drawing textures using the psych. toolbox.
     %
     % The class constructor can be called with a range of arguments:
@@ -105,25 +105,18 @@ classdef textures < handle
                 o.glsl = [];
             end
         end
+
         
-        function beforeTrial(o)
-        end
-        
-        function beforeFrame(o)
-            o.drawTextures();
-        end
-        
-        function afterFrame(o)
-        end
-    end % methods
-    
-    methods (Access = public)
-        function drawTextures(o)
+        function frameDraw(o,p)
+            if ~o.stimValue
+                return
+            end
+            
             % get textures to draw...
             idx = o.getTexIdx(o.id);
             
             texPtr = cellfun(@(x) x.ptr, o.texture(idx),'UniformOutput',true);
- 
+            
             r = floor(o.texSize./2); % pixels
             
             if size(r,2) == 1
@@ -133,9 +126,16 @@ classdef textures < handle
             
             filterMode = 1; % bilinear interpolation
             if ~isnan(o.winPtr)
-                Screen('DrawTextures',o.winPtr,texPtr,[],rect',[],filterMode,o.alpha);
+                Screen('DrawTextures',p.trial.display.ptr,texPtr,[],rect',[],filterMode,o.alpha);
             end
         end
+        
+        function frameUpdate(o)
+        end
+    end % methods
+    
+    methods (Access = public)
+        
         
         function addTexture(o,id,img,varargin)
             % add IMG to the list of textures, with texture id ID.

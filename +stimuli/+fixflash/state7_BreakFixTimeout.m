@@ -1,41 +1,36 @@
 classdef state7_BreakFixTimeout < stimuli.state
-  % state 7 - timeout interval
-  
-  % 07-07-2016 - Shaun L. Cloherty <s.cloherty@ieee.org>
-  
+  % state 7 - break fixation timeout interval
+ 
+  % TODO: maybe just use sc.getTxTime instead of s.tStart??
   properties
-    tStart = NaN; % 'start' time        
   end
   
   methods (Access = public)
-    function s = state7_BreakFixTimeout(hTrial,varargin)
+    function s = state7_BreakFixTimeout(varargin)
       fprintf(1,'%s\n',mfilename);
       
-      s = s@stimuli.state(7,hTrial); % call the parent constructor
+      s = s@stimuli.state(7); % call the parent constructor
     end
     
-    function beforeFrame(s)
-%       fprintf(1,'dotMotionState7.beforeFrame()\n');
-      
-%       hTrial = s.hTrial;
+    function frameDraw(~,~,~)
+        % break fix do nothing
     end
     
-    function afterFrame(s,t)
-%       fprintf(1,'dotMotionState7.afterFrame()\n');
- 
-      hTrial = s.hTrial;
-      
-      if isnan(s.tStart) % <-- first frame
-        s.tStart = t;
-        hTrial.setTxTime(t);
-      end
-      
-      if (t > (s.tStart + hTrial.iti))
-        % done...
-        hTrial.done = true;
-        return;
-      end
-      
+    function frameUpdate(s, p, sn)
+        
+        % get the state controller ready
+        sc = s.sc;
+        
+        % --- Save start of state
+        if isnan(s.tStart) % <-- first frame
+            s.tStart = sc.getTxTime(s.id);
+        end
+        
+        if (p.trial.ttime > (s.tStart + p.trial.(sn).iti))
+            p.trial.flagNextTrial = true;
+            return
+        end
+        
     end % after frame
     
   end % methods

@@ -1,69 +1,61 @@
 classdef state2_FixHold < stimuli.state
     % state 2 - hold fixation for reward
     
-    % 07-07-2016 - Shaun L. Cloherty <s.cloherty@ieee.org>
-    
     properties
-        tStart = NaN;
         eyeXY
     end
     
     methods (Access = public)
-        function s = state2_FixHold(hTrial,varargin)
+        function s = state2_FixHold(varargin)
             fprintf(1,'%s\n',mfilename);
             
-            s = s@stimuli.state(2,hTrial); % call the parent constructor
+            s = s@stimuli.state(2); % call the parent constructor
         end
         
-        % --- Drawing
-        function beforeFrame(s)
+        % --- Drawing commands
+        function frameDraw(~,p,sn)
             
-            hTrial = s.hTrial;
+            % call draw functions for objects that should be shown
+            p.trial.(sn).hFix.frameDraw(p);
             
-            if hTrial.showFix
-                hTrial.hFix(1).beforeFrame(); % draw fixation target
-            end
-        end
+        end % frameDraw
         
-        % --- Update behavior
-        function afterFrame(s,t)
+        % -- Evaluate state logic (prepare before drawing)
+        function frameUpdate(s,p,sn)
             
-            hTrial = s.hTrial;
+            % get the state controller ready
+            sc = s.sc;
             
-            % --- Save time state began
+            % --- Save start of state
             if isnan(s.tStart) % <-- first frame
-                s.tStart = t;
-                s.eyeXY = [hTrial.x,hTrial.y];
-                hTrial.setTxTime(t); % save transition time
+                s.tStart = sc.getTxTime(s.id);
             end
             
             % --- If held to maximum duration --> move to next state
-            if t > (s.tStart + hTrial.fixDuration)
+            if p.trial.ttime > (s.tStart + p.trial.(sn).fixDuration)
                 
-                hTrial.holdXY       = mean(s.eyeXY);
-                hTrial.holdDuration = t - s.tStart;
+                p.trial.(sn).holdXY       = mean(s.eyeXY);
+                p.trial.(sn).holdDuration = p.trial.ttime - s.tStart;
                 
                 % move to state 8 - inter-trial interval
-                hTrial.setState(8);
-                return;
+                sc.setState(8);
+                return
             end
             
             % --- Check status of fixation
-            r = norm([hTrial.x,hTrial.y]);
+            if ~p.trial.(sn).hFix.isFixated % left fixation window
             
-            if (r > hTrial.fixWinRadius) % left fixation window
-                hTrial.holdDuration = t - s.tStart;
+                p.trial.(sn).holdDuration = p.trial.ttime - s.tStart;
 
-                hTrial.holdXY       = mean(s.eyeXY,1);
+                p.trial.(sn).holdXY       = mean(s.eyeXY,1);
                 
-                hTrial.error = 2;
-                hTrial.setState(7)
+                sc.setState(7) % break fixation state
 
-                return;
+                return
             end
             
             % keep track of fixated position
-            s.eyeXY = [s.eyeXY; [hTrial.x hTrial.y]];
+            s.eyeXY = [s.eyeXY; [p.trial.eyeX p.trial.eyeY]];
         end
         
     end % methods

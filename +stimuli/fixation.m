@@ -1,5 +1,5 @@
-classdef fixation < handle
-  % Matlab class for drawing fixation target(s) using the psych. toolbox.
+classdef fixation < stimuli.target
+  % FIXATION is a class for drawing fixation points in PLDAPS
   %
   % The fixation target consists of a central circular target and a
   % concentric circular surround (usually contrasting). The size and colour
@@ -7,100 +7,125 @@ classdef fixation < handle
   %
   % The class constructor can be called with a range of arguments:
   %
-  %   centreSize - diameter of centre (pixels)
-  %   surroundRadius - diameter of surround (pixels)
-  %   centreColour - colour of centre (clut index or [r,g,b])
-  %   surroundColour - colour of surround (clut index or [r,g,b])
-  %   position - center of target (x,y; pixels)
-  
-  % 16-06-2016 - Shaun L. Cloherty <s.cloherty@ieee.org>
+  %   <strong> xyPix     </strong>     - center of the target (x,y; pixels)
+  %   <strong> radius    </strong>     - radius of surround (pixels)
+  %   <strong> winRadius </strong>     - radius of the fixation window 
+  %   <strong> color     </strong>     - color of fixation point (clut index or [r,g,b])
+  %   <strong> ctrColor  </strong>  (optional) color of fixation point center (clut index or [r,g,b])
+  %   <strong> winColour </strong>  (optional) color of fixation window (clut index or [r,g,b])
+  %
+  % e.g., 
+  %     targ = <strong>stimuli.fixation</strong>('xyPix', [960 540], 'radius', 10)
+  %
+  %     targ = <strong>stimuli.fixation</strong>('xyPix', p.trial.display.ctr(1:2), ...
+  %             'radius', 0.5*p.trial.display.ppd, ...
+  %             'winRadius', 1.5*p.trial.display.ppd, ...
+  %             'color', [1 1 1], ...
+  %             'ctrColor', [0 0 0], ...
+  %             'winColor', p.trial.display.clut.bg_white);
+  % 
+  % The class has a number of useful properties and methods
+  %   isFixated 
+  %         is a flag for whether the fixation point is fixated currently
+  %         fixlog(end) tells the time of the last fixation state change
+  %
+  %   e.g., 
+  %     if targ.isFixated
+  %         fixEntered = targ.fixlog(end);
+  %         fixDuration = GetSecs - fixEntered;
+  %     end
+  % 
+  %  frameUpdate()
+  %         method that updates the status of isFixated. Should be called
+  %         every trial during the frameUpdate state
+  %         requires an active PDLAPS as input
+  %     e.g., 
+  %         targ.frameUpdate(p)
+  %
+  %  frameDraw()
+  %         method for drawing the fixation point and windows
+  %         requires an active PDLAPS as input
+  %     e.g., 
+  %         targ.frameDraw(p)
   
   properties (Access = public),
-    cSize@double = 2; % pixels
-    sSize@double = 4; % pixels
-    cColour@double = zeros([1,3]); % clut index or [r,g,b]
-    sColour@double = ones([1,3]);
-    position@double = [0.0, 0.0]; % [x,y] (pixels)
-  end
-        
-  properties (Access = private)
-    winPtr; % ptb window
+    radius@double = 5; % pixels
+    color@double  = ones(1,3);
+    wincolor
   end
   
   methods (Access = public)
-    function o = fixation(winPtr,varargin) % marmoview's initCmd?
-      o.winPtr = winPtr;
       
-      if nargin == 1
-        return
-      end
-
-      % initialise input parser
-      args = varargin;
-      p = inputParser;
-%       p.KeepUnmatched = true;
-      p.StructExpand = true;
-      p.addParameter('centreSize',o.cSize,@isfloat); % pixels
-      p.addParameter('surroundSize',o.sSize,@isfloat);
-      p.addParameter('centreColour',o.cColour,@isfloat); % clut index or [r,g,b]
-      p.addParameter('surroundColour',o.sColour,@isfloat);
-      p.addParameter('position',o.position,@isfloat); % [x,y] (pixels)
-                  
-      try
-        p.parse(args{:});
-      catch
-        warning('Failed to parse name-value arguments.');
-        return;
+      % --- Class constructor
+      function o = fixation(varargin)
+          
+          o = o@stimuli.target(); % use parent constructor (inherits the properties and methods of TARGET)
+          
+          if nargin == 1
+              return
+          end
+          
+          % initialise input parser
+          ip = inputParser;
+          ip.StructExpand = true;
+          ip.addParameter('radius', o.radius,   @isfloat); % pixels
+          ip.addParameter('color',  o.color,    @isfloat); % color r,g,b triplet
+          ip.addParameter('xyPix',  o.xyPix,    @isfloat); % [x,y] (pixels)
+          
+          try
+              ip.parse(varargin{:});
+          catch
+              warning('Failed to parse name-value arguments.');
+              return;
+          end
+          
+          args = ip.Results;
+          
+          o.radius      = args.radius;
+          o.color       = args.color;
+          o.xyPix    	= args.xyPix;
       end
       
-      args = p.Results;
+      
+      function frameDraw(o,p)
+          % draw the fixation point and fixation windows
+          
+          if nargin < 2
+              warning('needs a pldaps to run')
+              return
+          end
+          
+          if ~o.stimValue % check if the stimulus should be shown
+              return
+          end
+          
+          
+          r = o.radius; % radius in pixels
+          
+          rect = kron([1,1],o.xyPix) + kron(r(:),[-1, -1, +1, +1]);
+          Screen('FillOval',p.trial.display.overlayptr, o.color,rect');
+          
+          % draw the fixation window
+          if ~isempty(o.wincolor)
+              r = o.winRadius;
+              rect = kron([1,1],o.xyPix) + kron(r(:),[-1, -1, +1, +1]);
+              Screen('FillOval',p.trial.display.overlayptr, o.wincolor,rect');
+          end
+          
+      end
+      
+      function frameUpdate(o,p)
+          % every frame update call, check the fixation status
+          
+          if nargin < 2
+              warning('needs a pldaps to run')
+              return
+          end
+          
+          o.isHeld([p.trial.eyeX p.trial.eyeY])
+      end
     
-      o.cSize       = args.centreSize;
-      o.sSize       = args.surroundSize;
-      o.cColour     = args.centreColour;
-      o.sColour     = args.surroundColour;
-      o.position    = args.position;
-    end
-        
-    function beforeTrial(o)
-    end
-    
-    function beforeFrame(o)
-      o.drawFixation();
-    end
-        
-    function afterFrame(o)
-    end
   end % methods
     
-  methods (Access = public)        
-    function drawFixation(o)
-        
-%       r = floor(o.cSize*5);
-%       
-%       rect = kron([1,1],o.position) + kron(r(:),[-1, -1, +1, +1]);
-%       col = -1*[1 1 1]; %
-%       Screen('FillOval',o.winPtr,col,rect');
-%       
-%       rect = kron([1,1],o.position) + kron(r(:),[-1, -1, +1, +1]);
-%       col = +1*[1 1 1]; %floor( (o.sColour + o.cColour)/2 ); %-1*[1 1 1]; %
-%       Screen('FillOval',o.winPtr,col,rect');
-      
-     
-           
-      r = floor(o.sSize./2); % radius in pixels
-      
-      rect = kron([1,1],o.position) + kron(r(:),[-1, -1, +1, +1]);
-      Screen('FillOval',o.winPtr,o.sColour,rect');
-
-      r = floor(o.cSize./2);
-      
-      rect = kron([1,1],o.position) + kron(r(:),[-1, -1, +1, +1]);
-      Screen('FillOval',o.winPtr,o.cColour,rect');   
-      
-      
-      
-    end
-  end % methods
   
 end % classdef

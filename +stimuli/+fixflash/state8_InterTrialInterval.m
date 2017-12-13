@@ -4,59 +4,48 @@ classdef state8_InterTrialInterval < stimuli.state
     % 07-07-2016 - Shaun L. Cloherty <s.cloherty@ieee.org>
     
     properties
-        tStart    = NaN;    % 'start' time
+        %tStart    = NaN;    % 'start' time
         rewardCnt = 0;      % the number of reward(s) delivered...
-        showFace  = true;  % show face, for additional reward?
     end
     
     methods (Access = public)
-        function s = state8_InterTrialInterval(hTrial,varargin)
+        function s = state8_InterTrialInterval(varargin)
             fprintf(1,'%s\n',mfilename);
             
-            s = s@stimuli.state(8,hTrial); % call the parent constructor
+            s = s@stimuli.state(8); % call the parent constructor
         end
         
-        function beforeFrame(s)
+        function frameDraw(~,p,sn)
             
-            hTrial = s.hTrial;
+            p.trial.(sn).hFace.beforeFrame(); % show face
             
-%             if hTrial.rewardCnt > 0
-%                 s.showFace = true;
-%             end
-            
-            if s.showFace
-                hTrial.hFace.beforeFrame(); % show face...
-%             else
-%                 hTrial.hFbk.beforeFrame();  % draw the *correct* choice cue
-            end
         end % beforeFrame
         
-        function afterFrame(s,t)
+        function frameUpdate(s,p,sn)
             
-            hTrial = s.hTrial;
+            sc = s.sc;
             
             if isnan(s.tStart) % <-- first frame
-                s.tStart = t;
-                hTrial.setTxTime(t);
-                hTrial.rewardAmount = find(hTrial.holdDuration>hTrial.rewardLevels, 1, 'last'); % round(2*hTrial.holdDuration.^1.2);
-                fprintf('Reward amount: %d\n', hTrial.rewardAmount)
+                s.tStart = sc.getTxTime(s.id);
+                p.trial.(sn).rewardAmount = find(p.trial.(sn).holdDuration>p.trial.(sn).rewardLevels, 1, 'last');
+                fprintf('Reward amount: %d\n', p.trial.(sn).rewardAmount)
             end
             
-            if t > s.tStart + hTrial.rewardFaceDuration
-                s.showFace = false;
+            if p.trial.ttime > s.tStart + p.trial.(sn).rewardFaceDuration
+                p.trial.(sn).hFace.stimVal = false;
             end
             
-            if s.rewardCnt < hTrial.rewardAmount
-                if t > (s.tStart + 0.2*s.rewardCnt)
+            if s.rewardCnt < p.trial.(sn).rewardAmount
+                if p.trial.ttime > (s.tStart + 0.2*s.rewardCnt)
 
-                    hTrial.hReward.give();
+                    pds.behavior.reward.give(p);
                     
                     s.rewardCnt = s.rewardCnt + 1;
                 end
-            elseif (t > (s.tStart + hTrial.iti))
+            elseif p.trial.ttime > (s.tStart + p.trial.(sn).iti)
                 % done...
-                hTrial.done = true;
-                return;
+                p.trial.flagNextTrial = true;
+                return
             end
             
             
