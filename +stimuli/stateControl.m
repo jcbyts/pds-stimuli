@@ -60,6 +60,11 @@ classdef stateControl < handle % handle class self references in memory
         function value = getLog(o, id)
             % get the timestamps for a particular state
             % log = o.getLog(id)
+            if nargin ==1
+                value = o.txLog;
+                return
+            end
+            
             ii = o.stateIds == id;
             value = o.txLog{ii};
         end
@@ -113,6 +118,11 @@ classdef stateControl < handle % handle class self references in memory
             end
             
             ii = o.stateIds == id;
+            if isempty(o.txLog{ii})
+                t = nan;
+                return
+            end
+            
             t  = o.txLog{ii}(end);
         end
         

@@ -33,6 +33,8 @@ switch state
     % --- Draw task semantics using info from hTrial
     case p.trial.pldaps.trialStates.framePrepareDrawing
         
+        p.trial.(sn).hFix.frameUpdate(p); % update fixation object
+        
         % call the state machine to update
         p.trial.(sn).states.frameUpdate(p,sn)
     
@@ -45,7 +47,28 @@ switch state
 	% --- Cleanup and save all parameters
     case p.trial.pldaps.trialStates.trialCleanUpandSave
         
-        stimuli.fixflash.cleanUpandSave(p, sn);
+        % --- Staircase parameters
+        if p.trial.(sn).staircaseOn && p.trial.(sn).minFixDuration < p.trial.(sn).maxFixDuration
+            
+            
+            lastError = p.trial.(sn).error;
+            
+%             if p.trial.pldaps.iTrial < numel(p.conditions)
+                
+                switch lastError
+                    case 0 % staircase up
+                        p.conditions{p.trial.pldaps.iTrial + 1}.(sn).minFixDuration =  p.trial.(sn).minFixDuration + p.trial.(sn).staircaseStep;
+                    case 1 % do nothing
+                        p.conditions{p.trial.pldaps.iTrial + 1}.(sn).minFixDuration =  p.trial.(sn).minFixDuration;
+                    case 2 % staircase down
+                        p.conditions{p.trial.pldaps.iTrial + 1}.(sn).minFixDuration =  p.trial.(sn).minFixDuration - .75*p.trial.(sn).staircaseStep;
+                end
+                
+%             end % trial number
+            
+        end % staircase on
+        
+        stimuli.fixflash.updateGUI(p, sn);
     
 	case p.trial.pldaps.trialStates.experimentPreOpenScreen
         
@@ -93,8 +116,10 @@ switch state
             'staircaseOn',              true, ...
             'staircaseMax',             1, ...
             'staircaseStep',            .05, ...
-            'rewardLevels',             [.2 .4 .8 1 1.2 1.4], ...
             'trialTimeout',             3, ... % seconds to obtain fixation
+            'rewardLevels',             [.2 .4 .8 1 1.2 1.4], ...
+            'rewardForObtainFixation',  false, ...
+            'rewardFaceDuration',       0.2, ...
             };
         
         for iArg = 1:2:numel(defaultArgs)

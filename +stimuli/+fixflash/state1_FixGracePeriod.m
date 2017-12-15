@@ -3,9 +3,6 @@ classdef state1_FixGracePeriod < stimuli.state
     % Time alotted after entering fixation window before Hold Fixation begins
     
     
-    properties
-    end
-    
     methods (Access = public)
         function s = state1_FixGracePeriod(varargin)
             fprintf(1,'%s\n',mfilename);
@@ -29,13 +26,12 @@ classdef state1_FixGracePeriod < stimuli.state
             % get the state controller ready
             sc = s.sc;
             
-            % --- Save start of state
-            if isnan(s.tStart) % <-- first frame
-                s.tStart = sc.getTxTime(s.id);
-            end
+            % calculate the timegracePeriod time to transition if fixation
+            % hold is maintained
+            transitionTime = (sc.getTxTime(s.id) + p.trial.(sn).fixGracePeriod - p.trial.trstart);
             
             % if during grace period, do nothing
-            if p.trial.ttime < (s.tStart + p.trial.(sn).fixGracePeriod)
+            if p.trial.ttime < transitionTime
                 return;
             end
             
@@ -51,6 +47,7 @@ classdef state1_FixGracePeriod < stimuli.state
             end
             
             sc.setState(2); % ---> to fix hold
+            
         end % after frame
         
     end % methods

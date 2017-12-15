@@ -24,9 +24,7 @@ classdef state < handle
 
     properties (Access = {?stimuli.stateControl,?stimuli.state})
         id@double; % state identifier
-        tStart@double = NaN; % time the state started
-        tDur@double   = NaN; % time in state
-        sc@stimuli.stateControl %?? Needed ??
+        sc@stimuli.stateControl % parent state controller
     end
     
     methods (Access = public)

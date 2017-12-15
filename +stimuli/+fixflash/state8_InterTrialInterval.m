@@ -4,7 +4,7 @@ classdef state8_InterTrialInterval < stimuli.state
     % 07-07-2016 - Shaun L. Cloherty <s.cloherty@ieee.org>
     
     properties
-        %tStart    = NaN;    % 'start' time
+        tStart    = NaN;    % 'start' time
         rewardCnt = 0;      % the number of reward(s) delivered...
     end
     
@@ -17,7 +17,7 @@ classdef state8_InterTrialInterval < stimuli.state
         
         function frameDraw(~,p,sn)
             
-            p.trial.(sn).hFace.beforeFrame(); % show face
+            p.trial.(sn).hFace.frameDraw(p); % show face
             
         end % beforeFrame
         
@@ -26,13 +26,14 @@ classdef state8_InterTrialInterval < stimuli.state
             sc = s.sc;
             
             if isnan(s.tStart) % <-- first frame
-                s.tStart = sc.getTxTime(s.id);
+                s.tStart = sc.getTxTime(s.id) - p.trial.trstart;
+                p.trial.(sn).error = 0;
                 p.trial.(sn).rewardAmount = find(p.trial.(sn).holdDuration>p.trial.(sn).rewardLevels, 1, 'last');
                 fprintf('Reward amount: %d\n', p.trial.(sn).rewardAmount)
             end
             
             if p.trial.ttime > s.tStart + p.trial.(sn).rewardFaceDuration
-                p.trial.(sn).hFace.stimVal = false;
+                p.trial.(sn).hFace.stimValue = false;
             end
             
             if s.rewardCnt < p.trial.(sn).rewardAmount

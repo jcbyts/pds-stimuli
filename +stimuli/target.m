@@ -40,7 +40,7 @@ classdef target < stimuli.stimulus %#ok<*MCSUP>
                
             % log changes
             if val ~= obj.isFixated
-                obj.fixated = val;
+                obj.isFixated = val;
             end
             
             if nargout > 0

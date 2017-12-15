@@ -5,6 +5,7 @@ classdef state0_FixWait < stimuli.state
     properties (Access = public)
         
         % properties for flashing the fixation target
+        showFix=false;
         frameCnt  = 0; % frame counter (for this state?)
         faceFlash = 0; % face intermixed in flashing point
     end
@@ -33,35 +34,40 @@ classdef state0_FixWait < stimuli.state
             % get the state controller ready
             sc = s.sc;
             
-            % --- Save start of state
-            if isnan(s.tStart) % <-- first frame
-                s.tStart = sc.getTxTime(s.id);
-            end
-            
             % iterate frame counter
             s.frameCnt = mod(s.frameCnt+1,p.trial.(sn).fixFlashCnt);
             
             % --- flash fixation until it is obtained
             if s.frameCnt == 0
                 
-                % --- show face every 3rd flash
-                if mod(s.faceFlash, 3)==0
-                    p.trial.(sn).hFace.stimValue = true;
-                else
-                    p.trial.(sn).hFace.stimValue = false;
-                    % flip state of the fixation point
-                    p.trial.(sn).hFix.stimValue = ~p.trial.(sn).hFix.stimValue;
-                end
+                s.showFix = ~s.showFix; % flash fixation
                 
-                if p.trial.(sn).hFix.stimValue
+                if s.showFix
                     s.faceFlash = s.faceFlash + 1; % count flashes
                 end
-                
             end
+            
+            if s.showFix % fixation on
+                
+                % --- show face every 3rd flash
+                if mod(s.faceFlash, 3)==0 % is face?
+                    p.trial.(sn).hFace.stimValue = true;
+                    p.trial.(sn).hFix.stimValue  = false;
+                else % not face
+                    p.trial.(sn).hFace.stimValue = false;
+                    p.trial.(sn).hFix.stimValue  = true;
+                end
+            else
+                p.trial.(sn).hFace.stimValue = false;
+                p.trial.(sn).hFix.stimValue  = false;
+            end
+                
+
+            
             
             
             % --- Never obtained fixation
-            if p.trial.ttime > (s.tStart + p.trial.(sn).trialTimeout)
+            if p.trial.ttime > p.trial.(sn).trialTimeout
                 % failed to initiate the trial... move to state 7 - timeout interval
                 sc.setState(7);
                 return
@@ -69,8 +75,12 @@ classdef state0_FixWait < stimuli.state
             
             % --- check if fixating
             if p.trial.(sn).hFix.isFixated
+                
+                p.trial.(sn).hFix.stimValue = true; % make sure fixation point is on
+                p.trial.(sn).hFace.stimValue = true; % make sure face is off
+                
                 % move to state 1 - fixation grace period
-                hTrial.setState(1);
+                sc.setState(1);
                 return
             end
             

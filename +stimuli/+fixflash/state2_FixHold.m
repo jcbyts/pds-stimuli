@@ -2,7 +2,7 @@ classdef state2_FixHold < stimuli.state
     % state 2 - hold fixation for reward
     
     properties
-        eyeXY
+        eyeXY % variable for tracking the eye position during detected fixation
     end
     
     methods (Access = public)
@@ -26,16 +26,15 @@ classdef state2_FixHold < stimuli.state
             % get the state controller ready
             sc = s.sc;
             
-            % --- Save start of state
-            if isnan(s.tStart) % <-- first frame
-                s.tStart = sc.getTxTime(s.id);
-            end
+            % --- Time to transition to next state if fixation is held
+            startTime = sc.getTxTime(s.id) - p.trial.trstart;
+            
             
             % --- If held to maximum duration --> move to next state
-            if p.trial.ttime > (s.tStart + p.trial.(sn).fixDuration)
+            if p.trial.ttime > startTime + p.trial.(sn).fixDuration
                 
-                p.trial.(sn).holdXY       = mean(s.eyeXY);
-                p.trial.(sn).holdDuration = p.trial.ttime - s.tStart;
+                p.trial.(sn).holdXY       = mean(s.eyeXY); % record eye position
+                p.trial.(sn).holdDuration = p.trial.ttime - startTime;
                 
                 % move to state 8 - inter-trial interval
                 sc.setState(8);
@@ -45,7 +44,7 @@ classdef state2_FixHold < stimuli.state
             % --- Check status of fixation
             if ~p.trial.(sn).hFix.isFixated % left fixation window
             
-                p.trial.(sn).holdDuration = p.trial.ttime - s.tStart;
+                p.trial.(sn).holdDuration = p.trial.ttime - startTime;
 
                 p.trial.(sn).holdXY       = mean(s.eyeXY,1);
                 

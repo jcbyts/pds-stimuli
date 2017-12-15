@@ -20,6 +20,9 @@ classdef stimulus < handle %#ok<*MCSUP>
         
         % --- set function logs the value when it is change
         function set.stimValue(obj, val)
+            if obj.stimValue==val
+                return
+            end
             obj.stimValue = val;
             obj.log(:,end+1) = [obj.stimValue; GetSecs];
         end

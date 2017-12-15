@@ -51,6 +51,7 @@ classdef fixation < stimuli.target
   properties (Access = public),
     radius@double = 5; % pixels
     color@double  = ones(1,3);
+    ctrColor@double = -ones(1,3);
     wincolor
   end
   
@@ -105,11 +106,17 @@ classdef fixation < stimuli.target
           rect = kron([1,1],o.xyPix) + kron(r(:),[-1, -1, +1, +1]);
           Screen('FillOval',p.trial.display.overlayptr, o.color,rect');
           
+          r = o.radius/2; % radius in pixels
+          
+          rect = kron([1,1],o.xyPix) + kron(r(:),[-1, -1, +1, +1]);
+          Screen('FillOval',p.trial.display.overlayptr, o.ctrColor,rect');
+          
           % draw the fixation window
           if ~isempty(o.wincolor)
               r = o.winRadius;
               rect = kron([1,1],o.xyPix) + kron(r(:),[-1, -1, +1, +1]);
-              Screen('FillOval',p.trial.display.overlayptr, o.wincolor,rect');
+              Screen('FrameOval', p.trial.display.overlayptr, o.wincolor, rect');
+%               Screen('FillOval',p.trial.display.overlayptr, o.wincolor,rect');
           end
           
       end

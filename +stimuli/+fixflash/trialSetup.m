@@ -33,11 +33,15 @@ p.trial.(sn).hFix.radius     = sz;
 p.trial.(sn).hFix.color      = ones(1,3);
 % p.trial.(sn).hFix.ctrColor   = -ones(1,3);
 p.trial.(sn).hFix.xyPix      = [xpos ypos] * ppd + ctr;
-p.trial.(sn).hFix.winRadius  = p.trial.(sn).fixWinRadius;
+p.trial.(sn).hFix.winRadius  = p.trial.(sn).fixWinRadius * ppd;
 p.trial.(sn).hFix.wincolor   = p.trial.display.clut.bg_white;
 
 % fixation duration
 p.trial.(sn).fixDuration = p.trial.(sn).minFixDuration;
+
+% initialize some measurements of interest
+p.trial.(sn).holdXY = nan(1,2); % x,y position of fixation
+p.trial.(sn).holdDuration = 0;
 
 % --- Face for reward feedback
 p.trial.(sn).hFace.texSize  = 2 * p.trial.(sn).faceRadius * ppd;
@@ -45,8 +49,7 @@ p.trial.(sn).hFace.position = p.trial.(sn).hFix.xyPix;
 p.trial.(sn).hFace.id       = p.trial.(sn).faceIndex;
 
 % --- Reward
-% p.trial.(sn).hReward.defaultAmount = p.trial.behavior.reward.defaultAmount;
-% p.trial.(sn).hReward.iTrial        = p.trial.pldaps.iTrial;
+p.trial.(sn).error = 1; % default to "never obtained fixation"
 
 % -------------------------------------------------------------------------
 % --- Setup trial state machine

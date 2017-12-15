@@ -22,11 +22,9 @@ classdef state7_BreakFixTimeout < stimuli.state
         sc = s.sc;
         
         % --- Save start of state
-        if isnan(s.tStart) % <-- first frame
-            s.tStart = sc.getTxTime(s.id);
-        end
+        tStart = sc.getTxTime(s.id) - p.trial.trstart;
         
-        if (p.trial.ttime > (s.tStart + p.trial.(sn).iti))
+        if (p.trial.ttime > (tStart + p.trial.(sn).iti))
             p.trial.flagNextTrial = true;
             return
         end
