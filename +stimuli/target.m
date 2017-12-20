@@ -17,7 +17,8 @@ classdef target < stimuli.stimulus %#ok<*MCSUP>
         % class constructor
         function obj = target(varargin)
             
-            obj = obj@stimuli.stimulus();
+            obj = obj@stimuli.stimulus(varargin{:});
+            
             if nargin > 0
                 obj.xyPix = varargin{1};
             end

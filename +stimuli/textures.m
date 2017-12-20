@@ -130,8 +130,8 @@ classdef textures < stimuli.target
             end
         end
         
-        function frameUpdate(o)
-        end
+%         function frameUpdate(o)
+%         end
     end % methods
     
     methods (Access = public)

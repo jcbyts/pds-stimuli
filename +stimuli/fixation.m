@@ -131,6 +131,12 @@ classdef fixation < stimuli.target
           
           o.isHeld([p.trial.eyeX p.trial.eyeY])
       end
+      
+      function trialSetup(o,p)
+      end
+      
+      function cleanup(o,p)
+      end
     
   end % methods
     

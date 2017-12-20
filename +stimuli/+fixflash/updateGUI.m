@@ -1,6 +1,8 @@
 function updateGUI(p,sn)
+% UPDATEGUI plots the outcome of the fixflash protocol
 
 hObj = p.functionHandles.fixFlashPlot;
+
 figure(hObj) % bring figure to the front
 handles = guidata(hObj);
 

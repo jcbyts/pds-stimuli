@@ -25,7 +25,7 @@ settingsStruct.session.subject=subject;
 % Add natural background module
 sn='natImgBackground';
 settingsStruct.(sn).stateFunction.name = 'v1mapping.natImgBackground';
-settingsStruct.(sn).stateFunction.order = 1;
+settingsStruct.(sn).stateFunction.order = -1;
 settingsStruct.(sn).use = true;
 settingsStruct.(sn).imageContrast = .5;
 settingsStruct.(sn).numToShow     = 1; % number of images to show per trial
