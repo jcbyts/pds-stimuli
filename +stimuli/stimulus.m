@@ -6,6 +6,7 @@ classdef stimulus < handle %#ok<*MCSUP>
     
     properties (Access = public)
         stimValue
+        rng@RandStream=RandStream('mt19937ar')
     end
     
     properties (SetAccess = ?stimuli.stimulus, GetAccess = public)
@@ -16,6 +17,18 @@ classdef stimulus < handle %#ok<*MCSUP>
         % --- class constructor
         function obj = stimulus(varargin)
             obj.stimValue = true; % the stimulus defaults to a value of true
+            
+            rngArg  = find(cellfun(@(x) strcmp(x, 'rng'), varargin));
+            seedArg = find(cellfun(@(x) strcmp(x, 'seed'), varargin));
+            
+            if ~isempty(rngArg)
+                obj.rng = varargin{rngArg+1};
+            end
+            
+            if ~isempty(seedArg)
+                obj.rng = RandStream(obj.rng.Type, 'Seed', varargin{seedArg+1});
+            end
+            
         end
         
         % --- set function logs the value when it is change
@@ -25,6 +38,25 @@ classdef stimulus < handle %#ok<*MCSUP>
             end
             obj.stimValue = val;
             obj.log(:,end+1) = [obj.stimValue; GetSecs];
+        end
+        
+        function setRandomSeed(obj, arg)
+            % can pass in a RandStream object
+            % a seed
+            % or nothing
+            
+            if nargin < 2
+                seed = randi(10^7);
+            else
+                seed = arg;
+            end
+            
+            if isa(seed, 'RandStream')
+                obj.rng = seed;
+            else
+                obj.rng = RandStream(obj.rng.Type, 'Seed', seed);
+            end
+            
         end
     end
     
