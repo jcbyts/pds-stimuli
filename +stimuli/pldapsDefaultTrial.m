@@ -2,20 +2,27 @@ function p=pldapsDefaultTrial(p,state)
 % Default trial function just measures input
 if nargin==1 %initial call to setup conditions
     
-    % Colors
-    %-------------------------------------------------------------------------%
+    % ---------------------------------------------------------------------
+    % --- Colors
+    % PLDAPS uses a color lookup table (CLUT) to draw separate colors to 
+    % the two screens: subject screen and experimenter screen
+    % These colors are set here in defaultColors and stimuli.clutColors.
+    % You can create more colors by following the formula within.
+    %
+    % When drawing to the overlay (for two seperate colors), the draw call
+    % will use a color that is an index value into the CLUT that is setup
+    % here.
     p = defaultColors(p);
+    stimuli.clutColors(p);
     
     % dot sizes for drawing
     p.defaultParameters.stimulus.eyeW      = 8;    % eye indicator width in pixels
-    p.defaultParameters.stimulus.fixdotW   = 8;    % width of the fixation dot
-    p.defaultParameters.stimulus.targdotW  = 8;    % width of the target dot
     p.defaultParameters.stimulus.cursorW   = 8;    % cursor width in pixels
     
     p.defaultParameters.pldaps.trialMasterFunction = 'runModularTrial';
     p.defaultParameters.pldaps.trialFunction = 'stimuli.pldapsDefaultTrial';
     
-    % seconds per trial.
+    % seconds per trial
     p.trial.pldaps.maxTrialLength = 20;
     p.trial.pldaps.maxFrames = p.trial.pldaps.maxTrialLength*p.trial.display.frate;
     
