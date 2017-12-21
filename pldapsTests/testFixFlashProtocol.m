@@ -24,7 +24,7 @@ settingsStruct.display.viewdist = 100; % cm
 
 
 sn = 'fixflash';
-settingsStruct.(sn).stateFunction.name = 'stimuli.fixflash.runDefaultTrial';
+settingsStruct.(sn).stateFunction.name = 'stimuli.modules.fixflash.runDefaultTrial';
 settingsStruct.(sn).stateFunction.order = 2;
 settingsStruct.(sn).use = true;
 settingsStruct.(sn).staircaseOn = true;
@@ -57,7 +57,7 @@ settingsStruct.display.viewdist = 100; % cm
 
 
 sn = 'fixflash';
-settingsStruct.(sn).stateFunction.name = 'stimuli.fixflash.runImgScan';
+settingsStruct.(sn).stateFunction.name = 'stimuli.modules.fixflash.runImgScan';
 settingsStruct.(sn).stateFunction.order = 2;
 settingsStruct.(sn).use = true;
 settingsStruct.(sn).staircaseOn = false;
