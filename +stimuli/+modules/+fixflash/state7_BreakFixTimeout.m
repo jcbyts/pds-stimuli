@@ -1,4 +1,4 @@
-classdef state7_BreakFixTimeout < stimuli.state
+classdef state7_BreakFixTimeout < stimuli.objects.state
   % state 7 - break fixation timeout interval
  
   % TODO: maybe just use sc.getTxTime instead of s.tStart??
@@ -9,7 +9,7 @@ classdef state7_BreakFixTimeout < stimuli.state
     function s = state7_BreakFixTimeout(varargin)
       fprintf(1,'%s\n',mfilename);
       
-      s = s@stimuli.state(7); % call the parent constructor
+      s = s@stimuli.objects.state(7); % call the parent constructor
     end
     
     function frameDraw(~,~,~)

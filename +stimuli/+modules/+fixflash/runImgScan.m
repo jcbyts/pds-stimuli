@@ -1,5 +1,5 @@
-function p=runDefaultTrial(p,state, sn)
-% RUNDEFAULTTRIAL run a trial of the dotmotion task
+function p=runImgScan(p,state, sn)
+% RUNTRIAL run a trial of the dotmotion task
 %
 % stimuli.dotmotion.runTrial is a PLDAPS trial function. PLDAPS trial functions switch
 % between different states that have to do with timing relative to the
@@ -26,8 +26,15 @@ switch state
     % --- Called before each trial. Sets up all parameters
     case p.trial.pldaps.trialStates.trialSetup
         
+        % set random seed for Fixation object this trial
+        p.trial.(sn).hFix.setRandomSeed();
+        
         % setup the next trial
-        stimuli.fixflash.trialSetup(p, sn);
+        stimuli.modules.fixflash.trialSetup(p, sn);
+        p.trial.(sn).hFix.trialSetup(p);
+        
+        
+        
         
 
     % --- Draw task semantics using info from hTrial
@@ -47,33 +54,30 @@ switch state
 	% --- Cleanup and save all parameters
     case p.trial.pldaps.trialStates.trialCleanUpandSave
         
+        p.conditions{p.trial.pldaps.iTrial + 1} = [];
+        
         % --- Staircase parameters
         if p.trial.(sn).staircaseOn && p.trial.(sn).minFixDuration < p.trial.(sn).maxFixDuration
             
             
             lastError = p.trial.(sn).error;
             
-%             if p.trial.pldaps.iTrial < numel(p.conditions)
-                
                 switch lastError
                     case 0 % staircase up
                         p.conditions{p.trial.pldaps.iTrial + 1}.(sn).minFixDuration =  p.trial.(sn).minFixDuration + p.trial.(sn).staircaseStep;
-                    case 1 % do nothing
-                        p.conditions{p.trial.pldaps.iTrial + 1}.(sn).minFixDuration =  p.trial.(sn).minFixDuration;
                     case 2 % staircase down
                         p.conditions{p.trial.pldaps.iTrial + 1}.(sn).minFixDuration =  p.trial.(sn).minFixDuration - .75*p.trial.(sn).staircaseStep;
+                    otherwise % do nothing
+                        p.conditions{p.trial.pldaps.iTrial + 1}.(sn).minFixDuration =  p.trial.(sn).minFixDuration;
                 end
-                
-%             end % trial number
             
         end % staircase on
         
-        stimuli.fixflash.updateGUI(p, sn);
+        stimuli.modules.fixflash.updateGUI(p, sn);
+        
+        p.trial.(sn).hFix.cleanup(p);
     
-    % ---------------------------------------------------------------------
-    % --- What to do before opening the pldaps screen
 	case p.trial.pldaps.trialStates.experimentPreOpenScreen
-        % This code should be copied from protocol to protocol
         
         p.defaultParameters.(sn).stateFunction.acceptsLocationInput = true; % is this necessary
         % setup states that will be called by this module
@@ -98,10 +102,10 @@ switch state
         % --- set up default parameters
         defaultArgs = {...
             'bgColor',                  0.5, ...
-            'fixPointRadius',           0.3, ...
+            'fixPointRadius',           1, ...
             'fixPointDim',              0.1, ...
             'fixWinRadius',             1.8, ...
-            'fixFlashCnt',              round(0.250*p.trial.display.frate), ...
+            'fixFlashCnt',              round(1*p.trial.display.frate), ...
             'feedbackApertureRadius',   1.8, ...  % TODO: is this used?
             'feedbackApertureContrast', -0.5, ... % TODO: is this used?
             'maxRewardCnt',             4, ...
@@ -123,6 +127,9 @@ switch state
             'rewardLevels',             [.2 .4 .8 1 1.2 1.4], ...
             'rewardForObtainFixation',  false, ...
             'rewardFaceDuration',       0.2, ...
+            'shrinkTimeConstant',       0.15, ...
+            'maskType',                 'circle', ...
+            'noisesigma',               20, ... % pixels (noise of random walk)
             };
         
         for iArg = 1:2:numel(defaultArgs)
@@ -135,17 +142,26 @@ switch state
             end 
         end
         
+        % color scheme for this task
+        stimuli.clutColors(p);
+        
         %------------------------------------------------------------------
         % --- Instantiate classes
         
         % --- Fixation
-        p.trial.(sn).hFix   = stimuli.fixation('position', p.trial.display.ctr(1:2));
+        p.trial.(sn).hFix   = stimuli.fixationImg('position', p.trial.display.ctr(1:2));
+        
+        % apply specialized parameters
+        p.trial.(sn).hFix.shrinkTimeConstant = p.trial.(sn).shrinkTimeConstant;
         
         % --- Reward Face
         p.trial.(sn).hFace  = stimuli.face(p);
         
         % --- Plotting
-        p.functionHandles.fixFlashPlot = stimuli.fixflash.fixFlashPlot;
+        p.functionHandles.fixFlashPlot = stimuli.modules.fixflash.fixFlashPlot;
+        
+        % --- Reward
+%         p.trial.(sn).hReward    = stimuli.reward(p); % TODO: make this global
 
         
 end % switch

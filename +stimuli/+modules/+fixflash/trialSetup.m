@@ -59,12 +59,12 @@ p.trial.(sn).error = 1; % default to "never obtained fixation"
 
 % behavior on this module progresses through a set of states, starting with
 % state 1
-p.trial.(sn).states = stimuli.stateControl();
-p.trial.(sn).states.addState(stimuli.fixflash.state0_FixWait(0))
-p.trial.(sn).states.addState(stimuli.fixflash.state1_FixGracePeriod(1))
-p.trial.(sn).states.addState(stimuli.fixflash.state2_FixHold(2))
-p.trial.(sn).states.addState(stimuli.fixflash.state7_BreakFixTimeout(7))
-p.trial.(sn).states.addState(stimuli.fixflash.state8_InterTrialInterval(8))
+p.trial.(sn).states = stimuli.objects.stateControl();
+p.trial.(sn).states.addState(stimuli.modules.fixflash.state0_FixWait(0))
+p.trial.(sn).states.addState(stimuli.modules.fixflash.state1_FixGracePeriod(1))
+p.trial.(sn).states.addState(stimuli.modules.fixflash.state2_FixHold(2))
+p.trial.(sn).states.addState(stimuli.modules.fixflash.state7_BreakFixTimeout(7))
+p.trial.(sn).states.addState(stimuli.modules.fixflash.state8_InterTrialInterval(8))
 
 p.trial.(sn).states.setState(0); % initialize state machine
 end

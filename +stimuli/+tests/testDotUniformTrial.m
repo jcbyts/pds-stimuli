@@ -78,7 +78,7 @@ switch state
         % --- Instantiate classes
         
         % --- Fixation Image Object
-        p.trial.(sn).hDots   = stimuli.dotsUniform('position', p.trial.display.ctr(1:2), ...
+        p.trial.(sn).hDots   = stimuli.objects.dotsUniform('position', p.trial.display.ctr(1:2), ...
             'dotSize', 2, 'range', 50);
         p.trial.(sn).hDots.radius = 100; % 20 pixel radius
         

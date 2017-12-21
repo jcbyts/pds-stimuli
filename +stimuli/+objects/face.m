@@ -1,4 +1,4 @@
-classdef face < stimuli.textures
+classdef face < stimuli.objects.textures
     % FACE is a texture of a marmoset faces
     %   Detailed explanation goes here
     
@@ -16,7 +16,7 @@ classdef face < stimuli.textures
             ip.parse(varargin{:})
             
             % --- Face Textures
-            o = o@stimuli.textures(p.trial.display.ptr); % call the parent constructor
+            o = o@stimuli.objects.textures(p.trial.display.ptr); % call the parent constructor
             
             o.maxContrast = ip.Results.maxContrast;
             

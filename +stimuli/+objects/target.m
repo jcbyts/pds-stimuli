@@ -1,4 +1,4 @@
-classdef target < stimuli.stimulus %#ok<*MCSUP>
+classdef target < stimuli.objects.stimulus %#ok<*MCSUP>
 % TARGET is a STIMULUS that has a position and can be fixated
 % use this class if the stimulus behavior depends on whether the animal is
 % looking at it
@@ -17,7 +17,7 @@ classdef target < stimuli.stimulus %#ok<*MCSUP>
         % class constructor
         function obj = target(varargin)
             
-            obj = obj@stimuli.stimulus(varargin{:});
+            obj = obj@stimuli.objects.stimulus(varargin{:});
             
             ip = inputParser;
             ip.StructExpand  = true;
@@ -26,9 +26,6 @@ classdef target < stimuli.stimulus %#ok<*MCSUP>
             ip.parse(varargin{:})
             
             obj.position = ip.Results.position;
-%             if nargin > 0
-%                 obj.position = varargin{1};
-%             end
             
             obj.isFixated = false; % initialize to non-fixated state
         end

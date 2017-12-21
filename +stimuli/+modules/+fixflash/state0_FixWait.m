@@ -1,4 +1,4 @@
-classdef state0_FixWait < stimuli.state
+classdef state0_FixWait < stimuli.objects.state
     % state 0 - wait for fixation
     
     % --- Parameters that make this state operate
@@ -15,7 +15,7 @@ classdef state0_FixWait < stimuli.state
         function s = state0_FixWait(varargin) % constructor
             fprintf(1,'%s\n',mfilename);
             
-            s = s@stimuli.state(0); % call the parent constructor
+            s = s@stimuli.objects.state(0); % call the parent constructor
         end
         
         % --- Drawing commands

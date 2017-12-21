@@ -1,4 +1,4 @@
-classdef state8_InterTrialInterval < stimuli.state
+classdef state8_InterTrialInterval < stimuli.objects.state
     % state 8 - inter-trial interval
     
     % 07-07-2016 - Shaun L. Cloherty <s.cloherty@ieee.org>
@@ -12,7 +12,7 @@ classdef state8_InterTrialInterval < stimuli.state
         function s = state8_InterTrialInterval(varargin)
             fprintf(1,'%s\n',mfilename);
             
-            s = s@stimuli.state(8); % call the parent constructor
+            s = s@stimuli.objects.state(8); % call the parent constructor
         end
         
         function frameDraw(~,p,sn)

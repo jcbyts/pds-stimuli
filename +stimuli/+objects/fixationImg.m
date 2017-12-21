@@ -1,4 +1,4 @@
-classdef fixationImg < stimuli.target
+classdef fixationImg < stimuli.objects.target
   % FIXATIONIMG is a class for drawing fixation points in PLDAPS
   %
   % fixationImg is a <strong> stimuli.target </strong>
@@ -82,7 +82,7 @@ classdef fixationImg < stimuli.target
       % --- Class constructor
       function o = fixationImg(varargin)
           
-          o = o@stimuli.target(varargin{:}); % use parent constructor (inherits the properties and methods of TARGET)
+          o = o@stimuli.objects.target(varargin{:}); % use parent constructor (inherits the properties and methods of TARGET)
           
           if nargin == 1
               return

@@ -1,4 +1,4 @@
-classdef dotsbase < stimuli.target % (Abstract) % should this be abstract
+classdef dotsbase < stimuli.objects.target % (Abstract) % should this be abstract
     % Abstract class for drawing a circular patch of moving dots.
     %
     % The class constructor can be called with a number of arguments:
@@ -53,7 +53,7 @@ classdef dotsbase < stimuli.target % (Abstract) % should this be abstract
     methods (Access = public)
         function o = dotsbase(varargin)
             
-            o = o@stimuli.target(varargin{:});
+            o = o@stimuli.objects.target(varargin{:});
             
             if nargin < 2
                 return

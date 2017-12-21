@@ -77,7 +77,7 @@ switch state
         % --- Instantiate classes
         
         % --- Fixation Image Object
-        p.trial.(sn).hFix   = stimuli.fixationImg('position', p.trial.display.ctr(1:2));
+        p.trial.(sn).hFix   = stimuli.objects.fixationImg('position', p.trial.display.ctr(1:2));
         p.trial.(sn).hFix.radius = 20; % 20 pixel radius
         p.trial.(sn).hFix.noisesigma = 2;
         

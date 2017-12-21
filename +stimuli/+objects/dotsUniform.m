@@ -1,4 +1,4 @@
-classdef dotsUniform < stimuli.dotsbase
+classdef dotsUniform < stimuli.objects.dotsbase
     % Moving random dot stimulus with uniformly distributed dot directions.
     %
     % This class generates random dot stimuli with dot directions drawn
@@ -33,7 +33,7 @@ classdef dotsUniform < stimuli.dotsbase
             % pass unmatched name-value arguments to the parent constructor
             nextargs = [fieldnames(ip.Unmatched) struct2cell(ip.Unmatched)]';
             
-            o = o@stimuli.dotsbase(nextargs{:});
+            o = o@stimuli.objects.dotsbase(nextargs{:});
             
             args = ip.Results;
             o.range = args.range;

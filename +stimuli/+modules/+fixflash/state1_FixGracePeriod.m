@@ -1,4 +1,4 @@
-classdef state1_FixGracePeriod < stimuli.state
+classdef state1_FixGracePeriod < stimuli.objects.state
     % state 1 - fixation grace period
     % Time alotted after entering fixation window before Hold Fixation begins
     
@@ -7,7 +7,7 @@ classdef state1_FixGracePeriod < stimuli.state
         function s = state1_FixGracePeriod(varargin)
             fprintf(1,'%s\n',mfilename);
             
-            s = s@stimuli.state(1); % call the parent constructor
+            s = s@stimuli.objects.state(1); % call the parent constructor
         end
         
         % --- Drawing commands

@@ -1,4 +1,4 @@
-classdef state2_FixHold < stimuli.state
+classdef state2_FixHold < stimuli.objects.state
     % state 2 - hold fixation for reward
     
     properties
@@ -9,7 +9,7 @@ classdef state2_FixHold < stimuli.state
         function s = state2_FixHold(varargin)
             fprintf(1,'%s\n',mfilename);
             
-            s = s@stimuli.state(2); % call the parent constructor
+            s = s@stimuli.objects.state(2); % call the parent constructor
         end
         
         % --- Drawing commands
