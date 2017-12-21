@@ -13,8 +13,10 @@ ctr   = p.trial.display.ctr(1:2);   % center of the screen
 % --- Random seed
 if isfield(p.trial.(sn),'rngs') && isfield(p.trial.(sn).rngs, 'conditionerRNG')
     p.trial.(sn).rngs.conditionerRNG.reset; % reset saved stream
+    p.trial.(sn).hFix.rng.reset;
 else
-    p.trial.(sn).rngs.conditionerRNG=RandStream(p.trial.(sn).rngs.randomNumberGenerater, 'seed', p.trial.(sn).rngs.trialSeeds(p.trial.pldaps.iTrial));
+    [p.trial.(sn).rngs.conditionerRNG] = RandStream(p.trial.(sn).rngs.randomNumberGenerater, 'seed', p.trial.(sn).rngs.trialSeeds(p.trial.pldaps.iTrial));
+    p.trial.(sn).hFix.setRandomSeed();
 end
 setupRNG=p.trial.(sn).rngs.conditionerRNG;
 
@@ -32,9 +34,10 @@ sz = p.trial.(sn).fixPointRadius * ppd;
 p.trial.(sn).hFix.radius     = sz;
 p.trial.(sn).hFix.color      = ones(1,3);
 % p.trial.(sn).hFix.ctrColor   = -ones(1,3);
-p.trial.(sn).hFix.xyPix      = [xpos ypos] * ppd + ctr;
+p.trial.(sn).hFix.position      = [xpos ypos] * ppd + ctr;
 p.trial.(sn).hFix.winRadius  = p.trial.(sn).fixWinRadius * ppd;
 p.trial.(sn).hFix.wincolor   = p.trial.display.clut.bg_white;
+
 
 % fixation duration
 p.trial.(sn).fixDuration = p.trial.(sn).minFixDuration;
@@ -45,7 +48,7 @@ p.trial.(sn).holdDuration = 0;
 
 % --- Face for reward feedback
 p.trial.(sn).hFace.texSize  = 2 * p.trial.(sn).faceRadius * ppd;
-p.trial.(sn).hFace.position = p.trial.(sn).hFix.xyPix;
+p.trial.(sn).hFace.position = p.trial.(sn).hFix.position;
 p.trial.(sn).hFace.id       = p.trial.(sn).faceIndex;
 
 % --- Reward

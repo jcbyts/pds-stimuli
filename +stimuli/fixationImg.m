@@ -9,7 +9,7 @@ classdef fixationImg < stimuli.target
   %
   % The class constructor can be called with a range of arguments:
   %
-  %   <strong> xyPix     </strong>     - center of the target (x,y; pixels)
+  %   <strong> position     </strong>     - center of the target (x,y; pixels)
   %   <strong> radius    </strong>     - radius of surround (pixels)
   %   <strong> winRadius </strong>     - radius of the fixation window 
   %   <strong> color     </strong>     - color of fixation point (clut index or [r,g,b])
@@ -17,9 +17,9 @@ classdef fixationImg < stimuli.target
   %   <strong> winColour </strong>  (optional) color of fixation window (clut index or [r,g,b])
   %
   % e.g., 
-  %     targ = <strong>stimuli.fixation</strong>('xyPix', [960 540], 'radius', 10)
+  %     targ = <strong>stimuli.fixation</strong>('position', [960 540], 'radius', 10)
   %
-  %     targ = <strong>stimuli.fixation</strong>('xyPix', p.trial.display.ctr(1:2), ...
+  %     targ = <strong>stimuli.fixation</strong>('position', p.trial.display.ctr(1:2), ...
   %             'radius', 0.5*p.trial.display.ppd, ...
   %             'winRadius', 1.5*p.trial.display.ppd, ...
   %             'color', [1 1 1], ...
@@ -51,30 +51,30 @@ classdef fixationImg < stimuli.target
   %         targ.frameDraw(p)
   
   properties (Access = public),
-	radius@double = 5; % pixels
-	color@double  = ones(1,3);
-	ctrColor@double = -ones(1,3);
-	wincolor
-    imgDir
-	fileList
-	contrast=.5
-    maskType@char='circle'
-    noisesigma@double = 20; % pixels (noise of random walk)
-    shrinkTimeConstant@double=.3
+	radius@double             = 5; % pixels
+	color@double              = ones(1,3);
+	ctrColor@double           = -ones(1,3);
+	wincolor                  % pointer to clut. see: pldaps.display.clut.(color)
+    imgDir                    % directory where the images live
+	fileList                  % list of files to draw from
+	contrast@double           = .5;         % contrast in range [-.5, .5]
+    maskType@char             = 'circle';   % 'circle', 'guassian', 'tukey'
+    noisesigma@double         = 20;         % pixels (noise of random walk)
+    shrinkTimeConstant@double = .3;
   end
   
   properties (Access = private)
     
     % --- properties for image-scanning fixation point  
-    tex
-	mask
-    sz
-    srcrect
-    cliprect
-    dstrect
-    maskrect
-    xyclip
-    frameIter=1
+    tex         % pointer to PTB texture of the image
+	mask        % pointer to PTB texture of the mask
+    sz          % size of the mask (based on radius)
+    srcrect     % rectangle indicating the size of the image
+    cliprect    % rectangle for the clipped region of the image
+    dstrect     % rectangle for the destination (of the image) on the screen
+    maskrect    % rectangle for the destination (of the mask) on the screen
+    xyclip      % random walk path of the mask/clipped region
+    frameIter=1 % counter for tracking frames
   end
   
   methods (Access = public)
@@ -91,13 +91,13 @@ classdef fixationImg < stimuli.target
           % initialise input parser
           ip = inputParser;
           ip.StructExpand = true;
-          ip.addParameter('radius', o.radius,   @isfloat); % pixels
-          ip.addParameter('color',  o.color,    @isfloat); % color r,g,b triplet
-          ip.addParameter('xyPix',  o.xyPix,    @isfloat); % [x,y] (pixels)
-          ip.addParameter('imgDir', o.imgDir,   @isdir);
+          ip.addParameter('radius',   o.radius,   @isfloat); % pixels
+          ip.addParameter('color',    o.color,    @isfloat); % color r,g,b triplet
+          ip.addParameter('position', o.position, @isfloat); % [x,y] (pixels)
+          ip.addParameter('imgDir',   o.imgDir,   @isdir);
           ip.addParameter('fileList', o.fileList);
-          ip.addParameter('rng', o.rng);
-          ip.addParameter('seed', []);
+          ip.addParameter('rng',      o.rng);
+          ip.addParameter('seed',     []);
           ip.addParameter('maskType', o.maskType, @ischar)
           
           try
@@ -111,7 +111,7 @@ classdef fixationImg < stimuli.target
           
           o.radius      = args.radius;
           o.color       = args.color;
-          o.xyPix    	= args.xyPix;
+          o.position    	= args.position;
           o.maskType    = args.maskType;
           
         %------------------------------------------------------------------
@@ -156,7 +156,7 @@ classdef fixationImg < stimuli.target
             end
                 
             % clipping point random walk center
-            xyclip0 = o.xyPix; % center of clipping point on source image
+            xyclip0 = o.position; % center of clipping point on source image
               
             maxFrames = p.trial.pldaps.maxTrialLength * p.trial.display.frate;
 
@@ -189,7 +189,7 @@ classdef fixationImg < stimuli.target
             
             myrect = [o.xyclip(1,:) - o.sz*2 o.xyclip(1,:) + o.sz*2 + 1];
             o.cliprect = ClipRect(myrect,p.trial.display.winRect);
-            o.dstrect  = CenterRectOnPoint([0 0 o.sz], o.xyPix(1), o.xyPix(2));
+            o.dstrect  = CenterRectOnPoint([0 0 o.sz], o.position(1), o.position(2));
             
             
             % make and store texture pointers
@@ -222,12 +222,12 @@ classdef fixationImg < stimuli.target
                   
                   r = o.radius; % radius in pixels
                   
-                  rect = kron([1,1],o.xyPix) + kron(r(:),[-1, -1, +1, +1]);
+                  rect = kron([1,1],o.position) + kron(r(:),[-1, -1, +1, +1]);
                   Screen('FillOval',p.trial.display.overlayptr, o.color,rect');
                   
                   r = o.radius/2; % radius in pixels
                   
-                  rect = kron([1,1],o.xyPix) + kron(r(:),[-1, -1, +1, +1]);
+                  rect = kron([1,1],o.position) + kron(r(:),[-1, -1, +1, +1]);
                   Screen('FillOval',p.trial.display.overlayptr, o.ctrColor,rect');
                   
           end
@@ -235,7 +235,7 @@ classdef fixationImg < stimuli.target
           % draw the fixation window
           if ~isempty(o.wincolor)
               r = o.winRadius;
-              rect = kron([1,1],o.xyPix) + kron(r(:),[-1, -1, +1, +1]);
+              rect = kron([1,1],o.position) + kron(r(:),[-1, -1, +1, +1]);
               Screen('FrameOval', p.trial.display.overlayptr, o.wincolor, rect');
               %               Screen('FillOval',p.trial.display.overlayptr, o.wincolor,rect');
           end
@@ -253,7 +253,6 @@ classdef fixationImg < stimuli.target
               warning('needs a pldaps to run')
               return
           end
-          o.frameIter = o.frameIter + 1; %p.trial.iFrame;
 %           myrect = [o.xyclip(o.frameIter,:) - o.sz*10 o.xyclip(o.frameIter,:) + o.sz + 1];
 %           myrect = [o.xyclip(o.frameIter,:) - o.sz o.xyclip(o.frameIter,:) + o.sz + 1];
           
@@ -266,9 +265,11 @@ classdef fixationImg < stimuli.target
           myrect = [o.xyclip(o.frameIter,:) - ss o.xyclip(o.frameIter,:) + ss + 1];
           o.cliprect = ClipRect(myrect,o.srcrect);
           
-          o.dstrect  = CenterRectOnPoint([0 0 ss], o.xyPix(1), o.xyPix(2));
+          o.dstrect  = CenterRectOnPoint([0 0 ss], o.position(1), o.position(2));
           o.maskrect = o.dstrect;
             
+          o.frameIter = o.frameIter + 1; %p.trial.iFrame;
+          
           % check if point is fixated
           o.isHeld([p.trial.eyeX p.trial.eyeY])
       end

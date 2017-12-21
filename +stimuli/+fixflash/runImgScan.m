@@ -147,7 +147,7 @@ switch state
         % --- Instantiate classes
         
         % --- Fixation
-        p.trial.(sn).hFix   = stimuli.fixationImg('xyPix', p.trial.display.ctr(1:2));
+        p.trial.(sn).hFix   = stimuli.fixationImg('position', p.trial.display.ctr(1:2));
         
         % apply specialized parameters
         p.trial.(sn).hFix.shrinkTimeConstant = p.trial.(sn).shrinkTimeConstant;

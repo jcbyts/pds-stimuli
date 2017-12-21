@@ -1,8 +1,58 @@
 classdef stimulus < handle %#ok<*MCSUP>
-    % STIMULUS is a handle class that logs how its property changes
-    %   The property STIMVALUE will be inherited by any stimulus and any time
+    % STIMULUS is a class that logs how its own property changes
+    %   The property <strong>stimvalue</strong> will be tracked and any time
     %   it is changed, the time of change will be logged and saved in the
-    %   property LOG
+    %   property <strong>log</strong> along with the value at that change.
+    %  
+    % It is unlikely that you will ever instantiate a stimulus on its own.
+    % For use, see <strong>stimuli.fixation</strong>, or 
+    % <strong>stimuli.target</strong>
+    %
+    % STIMULUS should be the core class for any stimulus implemented in
+    % pds-stimuli protocols. A stimulus doesn't really do anything except
+    % track when its property <strong>stimvalue</strong> is changed and
+    % manage a RandStream number generator.
+    % 
+    % PROPERTIES
+    %   stimValue   a scalar (double, logical) that has some meaning for 
+    %               the stimulus. For example 0 (false) means the stimulus
+    %               isn't shown. 1 (true) means the stimulus is shown. 2
+    %               (or any real number can indicate some other feature of
+    %               the stimulus).
+    %               Importantly, any time stimValue changes, the time of
+    %               change is logged using GetSecs -- thus, the PTB clock
+    %               value is stored whenever this value changes.
+    %               
+    %   log         a [2 x m] log of all changes to stimValue. Since
+    %               stimValue initializes to true, <strong>log</strong> will
+    %               always start with a [2 x 1] entry storing the time the
+    %               <strong>stimulus</strong> was constructed.
+    %
+    %   rng         a RandStream object. This is instantiated automatically
+    %               when the stimulus is constructed. It defaults to the
+    %               mt199937ar random number generator with a seed of 0. To
+    %               set rng, you can either pass in a RandStream object, or
+    %               pass in a seed.
+    %               
+    %  Example Calls:
+    %               s = stimuli.stimulus(); % create stimulus object
+    %                                       % automatically sets up rng
+    %               >> s.rng.Seed           % calling Seed returns the
+    %                                       % current seed
+    %               s.setRandomSeed();      % randomly assign seed
+    %               
+    %               or
+    %               
+    %               s.setRandomSeed(1234)   % sets the seed to 1234
+    %               
+    %               or
+    % 
+    %               s.setRandomSeed(RandStream('twister', 'Seed', 1235))
+    % 
+    %               s.stimValue = 2; 
+    %               check the log to see when stimValue was set to 2
+    
+
     
     properties (Access = public)
         stimValue
@@ -40,6 +90,7 @@ classdef stimulus < handle %#ok<*MCSUP>
             obj.log(:,end+1) = [obj.stimValue; GetSecs];
         end
         
+        % --- Manage the random number generator
         function setRandomSeed(obj, arg)
             % can pass in a RandStream object
             % a seed

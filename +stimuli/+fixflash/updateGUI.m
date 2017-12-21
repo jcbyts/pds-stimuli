@@ -101,7 +101,7 @@ eyexy = p.trial.behavior.eyeAtFrame;
     breakfix  = p.trial.(sn).states.getTxTime(7) - p.trial.trstart;
     iti       = p.trial.(sn).states.getTxTime(8) - p.trial.trstart;
     
-    eyexy = bsxfun(@minus, eyexy, p.trial.(sn).hFix(1).xyPix');
+    eyexy = bsxfun(@minus, eyexy, p.trial.(sn).hFix(1).position');
     eyexy = pds.px2deg(eyexy, p.trial.display.viewdist, p.trial.display.px2w);
     
     ax =handles.LastTrialPlot;

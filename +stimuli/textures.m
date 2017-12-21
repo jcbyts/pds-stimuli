@@ -7,17 +7,12 @@ classdef textures < stimuli.target
     %   position - center of texture (x,y; pixels)
     %
     % Example Call:
-    %  o = textures(winPtr)
-    
-    
-    % 26-06-2016 - Shaun L. Cloherty <s.cloherty@ieee.org>
-    % 27-05-2017 - Jake L. Yates
+    %  o = textures()
     
     properties (Access = public),
         id; % id of the texture to show on call to drawTextures();
         
         texSize@double; % width, or [wdth, hght] (pixels)
-        position@double = [0.0, 0.0]; % position [x,y] (pixels)
         
         alpha@double = 1.0; % alpha (opacity) for the selected texture(s)
         
@@ -60,6 +55,9 @@ classdef textures < stimuli.target
     
     methods (Access = public)
         function o = textures(winPtr,varargin) % marmoview's initCmd?
+            
+            o = o@stimuli.target(varargin{:});
+            
             o.winPtr = winPtr;
             
             if ~isnan(o.winPtr)

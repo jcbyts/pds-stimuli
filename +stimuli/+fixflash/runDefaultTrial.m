@@ -1,5 +1,5 @@
-function p=default(p,state, sn)
-% RUNTRIAL run a trial of the dotmotion task
+function p=runDefaultTrial(p,state, sn)
+% RUNDEFAULTTRIAL run a trial of the dotmotion task
 %
 % stimuli.dotmotion.runTrial is a PLDAPS trial function. PLDAPS trial functions switch
 % between different states that have to do with timing relative to the
@@ -70,7 +70,10 @@ switch state
         
         stimuli.fixflash.updateGUI(p, sn);
     
+    % ---------------------------------------------------------------------
+    % --- What to do before opening the pldaps screen
 	case p.trial.pldaps.trialStates.experimentPreOpenScreen
+        % This code should be copied from protocol to protocol
         
         p.defaultParameters.(sn).stateFunction.acceptsLocationInput = true; % is this necessary
         % setup states that will be called by this module
@@ -132,23 +135,17 @@ switch state
             end 
         end
         
-        % color scheme for this task
-        stimuli.clutColors(p);
-        
         %------------------------------------------------------------------
         % --- Instantiate classes
         
         % --- Fixation
-        p.trial.(sn).hFix   = stimuli.fixation('xyPix', p.trial.display.ctr(1:2));
+        p.trial.(sn).hFix   = stimuli.fixation('position', p.trial.display.ctr(1:2));
         
         % --- Reward Face
         p.trial.(sn).hFace  = stimuli.face(p);
         
         % --- Plotting
         p.functionHandles.fixFlashPlot = stimuli.fixflash.fixFlashPlot;
-        
-        % --- Reward
-%         p.trial.(sn).hReward    = stimuli.reward(p); % TODO: make this global
 
         
 end % switch

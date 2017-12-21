@@ -4,8 +4,8 @@ classdef target < stimuli.stimulus %#ok<*MCSUP>
 % looking at it
 
     properties
-        xyPix     = [0 0] % location on screen (in pixels)
-        winRadius = 20    % radius for detecting fixation
+        position@double  = [0 0] % location on screen (in pixels)
+        winRadius@double = 20    % radius for detecting fixation
     end
     
     properties (SetAccess = private, GetAccess = public) % you cannot write to these
@@ -19,9 +19,16 @@ classdef target < stimuli.stimulus %#ok<*MCSUP>
             
             obj = obj@stimuli.stimulus(varargin{:});
             
-            if nargin > 0
-                obj.xyPix = varargin{1};
-            end
+            ip = inputParser;
+            ip.StructExpand  = true;
+            ip.KeepUnmatched = true;
+            ip.addParameter('position', obj.position);
+            ip.parse(varargin{:})
+            
+            obj.position = ip.Results.position;
+%             if nargin > 0
+%                 obj.position = varargin{1};
+%             end
             
             obj.isFixated = false; % initialize to non-fixated state
         end
@@ -37,7 +44,7 @@ classdef target < stimuli.stimulus %#ok<*MCSUP>
             %   xyEye [1 x 2] x,y position of the eye (in pixels)
             
             % check if fixated
-            val = norm(xyEye(:) - obj.xyPix(:)) < obj.winRadius;
+            val = norm(xyEye(:) - obj.position(:)) < obj.winRadius;
                
             % log changes
             if val ~= obj.isFixated

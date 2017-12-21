@@ -1,130 +1,32 @@
 function p=forage(p, state, sn)
 % FACEFORAGE module for PLDAPS open reception
-% Draws randomly scaled gaussians across the screen for reverse
-% correlation. Based loosely on ProceduralGarborium.m
-
-
 
 if nargin<3
-    sn='stimulus';
+    sn='faceforage';
 end
 
-if nargin==1
-    Screen('Preference', 'TextRenderer', 1)
-    
-    p = pdsDefaultTrialStructure(p);
-    
-    p.defaultParameters.pldaps.trialMasterFunction='runModularTrial';
-    p.defaultParameters.pldaps.trialFunction='stimuli.forage.forage';
-    
-    c.Nr=1; %one condition;
-    p.conditions=repmat({c},1,200);
-    
-    p.defaultParameters.pldaps.finish = length(p.conditions);
-    
-    p.trial.(sn).rngs.randomNumberGenerater='mrg32k3a';
-    p.trial.(sn).rngs.trialSeeds = randi(2^32, [3e3 1]);
-    p.trial.exploded=0;
-    
-    %----------------------------------------------------------------------
-    % Default Conditions
-    if ~isfield(p.trial.pldaps, 'maxTrialLength')
-        p.trial.pldaps.maxTrialLength = 5; %20;
-    end
-    
-    p.trial.pldaps.maxFrames        = p.trial.pldaps.maxTrialLength*p.trial.display.frate;
-    
-    
-    if ~isfield(p.trial.(sn), 'MotN')
-        p.trial.(sn).MotN       = 5;  % number of face objects
-    end
-    
-    if ~isfield(p.trial.(sn), 'minSpeed')
-        p.trial.(sn).minSpeed   = 5;
-    end
-    
-    if ~isfield(p.trial.(sn), 'maxSpeed')
-        p.trial.(sn).maxSpeed   = 15;
-    end
-    
-    if ~isfield(p.trial.(sn), 'motionType')
-        p.trial.(sn).motionType = 'linear';
-    end
-    
-    if ~isfield(p.trial.(sn), 'forcefield')
-        p.trial.(sn).forcefield = false;
-    end
-    
-    if ~isfield(p.trial.(sn), 'type')
-        p.trial.(sn).type       = 'grating';
-    end
-    
-    if ~isfield(p.trial.(sn), 'appearGazeCont')
-        p.trial.(sn).appearGazeCont = false;
-    end
-    
-    if ~isfield(p.trial.(sn), 'appearRangePar')
-        p.trial.(sn).appearRangePar = 5;
-    end
-    
-    if ~isfield(p.trial.(sn), 'appearCenter')
-        p.trial.(sn).appearCenter = [0 0];
-    end
-    
-    if ~isfield(p.trial.(sn), 'appearTau')
-        p.trial.(sn).appearTau = 30;
-    end
-    
-    if ~isfield(p.trial.(sn), 'offLifetime')
-        p.trial.(sn).offLifetime = 250;
-    end
-    
-    if ~isfield(p.trial.(sn), 'onLifetime')
-        p.trial.(sn).onLifetime = 100;
-    end
-    
-    if ~isfield(p.trial.(sn), 'maxContrast')
-        p.trial.(sn).maxContrast = .2;
-    end
-    
-    if ~isfield(p.trial.(sn), 'holdDuration')
-        p.trial.(sn).holdDuration = 15;
-    end
-    
-    return
-end
+% -------------------------------------------------------------------------
+% --- Switch statement for frame states
 
-
-
-pldapsDefaultTrialFunction(p,state);
 switch state
     
-    %----------------------------------------------------------------------
-    % Update all behavior of the objects
-    case p.trial.pldaps.trialStates.frameUpdate
+    case p.trial.pldaps.trialStates.experimentPreOpenScreen
         
-        p.trial.(sn).m.isheld([p.trial.eyeX p.trial.eyeY]);
-        p.trial.(sn).m.move()
+        p.trial.(sn).stateFunction.acceptsLocationInput = true; % is this necessary
+        % setup states that will be called by this module
+        p.trial.(sn).stateFunction.requestedStates.experimentPostOpenScreen = true;
+        p.trial.(sn).stateFunction.requestedStates.trialSetup = true;
+        p.trial.(sn).stateFunction.requestedStates.framePrepareDrawing = true;
+        p.trial.(sn).stateFunction.requestedStates.frameDraw = true;
+        p.trial.(sn).stateFunction.requestedStates.trialCleanUpandSave = true;
         
-        
-        % --- logging parameters
-        p.trial.(sn).eyes(p.trial.iFrame,:) = [p.trial.eyeX;p.trial.eyeY];
-        p.trial.(sn).x(p.trial.iFrame, :)   = p.trial.(sn).m.x;
-        p.trial.(sn).y(p.trial.iFrame, :)   = p.trial.(sn).m.y;
-        p.trial.(sn).ctrHold(p.trial.iFrame, :) = p.trial.(sn).m.ctrHold;
-        
-        % flag end of trial (if time is greater than max trial length)
-        if p.trial.iFrame >= p.trial.(sn).maxFrames
-            p.trial.flagNextTrial=true;
-        end
-        
-    case p.trial.pldaps.trialStates.frameDraw
+        % --- setup random seeds
+        p.trial.(sn).rngs.randomNumberGenerater='mrg32k3a';
+        p.trial.(sn).rngs.trialSeeds = repmat(randi(2^32, [10 1]), 1e3,1);
 
-        p.trial.(sn).m.draw()
-%         Screen('DrawText', p.trial.display.ptr, num2str(p.trial.exploded), 50, 50, [1 1 1]);
     
-%--------------------------------------------------------------------------
-% --- Before Trial
+    %--------------------------------------------------------------------------
+    % --- Before Trial
     case p.trial.pldaps.trialStates.trialSetup
         
         % setup random seed
@@ -158,7 +60,32 @@ switch state
         p.trial.(sn).y = nan(p.trial.(sn).maxFrames, p.trial.(sn).MotN);
         
         p.trial.(sn).ctrHold    = nan(p.trial.(sn).maxFrames, p.trial.(sn).MotN);
+    
+    % ---------------------------------------------------------------------
+    % --- Update all behavior of the objects
+    case p.trial.pldaps.trialStates.framePrepareDrawing
+        
+        p.trial.(sn).m.isheld([p.trial.eyeX p.trial.eyeY]);
+        p.trial.(sn).m.move()
+        
+        % --- logging parameters
+        p.trial.(sn).eyes(p.trial.iFrame,:) = [p.trial.eyeX;p.trial.eyeY];
+        p.trial.(sn).x(p.trial.iFrame, :)   = p.trial.(sn).m.x;
+        p.trial.(sn).y(p.trial.iFrame, :)   = p.trial.(sn).m.y;
+        p.trial.(sn).ctrHold(p.trial.iFrame, :) = p.trial.(sn).m.ctrHold;
+        
+        % flag end of trial (if time is greater than max trial length)
+        if p.trial.iFrame >= p.trial.(sn).maxFrames
+            p.trial.flagNextTrial=true;
+        end
+        
+    % ---------------------------------------------------------------------
+    % --- Draw objects
+    case p.trial.pldaps.trialStates.frameDraw
+
+        p.trial.(sn).m.draw()
       
+	% ---------------------------------------------------------------------
     % --- After Trial
     case p.trial.pldaps.trialStates.trialCleanUpandSave
         
@@ -175,11 +102,6 @@ switch state
         ylabel('Degrees')
         ylim([-15 15])
         xlim([-15 15])
-        
-%         for i=1:p.trial.(sn).MotN
-%             ix=diff(p.trial.(sn).ctrHold(:,i))>0;
-%             plot(p.trial.(sn).x(ix,i), p.trial.(sn).y(ix,i), 'r.');
-%         end
         
         subplot(4,3,7:9)
         plot(p.trial.(sn).x); hold on
@@ -200,8 +122,70 @@ switch state
         p.trial.(sn).m.objects.closeAll;
         drawnow
     
-        % --- handles that depend on pldaps being totally set up
+	% ---------------------------------------------------------------------
+    % --- Set up default parameters
     case p.trial.pldaps.trialStates.experimentPostOpenScreen
+        
+        % --- Set up default parameters 
+        if ~isfield(p.trial.(sn), 'MotN')
+            p.trial.(sn).MotN       = 3;  % number of face objects
+        end
+        
+        if ~isfield(p.trial.(sn), 'minSpeed')
+            p.trial.(sn).minSpeed   = 5;
+        end
+        
+        if ~isfield(p.trial.(sn), 'maxSpeed')
+            p.trial.(sn).maxSpeed   = 10;
+        end
+        
+        if ~isfield(p.trial.(sn), 'motionType')
+            p.trial.(sn).motionType = 'randomwalk';
+        end
+        
+        if ~isfield(p.trial.(sn), 'forcefield')
+            p.trial.(sn).forcefield = false;
+        end
+        
+        if ~isfield(p.trial.(sn), 'type')
+            p.trial.(sn).type       = 'face';
+        end
+        
+        if ~isfield(p.trial.(sn), 'appearGazeContingent')
+            p.trial.(sn).appearGazeContingent = false;
+        end
+        
+        if ~isfield(p.trial.(sn), 'appearRangePar')
+            p.trial.(sn).appearRangePar = 2;
+        end
+        
+        if ~isfield(p.trial.(sn), 'appearCenter')
+            p.trial.(sn).appearCenter = [0 0];
+        end
+        
+        if ~isfield(p.trial.(sn), 'appearTau')
+            p.trial.(sn).appearTau = 5;
+        end
+        
+        if ~isfield(p.trial.(sn), 'offLifetime')
+            p.trial.(sn).offLifetime = 240;
+        end
+        
+        if ~isfield(p.trial.(sn), 'onLifetime')
+            p.trial.(sn).onLifetime = 100;
+        end
+        
+        if ~isfield(p.trial.(sn), 'maxContrast')
+            p.trial.(sn).maxContrast = 0.2;
+        end
+        
+        if ~isfield(p.trial.(sn), 'holdDuration')
+            p.trial.(sn).holdDuration = 15; % frames
+        end
+        
+        if ~isfield(p.trial.(sn), 'radius')
+            p.trial.(sn).radius = 1; % degrees of visual angle
+        end
         
 
         

@@ -7,7 +7,7 @@ classdef fixation < stimuli.target
   %
   % The class constructor can be called with a range of arguments:
   %
-  %   <strong> xyPix     </strong>     - center of the target (x,y; pixels)
+  %   <strong> position     </strong>     - center of the target (x,y; pixels)
   %   <strong> radius    </strong>     - radius of surround (pixels)
   %   <strong> winRadius </strong>     - radius of the fixation window 
   %   <strong> color     </strong>     - color of fixation point (clut index or [r,g,b])
@@ -15,9 +15,9 @@ classdef fixation < stimuli.target
   %   <strong> winColour </strong>  (optional) color of fixation window (clut index or [r,g,b])
   %
   % e.g., 
-  %     targ = <strong>stimuli.fixation</strong>('xyPix', [960 540], 'radius', 10)
+  %     targ = <strong>stimuli.fixation</strong>('position', [960 540], 'radius', 10)
   %
-  %     targ = <strong>stimuli.fixation</strong>('xyPix', p.trial.display.ctr(1:2), ...
+  %     targ = <strong>stimuli.fixation</strong>('position', p.trial.display.ctr(1:2), ...
   %             'radius', 0.5*p.trial.display.ppd, ...
   %             'winRadius', 1.5*p.trial.display.ppd, ...
   %             'color', [1 1 1], ...
@@ -60,7 +60,7 @@ classdef fixation < stimuli.target
       % --- Class constructor
       function o = fixation(varargin)
           
-          o = o@stimuli.target(); % use parent constructor (inherits the properties and methods of TARGET)
+          o = o@stimuli.target(varargin{:}); % use parent constructor (inherits the properties and methods of TARGET)
           
           if nargin == 1
               return
@@ -71,7 +71,7 @@ classdef fixation < stimuli.target
           ip.StructExpand = true;
           ip.addParameter('radius', o.radius,   @isfloat); % pixels
           ip.addParameter('color',  o.color,    @isfloat); % color r,g,b triplet
-          ip.addParameter('xyPix',  o.xyPix,    @isfloat); % [x,y] (pixels)
+          ip.addParameter('position',  o.position,    @isfloat); % [x,y] (pixels)
           
           try
               ip.parse(varargin{:});
@@ -84,7 +84,7 @@ classdef fixation < stimuli.target
           
           o.radius      = args.radius;
           o.color       = args.color;
-          o.xyPix    	= args.xyPix;
+          o.position    	= args.position;
       end
       
       
@@ -103,18 +103,18 @@ classdef fixation < stimuli.target
           
           r = o.radius; % radius in pixels
           
-          rect = kron([1,1],o.xyPix) + kron(r(:),[-1, -1, +1, +1]);
+          rect = kron([1,1],o.position) + kron(r(:),[-1, -1, +1, +1]);
           Screen('FillOval',p.trial.display.overlayptr, o.color,rect');
           
           r = o.radius/2; % radius in pixels
           
-          rect = kron([1,1],o.xyPix) + kron(r(:),[-1, -1, +1, +1]);
+          rect = kron([1,1],o.position) + kron(r(:),[-1, -1, +1, +1]);
           Screen('FillOval',p.trial.display.overlayptr, o.ctrColor,rect');
           
           % draw the fixation window
           if ~isempty(o.wincolor)
               r = o.winRadius;
-              rect = kron([1,1],o.xyPix) + kron(r(:),[-1, -1, +1, +1]);
+              rect = kron([1,1],o.position) + kron(r(:),[-1, -1, +1, +1]);
               Screen('FrameOval', p.trial.display.overlayptr, o.wincolor, rect');
 %               Screen('FillOval',p.trial.display.overlayptr, o.wincolor,rect');
           end
