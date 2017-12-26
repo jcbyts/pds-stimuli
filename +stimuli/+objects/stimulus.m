@@ -61,6 +61,7 @@ classdef stimulus < handle %#ok<*MCSUP>
     
     properties (SetAccess = ?stimuli.stimulus, GetAccess = public)
         log
+        locked@logical=false
     end
     
     methods
@@ -83,6 +84,11 @@ classdef stimulus < handle %#ok<*MCSUP>
         
         % --- set function logs the value when it is change
         function set.stimValue(obj, val)
+            if obj.locked
+                warning('you cannot modify a locked object')
+                return
+            end
+            
             if obj.stimValue==val
                 return
             end
@@ -109,6 +115,11 @@ classdef stimulus < handle %#ok<*MCSUP>
             end
             
         end
+        
+        function cleanup(obj)
+            obj.locked = true;
+        end
+            
     end
     
 end

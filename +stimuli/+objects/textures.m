@@ -167,7 +167,11 @@ classdef textures < stimuli.objects.target
             
             if ~isnan(o.winPtr)
                 for i = 1:o.numTex
+                    try
                     Screen('Close', o.texture{i}.ptr)
+                    catch
+                        warning('Texture close failed. Guessing it was already closed')
+                    end
                 end
             end
             

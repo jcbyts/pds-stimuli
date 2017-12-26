@@ -26,11 +26,11 @@ classdef stateControl < handle % handle class self references in memory
     
     properties (Access = private) % private. These are managed internally.
         stateIds@double             % array of all state ids
-        currentState@stimuli.state; % pointer to current state
+        currentState@stimuli.objects.state; % pointer to current state
         stateHandles@cell           % cell array of @state object handles
     end
     
-    properties (Access = {?stimuli.stateControl,?stimuli.state}) % only accessible by this class and the state class
+    properties (Access = {?stimuli.objects.stateControl,?stimuli.objects.state}) % only accessible by this class and the state class
 %         txTimes@double; % state transition times
         txLog@cell
 %         txCtr@double

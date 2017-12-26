@@ -37,19 +37,15 @@ switch state
             
             
             lastError = p.trial.(sn).error;
-            
-%             if p.trial.pldaps.iTrial < numel(p.conditions)
-                
-                switch lastError
-                    case 0 % staircase up
-                        p.conditions{p.trial.pldaps.iTrial + 1}.(sn).minFixDuration =  p.trial.(sn).minFixDuration + p.trial.(sn).staircaseStep;
-                    case 1 % do nothing
-                        p.conditions{p.trial.pldaps.iTrial + 1}.(sn).minFixDuration =  p.trial.(sn).minFixDuration;
-                    case 2 % staircase down
-                        p.conditions{p.trial.pldaps.iTrial + 1}.(sn).minFixDuration =  p.trial.(sn).minFixDuration - .75*p.trial.(sn).staircaseStep;
-                end
-                
-%             end % trial number
+                            
+            switch lastError
+                case 0 % staircase up
+                    p.conditions{p.trial.pldaps.iTrial + 1}.(sn).minFixDuration =  p.trial.(sn).minFixDuration + p.trial.(sn).staircaseStep;
+                case 1 % do nothing
+                    p.conditions{p.trial.pldaps.iTrial + 1}.(sn).minFixDuration =  p.trial.(sn).minFixDuration;
+                case 2 % staircase down
+                    p.conditions{p.trial.pldaps.iTrial + 1}.(sn).minFixDuration =  p.trial.(sn).minFixDuration - .75*p.trial.(sn).staircaseStep;
+            end
             
         end % staircase on
         

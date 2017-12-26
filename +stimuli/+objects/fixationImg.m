@@ -111,7 +111,7 @@ classdef fixationImg < stimuli.objects.target
           
           o.radius      = args.radius;
           o.color       = args.color;
-          o.position    	= args.position;
+          o.position    = args.position;
           o.maskType    = args.maskType;
           
         %------------------------------------------------------------------

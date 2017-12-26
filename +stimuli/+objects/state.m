@@ -22,9 +22,9 @@ classdef state < handle
     %       context while the @state class provides the state specific
     %       behaviour and transition logic
 
-    properties (Access = {?stimuli.stateControl,?stimuli.state})
+    properties (Access = {?stimuli.objects.stateControl,?stimuli.objects.state})
         id@double; % state identifier
-        sc@stimuli.stateControl % parent state controller
+        sc@stimuli.objects.stateControl % parent state controller
     end
     
     methods (Access = public)

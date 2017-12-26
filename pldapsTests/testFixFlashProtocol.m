@@ -27,6 +27,7 @@ sn = 'fixflash';
 settingsStruct.(sn).stateFunction.name = 'stimuli.modules.fixflash.runDefaultTrial';
 settingsStruct.(sn).stateFunction.order = 2;
 settingsStruct.(sn).use = true;
+
 settingsStruct.(sn).staircaseOn = true;
 settingsStruct.(sn).minFixDuration = .2;
 settingsStruct.(sn).fixationJitter = false;
