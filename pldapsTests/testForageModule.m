@@ -33,6 +33,11 @@ settingsStruct.(sn).use = false;
 sn = 'hartley';
 settingsStruct.(sn).stateFunction.name  = 'stimuli.modules.hartley.defaultHartleyTrial';
 settingsStruct.(sn).stateFunction.order = -1; % draw before behavior
+settingsStruct.(sn).use = false;
+
+sn = 'spatialsquares';
+settingsStruct.(sn).stateFunction.name  = 'stimuli.modules.mapping.spatialSquares';
+settingsStruct.(sn).stateFunction.order = -1; % draw before behavior
 settingsStruct.(sn).use = true;
 
 sn = 'forage';
