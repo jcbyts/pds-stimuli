@@ -1,20 +1,5 @@
-function p=runDefaultTrial(p,state, sn)
-% RUNDEFAULTTRIAL run a trial of the dotmotion task
-%
-% stimuli.dotmotion.runTrial is a PLDAPS trial function. PLDAPS trial functions switch
-% between different states that have to do with timing relative to the
-% frame refresh
-% 
-% all task/stimulus states are managed with a stimuli.trial object that is
-% constructed in stimuli.dotmotion.trialSetup(). That object, hTrial, controls the
-% transitions through the following states:
-% 
-% state0_ShowFixation - turn on the fixation point and wait for fixation
-% state1_FixWait      - grace period immediately after entering window
-% state2_FixPreStim   - hold fixation before showing dots
-% state6_HoldChoice   - hold choice to be evaluated
-% state7_BreakFixTimeout    - penalty for breaking fixation
-% state8_InterTrialInterval - time at the end of the trial
+function p = runDefaultTrial(p, state, sn)
+% RUNDEFAULTTRIAL run a trial of the fixflash task
 
 if nargin<3
     sn='fixflash';
@@ -75,20 +60,7 @@ switch state
 	case p.trial.pldaps.trialStates.experimentPreOpenScreen
         % This code should be copied from protocol to protocol
         
-        p.defaultParameters.(sn).stateFunction.acceptsLocationInput = true; % is this necessary
-        % setup states that will be called by this module
-        requestedStates = {...
-            'experimentPostOpenScreen',...
-            'trialSetup',...
-            'framePrepareDrawing',...
-            'frameDraw',...
-            'trialCleanUpandSave',...
-            };
-        
-        for iState = 1:numel(requestedStates)
-            stateName = requestedStates{iState};
-            p.defaultParameters.(sn).stateFunction.requestedStates.(stateName) = true;
-        end
+        stimuli.setupDefaultFrameStates(p, sn)
         
         p = stimuli.setupRandomSeed(p, sn);
             

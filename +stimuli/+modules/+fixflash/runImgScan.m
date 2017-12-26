@@ -132,6 +132,7 @@ switch state
             'noisesigma',               20, ... % pixels (noise of random walk)
             };
         
+        % step through argument pairs and add them to the module
         for iArg = 1:2:numel(defaultArgs)
             
             field = defaultArgs{iArg};
@@ -141,9 +142,6 @@ switch state
                 p.trial.(sn).(field) = val;
             end 
         end
-        
-        % color scheme for this task
-        stimuli.clutColors(p);
         
         %------------------------------------------------------------------
         % --- Instantiate classes
