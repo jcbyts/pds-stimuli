@@ -8,98 +8,23 @@ end
 
 switch state
         
-    case p.trial.pldaps.trialStates.framePrepareDrawing
+    %--------------------------------------------------------------------------
+    % --- Before Opening the screen: Setup the random seed and turn on the
+    %     default pldaps frame states
+    case p.trial.pldaps.trialStates.experimentPreOpenScreen
         
+        stimuli.setupDefaultFrameStates(p, sn);
+        stimuli.setupRandomSeed(p, sn);
         
-    case p.trial.pldaps.trialStates.frameUpdate
-        
-        if p.trial.(sn).on(p.trial.iFrame)
-            p.trial.(sn).hHart.kx=p.trial.(sn).kx(p.trial.iFrame);
-            p.trial.(sn).hHart.ky=p.trial.(sn).ky(p.trial.iFrame);
-            p.trial.(sn).hHart.tf=p.trial.(sn).tf(p.trial.iFrame);
-%             p.trial.(sn).phi(p.trial.iFrame)=mod(2*pi*p.trial.(sn).hHart.tf*p.trial.iFrame*p.trial.display.ifi, 2*pi);
-            p.trial.(sn).hHart.phi=p.trial.(sn).phi(p.trial.iFrame);
-        end
-        
-    case p.trial.pldaps.trialStates.frameDraw
-        
-        if p.trial.(sn).on(p.trial.iFrame)
-            p.trial.(sn).hHart.draw
-        end
-        
-    case p.trial.pldaps.trialStates.trialSetup
+    %--------------------------------------------------------------------------
+    % --- After screen is open: Setup default parameters
+    case p.trial.pldaps.trialStates.experimentPostOpenScreen
         
         % BLEND FUNCTION MUST BE GL_ONE, GL_ONE FOR THIS MODULE TO WORK
         p.trial.display.sourceFactorNew      = GL_ONE;
         p.trial.display.destinationFactorNew = GL_ONE;
         
         Screen('BlendFunction', p.trial.display.ptr, p.trial.display.sourceFactorNew, p.trial.display.destinationFactorNew);
-        
-
-        % setup random seed
-        p.trial.(sn).rngs.conditionerRNG=RandStream(p.trial.(sn).rngs.randomNumberGenerater, 'seed', p.trial.(sn).rngs.trialSeeds(p.trial.pldaps.iTrial));
-        setupRNG=p.trial.(sn).rngs.conditionerRNG;
-        
-        p.trial.(sn).hHart.contrast = p.trial.(sn).contrast;
-        p.trial.(sn).hHart.M = p.trial.(sn).M;
-        
-
-        p.trial.(sn).hHart.setup;
-            
-        if isfield(p.trial.(sn), 'kx')
-            return
-        end
-
-            
-            p.trial.(sn).maxFrames = p.trial.pldaps.maxTrialLength * p.trial.display.frate;
-            p.trial.(sn).count = 1; % number shown
-            p.trial.(sn).kx  = nan(p.trial.(sn).maxFrames,  p.trial.(sn).count);
-            p.trial.(sn).ky  = nan(p.trial.(sn).maxFrames,  p.trial.(sn).count);
-            p.trial.(sn).on  = zeros(p.trial.(sn).maxFrames,p.trial.(sn).count);
-            p.trial.(sn).phi = nan(p.trial.(sn).maxFrames,  p.trial.(sn).count);
-            p.trial.(sn).tf  = nan(p.trial.(sn).maxFrames,  p.trial.(sn).count);
-            
-            % exponential decay
-            p.trial.(sn).M = 1; % grid size
-
-            freqs = sort([-2.^(0:(p.trial.(sn).nOctaves-1))*p.trial.(sn).Freq0 0 2.^(0:(p.trial.(sn).nOctaves-1))*p.trial.(sn).Freq0]);
-            p.trial.(sn).kxs = freqs;
-            p.trial.(sn).kys = freqs;
-            
-            % generate exponentially distributed random variable using the
-            % exponential inverse cdf -- we call it this way so that we can
-            % pass in the random number generater argument
-            rnd = rand(setupRNG,  [p.trial.(sn).maxFrames,1]); % uniform random
-            on  = ceil( -p.trial.(sn).OnDuration .* log(rnd)); % convert to exponential
-            
-            rnd = rand(setupRNG,  [p.trial.(sn).maxFrames,1]); % uniform random
-            off = ceil( -p.trial.(sn).OffDuration .* log(rnd)); % convert to exponential
-            
-            % truncate
-            on  = min(on,  p.trial.(sn).MaxDuration);
-            off = min(off, p.trial.(sn).MaxDuration);
-            
-            % precompute stimulus
-            step = on + off;
-            nUpdates = find(cumsum(step) > p.trial.(sn).maxFrames, 1);
-            
-            [kxg, kyg, ktfg] = ndgrid(p.trial.(sn).kxs, p.trial.(sn).kys, p.trial.(sn).tfs);
-            
-            gridIx = randi(setupRNG, numel(kxg), nUpdates, 1);
-            
-            fr=0;
-            for iStim=1:nUpdates
-                iFrames=fr+(1:on(iStim));
-                p.trial.(sn).kx(iFrames)  = kxg(gridIx(iStim));
-                p.trial.(sn).ky(iFrames)  = kyg(gridIx(iStim));
-                p.trial.(sn).on(iFrames)  = 1;
-                p.trial.(sn).tf(iFrames)  = ktfg(gridIx(iStim));
-                p.trial.(sn).phi(iFrames) = rand(setupRNG)*2*pi;
-                fr = iFrames(end) + off(iStim) - 1;
-            end
-        
-        
-    case p.trial.pldaps.trialStates.experimentPostOpenScreen
         
         % --- set up default parameters
         defaultArgs = {...
@@ -120,12 +45,12 @@ switch state
             
             if ~isfield(p.trial.(sn), field)
                 p.trial.(sn).(field) = val;
-            end 
+            end
         end
         
         
         p.trial.(sn).M   = 1;
-        freqs = sort([-2.^(0:(p.trial.(sn).nOctaves-1))*p.trial.(sn).Freq0 0 2.^(0:(p.trial.(sn).nOctaves-1))*p.trial.(sn).Freq0]);            
+        freqs = sort([-2.^(0:(p.trial.(sn).nOctaves-1))*p.trial.(sn).Freq0 0 2.^(0:(p.trial.(sn).nOctaves-1))*p.trial.(sn).Freq0]);
         p.trial.(sn).kxs = freqs;
         p.trial.(sn).kys = freqs;
         
@@ -136,15 +61,111 @@ switch state
         p = stimuli.setupRandomSeed(p, sn);
         
         % --- instantiate Hartley object
-        p.trial.(sn).hHart = stimuli.hartley(p);
+        p.trial.(sn).hHart = stimuli.objects.hartleybase(p, 'maskType', 1, 'maskParam', 2, 'position', p.trial.display.ctr(1:2));
         
+        
+    %--------------------------------------------------------------------------
+    % --- Trial Setup: pre-allocate important variables for storage and
+    % update the object
+    case p.trial.pldaps.trialStates.trialSetup
+        
+
+        % setup random seed
+        p.trial.(sn).rngs.conditionerRNG=RandStream(p.trial.(sn).rngs.randomNumberGenerater, 'seed', p.trial.(sn).rngs.trialSeeds(p.trial.pldaps.iTrial));
+        
+        p.trial.(sn).hHart.contrast = p.trial.(sn).contrast;
+        p.trial.(sn).hHart.M = p.trial.(sn).M;
+        
+        
+        % preallocate variables
+        p.trial.(sn).maxFrames = p.trial.pldaps.maxTrialLength * p.trial.display.frate;
+        p.trial.(sn).count = 1; % number shown
+        p.trial.(sn).kx  = nan(p.trial.(sn).maxFrames,  p.trial.(sn).count);
+        p.trial.(sn).ky  = nan(p.trial.(sn).maxFrames,  p.trial.(sn).count);
+        p.trial.(sn).on  = zeros(p.trial.(sn).maxFrames,p.trial.(sn).count);
+        p.trial.(sn).phi = nan(p.trial.(sn).maxFrames,  p.trial.(sn).count);
+        p.trial.(sn).tf  = nan(p.trial.(sn).maxFrames,  p.trial.(sn).count);
+        
+        % exponential decay
+        p.trial.(sn).M = 1; % grid size
+        
+        freqs = sort([-2.^(0:(p.trial.(sn).nOctaves-1))*p.trial.(sn).Freq0 0 2.^(0:(p.trial.(sn).nOctaves-1))*p.trial.(sn).Freq0]);
+        p.trial.(sn).kxs = freqs;
+        p.trial.(sn).kys = freqs;
+        
+        p.trial.(sn).nextSwitch = 1; % start hartley on frame 1
+        
+	%--------------------------------------------------------------------------
+    % --- Manage stimulus before frame draw
+    case p.trial.pldaps.trialStates.framePrepareDrawing
+        % In this default version of hartely, we will switch the stimulus
+        % after a random delay that was set previously by the nextSwitch
+        % variable
+        
+        d = p.trial.iFrame - p.trial.(sn).nextSwitch;
+            if d <= 0 % time to swtich
+
+                switch p.trial.(sn).hHart.stimValue % stim off
+               
+                    case 1 % stim is on currently, turn it off
+                        
+                        p.trial.(sn).hHart.stimValue = 0; % turn stimulus off
+                        
+                        % generate exponentially distributed random variable using the
+                        % exponential inverse cdf -- we call it this way so that we can
+                        % pass in the random number generater argument
+                        rnd = rand(p.trial.(sn).rngs.conditionerRNG); % uniform random number
+                        dur = ceil( -p.trial.(sn).OffDuration .* log(rnd)); % convert to exponential
+   
+                    
+                    case 0 % stim is off currently, turn it on
+                        
+                        p.trial.(sn).hHart.stimValue = 1; % turn stimulus off
+                        
+                        rnd = rand(p.trial.(sn).rngs.conditionerRNG); % uniform random number
+                        dur = ceil( -p.trial.(sn).OnDuration .* log(rnd)); % convert to exponential
+                            
+                        % set up next stimulus
+                        n = numel(p.trial.(sn).kxs);
+                        p.trial.(sn).hHart.kx = p.trial.(sn).kxs(randi(p.trial.(sn).rngs.conditionerRNG, n));
+                        p.trial.(sn).hHart.ky = p.trial.(sn).kys(randi(p.trial.(sn).rngs.conditionerRNG, n));
+                        p.trial.(sn).hHart.tf = p.trial.(sn).tfs(randi(p.trial.(sn).rngs.conditionerRNG, numel(p.trial.(sn).tfs)));
+                        
+                        p.trial.(sn).hHart.phi = rand(p.trial.(sn).rngs.conditionerRNG)*2*pi;
+                        
+                end
+                
+                p.trial.(sn).nextSwitch = p.trial.iFrame + dur;
+                
+            end
+            
+            % save the current values
+            p.trial.(sn).on(p.trial.iFrame) = p.trial.(sn).hHart.stimValue;
+            
+            if p.trial.(sn).on(p.trial.iFrame)
+                p.trial.(sn).kx(p.trial.iFrame)  = p.trial.(sn).hHart.kx;
+                p.trial.(sn).ky(p.trial.iFrame)  = p.trial.(sn).hHart.ky;
+                p.trial.(sn).tf(p.trial.iFrame)  = p.trial.(sn).hHart.tf;
+                p.trial.(sn).phi(p.trial.iFrame) = p.trial.(sn).hHart.phi;
+            end        
+        
+    %--------------------------------------------------------------------------
+    % --- Draw the frame: Just call the hartley object's drawing method    
+    case p.trial.pldaps.trialStates.frameDraw
+
+        p.trial.(sn).hHart.frameDraw(p)
+        
+
+    %--------------------------------------------------------------------------
+    % --- After the trial: cleanup workspace for saving
     case p.trial.pldaps.trialStates.trialCleanUpandSave
         
+        % only save frames that were shown
         ix = 1:p.trial.iFrame;
-        p.trial.(sn).kx = p.trial.(sn).kx(ix,:);
-        p.trial.(sn).ky = p.trial.(sn).ky(ix,:);
-        p.trial.(sn).on = p.trial.(sn).on(ix,:);
-        p.trial.(sn).tf = p.trial.(sn).tf(ix,:);
+        p.trial.(sn).kx  = p.trial.(sn).kx(ix,:);
+        p.trial.(sn).ky  = p.trial.(sn).ky(ix,:);
+        p.trial.(sn).on  = p.trial.(sn).on(ix,:);
+        p.trial.(sn).tf  = p.trial.(sn).tf(ix,:);
         p.trial.(sn).phi = p.trial.(sn).phi(ix,:);
 
         
