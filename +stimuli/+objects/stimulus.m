@@ -59,7 +59,7 @@ classdef stimulus < handle %#ok<*MCSUP>
         rng@RandStream=RandStream('mt19937ar')
     end
     
-    properties (SetAccess = ?stimuli.stimulus, GetAccess = public)
+    properties (SetAccess = ?stimuli.objects.stimulus, GetAccess = public)
         log
         locked@logical=false
     end

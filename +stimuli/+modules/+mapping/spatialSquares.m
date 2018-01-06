@@ -4,7 +4,7 @@ function p=spatialSquares(p, state, sn)
 % correlation. Based loosely on ProceduralGarborium.m
 
 if nargin<3
-    sn='gaussianNoiseBlobs';
+    sn='spatialSquares';
 end
 
 
@@ -53,8 +53,9 @@ switch state
                 p.trial.(sn).(field) = val;
             end
         end
-        
-        p = stimuli.setupRandomSeed(p, sn);
+
+        % setup default object
+        p.trial.(sn).hSquares = stimuli.objects.spatialSquares(p);
         
     %--------------------------------------------------------------------------
     % --- Trial Setup: pre-allocate important variables for storage and
@@ -62,44 +63,34 @@ switch state
     case p.trial.pldaps.trialStates.trialSetup
         
         % --- Set Blend Function
+        % We want these squares to override whatever they're on top of
         p.trial.display.sourceFactorNew = GL_ONE;
         p.trial.display.destinationFactorNew = GL_ONE;
         
         Screen('BlendFunction', p.trial.display.ptr, p.trial.display.sourceFactorNew, p.trial.display.destinationFactorNew);
+        
+        p.trial.(sn).hSquares.setRandomSeed(p.trial.(sn).rngs.trialSeeds(p.trial.pldaps.iTrial)); % setup random seed
 
-        % trial random seed
-        p.trial.(sn).rngs.conditionerRNG=RandStream(p.trial.(sn).rngs.randomNumberGenerater, 'seed', p.trial.(sn).rngs.trialSeeds(p.trial.pldaps.iTrial));
-        setupRNG=p.trial.(sn).rngs.conditionerRNG;
-        
-        % --- build stimulus sequence
-        pxwin   = pds.deg2px(reshape(p.trial.(sn).position, 2, 2), p.trial.display.viewdist, p.trial.display.w2px);
-        pxwin   = pxwin(:)'.*[1 -1 1 -1] + p.trial.display.ctr;
-        pWidth  = pxwin(3)-pxwin(1);
-        pHeight = pxwin(4)-pxwin(2);
-        pUlX    = pxwin(1);
-        pUlY    = pxwin(2);
-        
-        
-        p.trial.(sn).on  = true(p.trial.pldaps.maxFrames,1); % stimulus is on every frame
-        
-        p.trial.(sn).pos = nan(4, p.trial.(sn).N, p.trial.pldaps.maxFrames);
-        lifetime         = randi(setupRNG, p.trial.(sn).lifetime, p.trial.(sn).N, 1);
-        xpos             = round(rand(setupRNG, p.trial.(sn).N, 1)*pWidth) + pUlX;
-        ypos             = round(rand(setupRNG, p.trial.(sn).N, 1)*pHeight) + pUlY;
-        szpix            = p.trial.(sn).size * p.trial.display.ppd;
-        rect             = [xpos(:) ypos(:) xpos(:)+szpix ypos(:)+szpix];
-        
-        p.trial.(sn).pos(:,:,1) = rect';
-        for iFrame = 2:p.trial.pldaps.maxFrames
-            idx = lifetime == 1;
-            xpos = round(rand(setupRNG, sum(idx), 1)*pWidth) + pUlX;
-            ypos = round(rand(setupRNG, sum(idx), 1)*pHeight) + pUlY;
-            rect(idx,:) = [xpos(:) ypos(:) xpos(:)+szpix ypos(:)+szpix];
-            p.trial.(sn).pos(:,:,iFrame) = rect';
-                
-            lifetime = mod(lifetime, p.trial.(sn).lifetime)+1;
-            
+        % update variable if they have changed
+        p.trial.(sn).hSquares.position = p.trial.(sn).position;
+        p.trial.(sn).hSquares.N        = p.trial.(sn).N;
+        p.trial.(sn).hSquares.size     = p.trial.(sn).size;
+        p.trial.(sn).hSquares.contrast = p.trial.(sn).contrast;
+        p.trial.(sn).hSquares.lifetime = p.trial.(sn).lifetime;
+
+        % prepare object for trial
+        p.trial.(sn).hSquares.trialSetup(p);
+
+        if p.trial.(sn).minFixation > 0 % fixation required
+            p.trial.(sn).hSquares.stimValue = 0; % make sure squares are off
+        else
+            p.trial.(sn).hSquares.stimValue = 1; % stimulus on from the start
         end
+        
+        % --- still log the same way you did before for easy reconstruction
+        p.trial.(sn).on  = nan(p.trial.pldaps.maxFrames,1);
+        p.trial.(sn).pos = nan(4, p.trial.(sn).N, p.trial.pldaps.maxFrames);
+        
         
     %--------------------------------------------------------------------------
     % --- Manage stimulus before frame draw
@@ -107,32 +98,29 @@ switch state
         
         % check if the stimulus should be on or off
         if p.trial.(sn).minFixation > 0 % fixation is required
-            if p.trial.fixflash.hFix.isFixated
-                if (p.trial.ttime + p.trial.trstart) < (p.trial.fixflash.hFix.fixlog(end) + p.trial.(sn).minFixation)
-                    p.trial.(sn).on(p.trial.iFrame) = false;
-                else
-                    p.trial.(sn).on(p.trial.iFrame) = true;
+
+            if p.trial.fixflash.hFix.isFixated % is fixation obtained?
+
+                % check if it's time to turn on the object
+                if (p.trial.ttime + p.trial.trstart) > (p.trial.fixflash.hFix.fixlog(end) + p.trial.(sn).minFixation)
+                    p.trial.(sn).hSquares.stimValue = 1; % turn it on
                 end
-            else
-                p.trial.(sn).on(p.trial.iFrame) = false;
             end
         end
         
+        p.trial.(sn).hSquares.frameUpdate(p);
+        
+        p.trial.(sn).on(p.trial.iFrame) = p.trial.(sn).hSquares.stimValue;
+        p.trial.(sn).pos(:,:, p.trial.iFrame) = p.trial.(sn).hSquares.rect;
+        
     case p.trial.pldaps.trialStates.frameDraw
         
-        if p.trial.(sn).on(p.trial.iFrame)
-            Screen('FillRect', p.trial.display.ptr, [1 1 1], p.trial.(sn).pos(:,:,p.trial.iFrame))
-        end
-        
-        
-        
-        
+        p.trial.(sn).hSquares.frameDraw(p);
         
         
     case p.trial.pldaps.trialStates.trialCleanUpandSave
-        if p.trial.(sn).on
-            ix=p.trial.iFrame:size(p.trial.(sn).pos,3);
-            p.trial.(sn).pos(:,:,ix)=[];
-        end
+
+        p.trial.(sn).on     = p.trial.(sn).on(1:p.trial.iFrame);
+        p.trial.(sn).pos    = p.trial.(sn).pos(:,:, 1:p.trial.iFrame);
         
 end
