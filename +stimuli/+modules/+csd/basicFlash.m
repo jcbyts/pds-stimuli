@@ -8,24 +8,11 @@ end
 
 switch state
     
+    % copy-paste this in every module that has the default trial states
     case p.trial.pldaps.trialStates.experimentPreOpenScreen
         
-        p.defaultParameters.(sn).stateFunction.acceptsLocationInput = true; % is this necessary
-        % setup states that will be called by this module
-        requestedStates = {...
-            'experimentPostOpenScreen',...
-            'trialSetup',...
-            'framePrepareDrawing',...
-            'frameDraw',...
-            'trialCleanUpandSave',...
-            };
-        
-        for iState = 1:numel(requestedStates)
-            stateName = requestedStates{iState};
-            p.defaultParameters.(sn).stateFunction.requestedStates.(stateName) = true;
-        end
-        
-        p = stimuli.setupRandomSeed(p, sn);
+        stimuli.setupDefaultFrameStates(p, sn);
+        stimuli.setupRandomSeed(p, sn);
     
     case p.trial.pldaps.trialStates.framePrepareDrawing
         
