@@ -134,7 +134,7 @@ classdef fixationImg < stimuli.objects.target
             blendFlag = strcmp(p.trial.display.destinationFactorNew, GL_ONE);
             
             % build mask
-            r = o.radius; % mask radius parameter (pixels)
+            r = o.radius*2; % mask radius parameter (pixels)
             o.mask = o.makeMask(r,o.maskType);
             o.sz = size(o.mask,1)*[1 1];
             
