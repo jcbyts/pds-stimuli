@@ -35,10 +35,14 @@ settingsStruct.(sn).stateFunction.name  = 'stimuli.modules.hartley.defaultHartle
 settingsStruct.(sn).stateFunction.order = -1; % draw before behavior
 settingsStruct.(sn).use = false;
 
-sn = 'spatialsquares';
+sn = 'spatialSquares';
 settingsStruct.(sn).stateFunction.name  = 'stimuli.modules.mapping.spatialSquares';
 settingsStruct.(sn).stateFunction.order = -1; % draw before behavior
 settingsStruct.(sn).use = true;
+settingsStruct.(sn).N = 4;
+settingsStruct.(sn).contrast = 1;
+settingsStruct.(sn).size = 1;
+settingsStruct.(sn).position = [-5 5 5 -5];
 
 sn = 'forage';
 % settingsStruct.(sn).stateFunction.name = 'stimuli.modules.fixflash.runDefaultTrial';
@@ -46,10 +50,10 @@ settingsStruct.(sn).stateFunction.name = 'stimuli.modules.forage.forage';
 settingsStruct.(sn).stateFunction.order = 2;
 settingsStruct.(sn).use = true;
 
-settingsStruct.(sn).staircaseOn = true;
-settingsStruct.(sn).minFixDuration = .2;
-settingsStruct.(sn).fixationJitter = false;
-settingsStruct.(sn).fixationJitterSize = 0;
+% settingsStruct.(sn).staircaseOn = true;
+% settingsStruct.(sn).minFixDuration = .2;
+% settingsStruct.(sn).fixationJitter = false;
+% settingsStruct.(sn).fixationJitterSize = 0;
 
 % run pldaps
 p = pldaps(@stimuli.pldapsDefaultTrial, settingsStruct);
