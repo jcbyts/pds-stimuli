@@ -1,17 +1,36 @@
 classdef dotsUniform < stimuli.objects.dotsbase
-    % Moving random dot stimulus with uniformly distributed dot directions.
-    %
-    % This class generates random dot stimuli with dot directions drawn
-    % form a uniform distribution of the specified range/width.
-    %
-    % Rendering the dots is handled by the parent class @dotsbase
-    % which provides properties and methods applicable to all moving dot
-    % stimuli. Type 'help stimuli.dotsbase' for supported arguments.
-    %
-    % This class constructor can be instantiated with one additional
-    % arguments:
-    %
-    %   range   - range/width of the uniform noise distribution
+% <strong> dotsUniform </strong> is a moving random dot stimulus with 
+% uniformly distributed dot directions.
+%
+% This class generates random dot stimuli with dot directions drawn
+% form a uniform distribution of the specified range/width.
+%
+% Rendering the dots is handled by the parent class @stimuli.objects.dotsbase
+% which provides properties and methods applicable to all moving dot
+% stimuli. Type <strong> 'help stimuli.objects.dotsbase' </strong> for supported arguments.
+%
+% This class constructor can be instantiated with one additional
+% arguments:
+%
+% <strong> range </strong> - range/width of the uniform distribution (degrees)
+%
+% see <strong> 'help stimuli.objects.dotsbase' </strong> for additional
+% arguments.
+% e.g.,
+%   dots = stimuli.objects.dotsUniform();
+%
+%   dots = stimuli.objects.dotsUniform('range', 10, 'position', [500,600], ...
+%           'speed', 2, ...
+%           'direction', 0, ...
+%           'numDots', 50)
+%
+% Once instantiated, the class inherits useful arguments from dotsbase
+%
+% trialSetup(p) - initializes dot positions before a trial
+% setRandomSeed(seed)
+% frameUpdate(p)
+% frameDraw(p)
+%
     
     
     properties (Access = public),

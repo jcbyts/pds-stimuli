@@ -13,6 +13,11 @@ classdef dotsbase < stimuli.objects.target % (Abstract) % should this be abstrac
     %   position   - aperture position (x,y; pixels)
     %   colour     - dot colour (RGB)
     %   visible    - flag to toggle dot visibility (default: true)
+    %
+    % Methods
+    % trialSetup(p)
+    % frameUpdate(p)
+    % frameDraw(p)
     
     % 2017-06-04 - Shaun L. Cloherty <s.cloherty@ieee.org>
     
