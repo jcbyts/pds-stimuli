@@ -49,7 +49,9 @@ switch state
             
         end % staircase on
         
-        stimuli.modules.fixflash.updateGUI(p, sn);
+        if p.trial.(sn).showGUI
+            stimuli.modules.fixflash.updateGUI(p, sn);
+        end
     
     % ---------------------------------------------------------------------
     % --- What to do before opening the pldaps screen
@@ -91,6 +93,7 @@ switch state
             'rewardLevels',             [.2 .4 .8 1 1.2 1.4], ...
             'rewardForObtainFixation',  false, ...
             'rewardFaceDuration',       0.2, ...
+            'showGUI',                  true, ...
             };
         
         for iArg = 1:2:numel(defaultArgs)
@@ -113,7 +116,9 @@ switch state
         p.trial.(sn).hFace  = stimuli.objects.face(p);
         
         % --- Plotting
-        p.functionHandles.fixFlashPlot = stimuli.modules.fixflash.fixFlashPlot;
+        if p.trial.(sn).showGUI
+            p.functionHandles.fixFlashPlot = stimuli.modules.fixflash.fixFlashPlot;
+        end
 
         
 end % switch

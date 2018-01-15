@@ -31,7 +31,7 @@ classdef state2_FixHold < stimuli.objects.state
             
             
             % --- If held to maximum duration --> move to next state
-            if p.trial.ttime > startTime + p.trial.(sn).fixDuration
+            if p.trial.ttime > startTime + p.trial.(sn).fixDuration + p.trial.(sn).fixStartOffset
                 
                 p.trial.(sn).holdXY       = nanmean(s.eyeXY, 1); % record eye position
                 p.trial.(sn).holdDuration = p.trial.ttime - startTime;
