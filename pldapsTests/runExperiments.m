@@ -1,7 +1,7 @@
 %% Sample experiments
 
 subject = 'Ellie'; % Ellie (Capitalized)
-pauseBeforeExperiment = 0;
+pauseBeforeExperiment = 1;
 
 %% Test subject case
 subject = 'test'; 
@@ -54,7 +54,10 @@ runFaceForageDotMapping(subject, pauseBeforeExperiment, ...
 
 % edit this function to see how it works (I will add parameter arguments
 % later)--Jake
-runDotSelection(subject, pauseBeforeExperiment)
+runDotSelection(subject, pauseBeforeExperiment,1,1);  % first param: 1-left vs right, 2 - both right, 3 - both left
+
+%% Motion saccade task with 2 aperts
+runDotSelection(subject, pauseBeforeExperiment,1,0); % second param: 1 -shows only one stim at a time, else 0 shows both
 
 %% Spatial Mapping (Range, Fixation)
 runSpatialMapping(subject, pauseBeforeExperiment, ...
@@ -80,7 +83,7 @@ runSpatialMapping(subject, pauseBeforeExperiment, ...
     'offDuration',48); 
 
 %% Decoding stimulus: limited range (this one first)
-runDotHandMapping(subject, pauseBeforeExperiment, ...
+runDotHandMapping(subject, pauseBeforeExperiment, ...m
     'priorMu', 60, ...
     'priorKappa', 10, ...% Kappa parameter of von Mises is uniform if == 0, gets narrower as you increase
     'targetSpeed', 2, ...       % degrees/sec
