@@ -1,7 +1,7 @@
 function trialSetup(p, sn)
 
 	if nargin < 2
-		sn = 'stimulus';
+		sn = 'dotselection';
 	end
 
 p.trial.pldaps.goodtrial = 1;
@@ -18,21 +18,6 @@ setupRNG = p.trial.(sn).rngs.conditionerRNG;
 
 % -------------------------------------------------------------------------
 % FIXATION POINT TIMING / PROPERTIES
-
-% --- Set Fixation Point Properties    
-sz = p.trial.(sn).fixPointRadius * ppd;
-p.trial.(sn).hFix(1).cSize      = sz;
-p.trial.(sn).hFix(1).sSize      = 2*sz;
-p.trial.(sn).hFix(1).cColour    = zeros(1,3);
-p.trial.(sn).hFix(1).sColour    = ones(1,3);
-p.trial.(sn).hFix(1).position   = p.trial.(sn).fixPointXy * ppd + p.trial.display.ctr(1:2);
-
-p.trial.(sn).hFix(2).cSize      = sz;
-p.trial.(sn).hFix(2).sSize      = 2*sz;
-p.trial.(sn).hFix(2).cColour    = p.trial.display.bgColor + p.trial.(sn).fixPointDim;
-p.trial.(sn).hFix(2).sColour    = p.trial.display.bgColor + p.trial.(sn).fixPointDim;
-p.trial.(sn).hFix(2).position   = p.trial.(sn).fixPointXy * ppd + ctr;
-
 
 
 % --- Pre-Stim Fixation duration (uniform distribution)
@@ -58,6 +43,9 @@ while r > p.trial.(sn).maxFixPostStim
     itr = itr + 1;
 end
 
+% update fixation module
+p.trial.(p.trial.(sn).fixationBehavior).minFixDuration = r;
+p.trial.(p.trial.(sn).fixationBehavior).fixDuration = r; % depending on the order of the modules, might need to set fixDuration directly
 p.trial.(sn).fixPostStimDuration = r;
 
 % -------------------------------------------------------------------------
@@ -76,29 +64,23 @@ assert(numDotApertures==2, 'This code is not designed for more than 2 apertures'
 
 for kDots = 1:numDotApertures
     
-    % dot mode (coherence or sample from distribution)
-    p.trial.(sn).hDots(kDots).mode      = p.trial.(sn).dotMode;
-    
-    % dot distribution
-    p.trial.(sn).hDots(kDots).dist      = p.trial.(sn).dotDist;
-    
     % dot Range / Bandwidth
-    p.trial.(sn).hDots(kDots).bandwdth  = p.trial.(sn).dotBandwidth;
+    p.trial.(sn).hDots(kDots).range  = p.trial.(sn).dotRange;
     
     % dot lifetime
-    p.trial.(sn).hDots(kDots).lifetime  = p.trial.(sn).dotLifetime;
+    p.trial.(sn).hDots(kDots).dotLifetime = p.trial.(sn).dotLifetime;
     
     % dot size (in pixels)
-    p.trial.(sn).hDots(kDots).size      = p.trial.(sn).dotSize * ppd; % pixels
+    p.trial.(sn).hDots(kDots).dotSize   = p.trial.(sn).dotSize * ppd; % pixels
     
     % dot speed (in pixels/frame)
-    p.trial.(sn).hDots(kDots).speed     = p.trial.(sn).dotSpeed * ppd / fps; % pixels/frame
+    p.trial.(sn).hDots(kDots).dotSpeed  = p.trial.(sn).dotSpeed * ppd / fps; % pixels/frame
     
     % % dot color
-    p.trial.(sn).hDots(kDots).colour       = p.trial.display.bgColor + p.trial.(sn).dotContrast;
+    p.trial.(sn).hDots(kDots).dotColor  = p.trial.display.bgColor + p.trial.(sn).dotContrast;
     
     % aperture radius (pixels)
-    p.trial.(sn).hDots(kDots).maxRadius = p.trial.(sn).dotApertureRadius * ppd;
+    p.trial.(sn).hDots(kDots).radius    = p.trial.(sn).dotApertureRadius * ppd;
     
     % number of dots (integer value, calculate from dot density)
     p.trial.(sn).hDots(kDots).numDots = ceil(p.trial.(sn).dotDensity * pi * p.trial.(sn).dotApertureRadius^2 / fps);
@@ -108,7 +90,7 @@ for kDots = 1:numDotApertures
     
     th = th + p.trial.(sn).DotCenterAngle(kDots)/180*pi;
     [xDeg, yDeg] = pol2cart(th, rho);
-    p.trial.(sn).hDots(kDots).position     = [xDeg, -1*yDeg] * ppd + ctr;
+    p.trial.(sn).hDots(kDots).position    = [xDeg, -1*yDeg] * ppd + ctr;
     
     % direction
     n = p.trial.(sn).numDirs; % number of directions/choice targets
@@ -118,14 +100,14 @@ for kDots = 1:numDotApertures
     else
         p.trial.(sn).direction(kDots) = ceil(rand(setupRNG)*n)/n*360;
     end
-    p.trial.(sn).hDots(kDots).direction(1) = p.trial.(sn).direction(kDots);
+    p.trial.(sn).hDots(kDots).dotDirection(1) = p.trial.(sn).direction(kDots);
     
 end
 
 % (re-)initialize dots
 p.trial.(sn).dotRNG = rng();
 for kDot = 1:numDotApertures
-    p.trial.(sn).hDots(kDot).beforeTrial();
+    p.trial.(sn).hDots(kDot).trialSetup(p);
 end
 
 % --- setup reward for the trial
@@ -137,41 +119,31 @@ p.trial.(sn).Dots2Rewarded = rand(setupRNG) < p.trial.(sn).rewardDot2Rate;
 
 %****************************
 
+
+        
+        
 % --- Face for aditional reward
 p.trial.(sn).hFace.texSize  = 2 * ppd;
 p.trial.(sn).hFace.position = ctr;
 p.trial.(sn).hFace.id       = p.trial.(sn).faceIndex;
 
-% --- Reward
-p.trial.(sn).hReward.defaultAmount = p.trial.behavior.reward.defaultAmount;
-p.trial.(sn).hReward.iTrial        = p.trial.pldaps.iTrial;
+% --- Setup State machine (This runs all the state transitions)
+p.trial.(sn).states = stimuli.objects.stateControl();
+p.trial.(sn).states.addState(stimuli.modules.dotselection.state0_preStim)
+p.trial.(sn).states.addState(stimuli.modules.dotselection.state1_showStim)
+p.trial.(sn).states.addState(stimuli.modules.dotselection.state2_Choice)
+p.trial.(sn).states.addState(stimuli.modules.dotselection.state3_HoldChoice)
+p.trial.(sn).states.addState(stimuli.modules.dotselection.state7_BreakFixTimeout)
+p.trial.(sn).states.addState(stimuli.modules.dotselection.state8_InterTrialInterval)
 
-p.trial.(sn).rewardcount
+p.trial.(sn).states.setState(0);
 
-% --- Setup Trial Object (This runs all the state transitions)
-% the @trial object (initially in state 0)
-p.trial.(sn).hTrial = stimuli.dotselection.dotMotionTrial( ...
-  p.trial.(sn).hFix, ...
-  p.trial.(sn).hDots,...
-  p.trial.(sn).hFace, ...
-  p.trial.(sn).hReward, ...
-  p.trial.display.ppd, ...
-  p.trial.display.ctr(1:2), ...
-  'fixWinRadius',    p.trial.(sn).fixWinRadius, ...
-  'fixGracePeriod',  p.trial.(sn).fixGracePeriod, ...
-  'fixHoldPreStim',  p.trial.(sn).fixPreStimDuration, ...
-  'fixFlashCnt',     p.trial.(sn).fixFlashCnt, ...
-  'fixHoldPostStim', p.trial.(sn).fixPostStimDuration, ...
-  'choiceHoldDuration',  p.trial.(sn).choiceHoldDuration, ...
-  'rewardWindow',    p.trial.(sn).rewardWindow, ... % think about this parameter name
-  'choiceTimeout',   p.trial.(sn).choiceTimeout, ...
-  'trialTimeout',    p.trial.(sn).trialTimeout, ...
-  'DotsRewarded',   [p.trial.(sn).Dots1Rewarded p.trial.(sn).Dots2Rewarded], ...
-  'iti',0, ...
-  'maxRewardCnt',   p.trial.(sn).maxRewardCnt, ...
-  'viewpoint',      false, ...
-  'rewardcount',    p.trial.(sn).rewardcount, ...       % added JM
-  'rewardtravel',   p.trial.(sn).rewardtravel, ...      % added JM
-  'rewardtransit',  p.trial.(sn).rewardtransit);
+  % 'rewardcount',    p.trial.(sn).rewardcount, ...       % added JM
+  % 'rewardtravel',   p.trial.(sn).rewardtravel, ...      % added JM
+  % 'rewardtransit',  p.trial.(sn).rewardtransit);
 
-p.trial.(sn).hTrial.rewardForFixation = p.trial.(sn).rewardForFixation;
+% allocate some variables
+p.trial.(sn).frameFixationObtained = nan;
+p.trial.(sn).preStimWaitFrames     = round(p.trial.(sn).fixPreStimDuration * p.trial.display.frate);
+
+
