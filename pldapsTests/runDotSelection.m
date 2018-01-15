@@ -1,4 +1,4 @@
-function runDotSelection(subject, pauseBeforeExperiment)
+function runDotSelection(subject, pauseBeforeExperiment, showside, showsingle)
 
 if nargin < 2
     pauseBeforeExperiment = 0;
@@ -29,17 +29,34 @@ settingsStruct.stimulus.holdDuration = 15; % frames (counter, not continuous)
 settingsStruct.stimulus.RfCenterXy = [4 -4];
 settingsStruct.stimulus.DotCenterAngle(1) = 0;
 settingsStruct.stimulus.DotCenterAngle(2) = -90;
+if (showside == 1)
+  settingsStruct.stimulus.RfCenterXy = [4 -4];
+  settingsStruct.stimulus.DotCenterAngle(1) = 0;
+  settingsStruct.stimulus.DotCenterAngle(2) = -90;
+end
+if (showside == 2)
+  settingsStruct.stimulus.RfCenterXy = [5.21 -2.16];
+  settingsStruct.stimulus.DotCenterAngle(1) = 0;
+  settingsStruct.stimulus.DotCenterAngle(2) = -45;    
+end
+if (showside == 3)
+  settingsStruct.stimulus.RfCenterXy = [2.16 -5.21];
+  settingsStruct.stimulus.DotCenterAngle(1) = 0;
+  settingsStruct.stimulus.DotCenterAngle(2) = -45;    
+end
 
 % The reward function I coded up will switch which target has the higher
 % reward reate randomly with a switch rate of .1, meaning each trial a
 % random number is drawn and if it is less than .1, the reward scheme will
 % switch
 settingsStruct.stimulus.rewardUpdateFun = @stimuli.dotselection.rewardUpdateSwitchRule;
-settingsStruct.stimulus.rewardUpdateArgs = {.125}; % low rate, high rate
+settingsStruct.stimulus.rewardUpdateArgs = {0.25}; % {.125}; % low rate, high rate
+%settingsStruct.stimulus.rewardUpdateArgs = {0.15}; % {.125}; % low rate, high rate
 
 % initialize reward rate
 settingsStruct.stimulus.rewardDot1Rate = .85;   %right stimulus
 settingsStruct.stimulus.rewardDot2Rate = .10;  %left stimulus
+settingsStruct.stimulus.stimVisible = [1 1 showsingle];
 
 settingsStruct.pldaps.draw.cursor.use = true;
 

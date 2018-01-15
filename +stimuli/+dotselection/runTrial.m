@@ -106,7 +106,10 @@ switch state
     case p.trial.pldaps.trialStates.trialSetup
          
         stimuli.dotselection.trialSetup(p, sn);
-        
+        %************ set dot visibility before drawing *******
+        p.trial.(sn).hTrial.hDots(1).visible = logical( p.trial.(sn).stimVisible(2) );  %right stim
+        p.trial.(sn).hTrial.hDots(2).visible = logical( p.trial.(sn).stimVisible(1) );  %left stim
+        %**************************
        
 	% --- All Screen() calls go here
     case p.trial.pldaps.trialStates.frameDraw
@@ -121,7 +124,9 @@ switch state
         choices = cellfun(@(x) x.stimulus.hTrial.choice, p.data(hasData));
         choices = [choices p.trial.stimulus.hTrial.choice];
         
-        [p.trial.(sn).rewardDot1Rate, p.trial.(sn).rewardDot2Rate] = p.trial.stimulus.rewardUpdateFun(choices, p.trial.(sn).rewardDot1Rate, p.trial.(sn).rewardDot2Rate, p.trial.stimulus.rewardUpdateArgs{:});
+        [p.trial.(sn).rewardDot1Rate, p.trial.(sn).rewardDot2Rate, p.trial.(sn).stimVisible] = ...
+            p.trial.stimulus.rewardUpdateFun(choices, p.trial.(sn).rewardDot1Rate, p.trial.(sn).rewardDot2Rate, ...
+                                           p.trial.stimulus.stimVisible,p.trial.stimulus.rewardUpdateArgs{:});
         
        
         %upload to conditions for next trial to live on
@@ -129,6 +134,7 @@ switch state
         for iTrial = (currTrial+1):numel(p.conditions)
              p.conditions{iTrial}.(sn).rewardDot1Rate = p.trial.(sn).rewardDot1Rate;
              p.conditions{iTrial}.(sn).rewardDot2Rate = p.trial.(sn).rewardDot2Rate;
+             p.conditions{iTrial}.(sn).stimVisible = p.trial.(sn).stimVisible;
         end
         
     % --- handles that depend on pldaps being totally set up
