@@ -7,17 +7,19 @@ classdef fixation < stimuli.objects.target
   %
   % The class constructor can be called with a range of arguments:
   %
-  %   <strong> position     </strong>     - center of the target (x,y; pixels)
+  %   <strong> position     </strong>  - center of the target (x,y; pixels)
   %   <strong> radius    </strong>     - radius of surround (pixels)
   %   <strong> winRadius </strong>     - radius of the fixation window 
   %   <strong> color     </strong>     - color of fixation point (clut index or [r,g,b])
-  %   <strong> ctrColor  </strong>  (optional) color of fixation point center (clut index or [r,g,b])
-  %   <strong> winColour </strong>  (optional) color of fixation window (clut index or [r,g,b])
+  %   <strong> ctrColor  </strong>    (optional) color of fixation point center (clut index or [r,g,b])
+  %   <strong> winColour </strong>    (optional) color of fixation window (clut index or [r,g,b])
   %
-  % e.g., 
-  %     targ = <strong>stimuli.fixation</strong>('position', [960 540], 'radius', 10)
+  % e.g.,
+  %     targ = <strong>stimuli.objects.fixation</strong>()
   %
-  %     targ = <strong>stimuli.fixation</strong>('position', p.trial.display.ctr(1:2), ...
+  %     targ = <strong>stimuli.objects.fixation</strong>('position', [960 540], 'radius', 10)
+  %
+  %     targ = <strong>stimuli.objects.fixation</strong>('position', p.trial.display.ctr(1:2), ...
   %             'radius', 0.5*p.trial.display.ppd, ...
   %             'winRadius', 1.5*p.trial.display.ppd, ...
   %             'color', [1 1 1], ...
@@ -84,7 +86,7 @@ classdef fixation < stimuli.objects.target
           
           o.radius      = args.radius;
           o.color       = args.color;
-          o.position    	= args.position;
+          o.position    = args.position;
       end
       
       

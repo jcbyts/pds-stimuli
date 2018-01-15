@@ -126,7 +126,3 @@ p.trial.(sn).hFace.id   = p.trial.(sn).faceIndex;
 p.trial.(sn).hDots(1)   = stimuli.dots(p.trial.display.ptr);
 p.trial.(sn).hDots(2)   = stimuli.dots(p.trial.display.ptr);
 
-
-% -------------------------------------------------------------------------
-% --- Update Conditions
-stimuli.dotselection.updateConditions(p)
