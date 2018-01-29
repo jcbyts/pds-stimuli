@@ -33,3 +33,17 @@ settingsStruct.(sn).use                 = true; % use this module
 p = pldaps(@stimuli.pldapsDefaultTrial, settingsStruct);
 
 p = p.run;
+
+
+%% test gabor target
+sn = 'testing';
+settingsStruct.(sn).stateFunction.name  = 'stimuli.tests.testGaborTargetTrial';
+settingsStruct.(sn).stateFunction.order = 2;    % when to run this module with respect to other modules
+settingsStruct.(sn).use                 = true; % use this module    
+
+% calling pldaps with @stimuli.pldapsDefaultTrial will make sure that
+% pldaps takes all the measurements that are required for our modules
+% (e.g., eye position)
+p = pldaps(@stimuli.pldapsDefaultTrial, settingsStruct);
+
+p = p.run;
