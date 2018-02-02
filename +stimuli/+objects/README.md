@@ -3,41 +3,29 @@ The `stimuli.objects` in pds-stimuli are a set of classes that support the easy 
 
 ## Base classes
 There are a number of classes in pds-stimuli that 
-1. [stimulus](##stimulus): governs **ALL** stimuli (tracks when they turn on, off. Has it's own random number generator)
-2. [targets](##targets): is a `stimulus`. logs all fixations that are centered on it
-3. [state](##state): a trial state. Handles a single behavioral state of a trial. Can be managed by `stateControl`
-4. [stateControl](##stateControl): handles the movement between states
+1. [stimulus](#stimulus): governs **ALL** stimuli (tracks when they turn on, off. Has it's own random number generator)
+2. [targets](#targets): is a `stimulus`. logs all fixations that are centered on it
+3. [state](#state): a trial state. Handles a single behavioral state of a trial. Can be managed by `stateControl`
+4. [stateControl](#stateControl): handles the movement between states
 ## Stimulus examples
 ### targets:
-1. [textures](##textures): draw a texture
-	* [face](##face): Draw a marmoset face `target`
+1. [textures](#textures): draw a texture
+	* [face](#face): Draw a marmoset face `target`
 2. [fixation](##fixation): Draw a fixation point `target`
-3. [fixationImg](##fixationImg): Draw a fixation point that scans over a background image. Probably should be called "porthole"
-4. [dots](##dots): Random dot kinematograms
-	* [dotsbase](###dotsbase): abstract. Governs all dots
-	* [dotsUniform](###dotsUniform): Pasternek range stimulus. Dot directions drawn from uniform distribution with specified range.
-	* [dotsVonMises](###dotsVonMises): Dot directions drawn from vonMises distribution
-	* [dotsNewsome](###dotsBritten): Coherence manipulation. Signal updates with specified `dt` (As close to the Britten dots as is possible with current monitors)
-	* [dotsShadlen](###dotsShadlen): Coherence manipulation. N tiers of dots, interleaved every N frames.
-5. [gabors/gratings](##gabors/gratings)
-	* [gaborTarget](###gaborTarget)
+3. [fixationImg](#fixationImg): Draw a fixation point that scans over a background image. Probably should be called "porthole"
+4. [dots](#dots): Random dot kinematograms
+	* [dotsbase](#dotsbase): abstract. Governs all dots
+	* [dotsUniform](#dotsUniform): Pasternek range stimulus. Dot directions drawn from uniform distribution with specified range.
+	* [dotsVonMises](#dotsVonMises): Dot directions drawn from vonMises distribution
+	* [dotsNewsome](#dotsBritten): Coherence manipulation. Signal updates with specified `dt` (As close to the Britten dots as is possible with current monitors)
+	* [dotsShadlen](#dotsShadlen): Coherence manipulation. N tiers of dots, interleaved every N frames.
+5. [gabors/gratings](#gabors/gratings)
+	* [gaborTarget](#gaborTarget)
 ### stimuli: (not targets)
-1. [hartley](##hartleybase): Full field flashed hartley basis
-2. [ffflash](##ffflash): Full field flash (for measuring CSD in V1)
-3. [butterfly](##butterfly): Moving targets (faces, single dots, currently). Can do random walks or linear trajectories.
+1. [hartley](#hartleybase): Full field flashed hartley basis
+2. [ffflash](#ffflash): Full field flash (for measuring CSD in V1)
+3. [butterfly](#butterfly): Moving targets (faces, single dots, currently). Can do random walks or linear trajectories.
 
-### dots
-
-#### dotsbase
-
-#### dotsUniform
-
-#### dotsVonMises
-
-
-
-
-### fixationImg
 
 ## stimulus
 `stimulus` governs the general tracking of what state an object is in (eg., *on*, *off*). `stimulus` is a handle class, meaning that passing it in and out of functions is (now) fast in matlab. That is because it points to the same place in memory and doesn't do a deep copy (as it would with structs). To create a stimulus, simply instantiate it by calling the constructor:
@@ -51,7 +39,7 @@ ans =
 
 	stimuli.objects.stimulus
 ```
-#### Properties
+*Properties*
     
 `stimulus` has four important properties: **stimValue**, **rng**, **log**, **locked**
 
@@ -112,23 +100,32 @@ ans =
     
 ## targets
 
+## state
+
+## stateControl
+
+## textures
+
 ### face
 
-### fixation
+## fixation
+
+## fixationImg
+
+## butterfly
+
+## dots
+
+### dotsbase
+
+### dotsUniform
+
+### dotsVonMises
+
+## gabors/gratings
 
 
-### butterfly
-
-### dots
-
-#### dotsbase
-
-#### dotsUniform
-
-#### dotsVonMises
 
 
 
-
-### fixationImg
 
