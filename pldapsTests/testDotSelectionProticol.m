@@ -20,7 +20,7 @@ settingsStruct.display.viewdist = 100; % cm
 % dot selection requires a fixation behavior
 sn = 'fixflash';
 settingsStruct.(sn).stateFunction.name = 'stimuli.modules.fixflash.runDefaultTrial';
-settingsStruct.(sn).stateFunction.order = 2;
+settingsStruct.(sn).stateFunction.order = 1;
 settingsStruct.(sn).use = true;
 
 settingsStruct.(sn).staircaseOn    = false;
@@ -30,7 +30,8 @@ settingsStruct.(sn).fixationJitterSize = 0;
 settingsStruct.(sn).showGUI = false;
 
 sn = 'dotselection';
-settingsStruct.(sn).stateFunction.name = 'stimuli.modules.dotselection.runDefaultTrial';
+% settingsStruct.(sn).stateFunction.name = 'stimuli.modules.dotselection.runDefaultTrial';
+settingsStruct.(sn).stateFunction.name = 'stimuli.modules.dotselection.runGaborsTrial';
 settingsStruct.(sn).stateFunction.order = 2;
 settingsStruct.(sn).use = true;
 

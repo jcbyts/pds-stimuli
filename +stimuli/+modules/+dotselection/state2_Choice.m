@@ -15,8 +15,8 @@ classdef state2_Choice < stimuli.objects.state
         % --- Drawing commands
         function frameDraw(~,p,sn)
             
-            for k = 1:numel(p.trial.(sn).hDots)
-                p.trial.(sn).hDots(k).frameDraw(p);
+            for k = 1:numel(p.trial.(sn).hTargs)
+                p.trial.(sn).hTargs(k).frameDraw(p);
             end
             
         end % frameDraw
@@ -37,11 +37,11 @@ classdef state2_Choice < stimuli.objects.state
             end
             
             % check if a target is fixated
-            for k = 1:numel(p.trial.(sn).hDots)
-                p.trial.(sn).hDots(k).frameUpdate(p);
-                p.trial.(sn).hDots(k).isHeld([p.trial.eyeX p.trial.eyeY]);
+            for k = 1:numel(p.trial.(sn).hTargs)
+                p.trial.(sn).hTargs(k).frameUpdate(p);
+                p.trial.(sn).hTargs(k).isHeld([p.trial.eyeX p.trial.eyeY]);
                 
-                if p.trial.(sn).hDots(k).isFixated
+                if p.trial.(sn).hTargs(k).isFixated
                     p.trial.(sn).dotsChosen = k;
                     sc.setState(3);
                     return

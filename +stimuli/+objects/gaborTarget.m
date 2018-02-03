@@ -51,13 +51,17 @@ classdef gaborTarget < stimuli.objects.target
       
       
       function obj = setup(obj, p)
-            
+          
+          if ~isempty(obj.gabortex) % setup has already been run
+              return
+          end
+          
           obj.ppd = p.trial.display.ppd;
-          disableNormalization = 1;
-          contrastPreMultiplicator = .5;
+            disableNormalization = 1;
+            contrastPreMultiplicator = .5;
 %           modulateColor = [0.5 0.5 0.5 0.0];
 %           modulateColor = [.5 .5 .5 0];
-          modulateColor = [0 0 0 0];
+            modulateColor = [0 0 0 0];
           obj.gabortex = CreateProceduralGabor(p.trial.display.ptr, obj.radius, obj.radius, [], modulateColor, disableNormalization,contrastPreMultiplicator);
         
       end
@@ -79,7 +83,7 @@ classdef gaborTarget < stimuli.objects.target
           r = o.radius; % radius in pixels
           
           rect = kron([1,1],o.position) + kron(r(:),[-1, -1, +1, +1]);
-          
+%           rect
           gaborParams = [180-o.phase, o.sf/o.ppd, o.sigma*o.ppd, o.contrast, 1, 0, 0, 0];
 
           Screen('BlendFunction', p.trial.display.ptr, GL_ONE, GL_ONE);
@@ -94,6 +98,10 @@ classdef gaborTarget < stimuli.objects.target
 %               Screen('FillOval',p.trial.display.overlayptr, o.wincolor,rect');
           end
           
+      end
+      
+      function trialSetup(o,p)
+          o.setup(p)
       end
       
       function frameUpdate(o,p)

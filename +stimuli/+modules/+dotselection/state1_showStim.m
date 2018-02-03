@@ -15,8 +15,8 @@ classdef state1_showStim < stimuli.objects.state
         % --- Drawing commands
         function frameDraw(~,p,sn)
             
-            for k = 1:numel(p.trial.(sn).hDots)
-                p.trial.(sn).hDots(k).frameDraw(p);
+            for k = 1:numel(p.trial.(sn).hTargs)
+                p.trial.(sn).hTargs(k).frameDraw(p);
             end
             
         end % frameDraw
@@ -30,8 +30,8 @@ classdef state1_showStim < stimuli.objects.state
             % fieldname for the fixation behavior
             fixSn  = p.trial.(sn).fixationBehavior;
             
-            for k = 1:numel(p.trial.(sn).hDots)
-                p.trial.(sn).hDots(k).frameUpdate(p);
+            for k = 1:numel(p.trial.(sn).hTargs)
+                p.trial.(sn).hTargs(k).frameUpdate(p);
             end
             
             if p.trial.(fixSn).states.currentState.id > 2 % fixHold has finished

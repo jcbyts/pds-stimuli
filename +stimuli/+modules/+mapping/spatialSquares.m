@@ -1,10 +1,27 @@
 function p=spatialSquares(p, state, sn)
-% gaussian noise module for PLDAPS open reception
-% Draws randomly scaled gaussians across the screen for reverse
-% correlation. Based loosely on ProceduralGarborium.m
+% Retinotopic Mapping: flashed squares
 
 if nargin<3
     sn='spatialSquares';
+end
+
+% -------------------------------------------------------------------------
+% COPY THIS INTO EACH PROTOCOL
+% This is just a courtesy: lists all the possible arguments and a
+% description of what they are. The
+if nargin < 1
+    defaultArgs = {...
+        'size',           'size of each square (degrees)', ...
+        'N',              'number of squares on each frame', ...
+        'contrast',       'contrast of the squares', ...
+        'lifetime',       'square lifetime (frames)', ...
+        'position',       'rectangle for stimulus location (degrees ptb rect [x,y,x,y])', ...
+        'minFixation',    'time fixation required (default: nan - no fixation required)', ...
+        };
+    fprintf('No arguments passed in: call from within pldaps\n')
+    fprintf('<strong>Optional Parameters:</strong>\n')
+    fprintf('<strong>%s</strong>\t\t\t%s\n', defaultArgs{:})
+    return
 end
 
 
@@ -23,12 +40,12 @@ switch state
     % --- After screen is open: Setup default parameters
     case p.trial.pldaps.trialStates.experimentPostOpenScreen
         
-        % BLEND FUNCTION MUST BE GL_ONE, GL_ONE FOR THIS MODULE TO WORK
-        p.trial.display.sourceFactorNew      = GL_ONE;
-        p.trial.display.destinationFactorNew = GL_ONE;
-        
-        Screen('BlendFunction', p.trial.display.ptr, p.trial.display.sourceFactorNew, p.trial.display.destinationFactorNew);
-        
+%         % BLEND FUNCTION MUST BE GL_ONE, GL_ONE FOR THIS MODULE TO WORK
+%         p.trial.display.sourceFactorNew      = GL_ONE;
+%         p.trial.display.destinationFactorNew = GL_ONE;
+%         
+%         Screen('BlendFunction', p.trial.display.ptr, p.trial.display.sourceFactorNew, p.trial.display.destinationFactorNew);
+%         
         
         win = pds.px2deg([-p.trial.display.pWidth -p.trial.display.pHeight; p.trial.display.pWidth p.trial.display.pHeight]'/2, p.trial.display.viewdist, p.trial.display.px2w);
         win = win(:)'.*[1 -1 1 -1];
@@ -62,12 +79,12 @@ switch state
     %     generate stimulus sequence
     case p.trial.pldaps.trialStates.trialSetup
         
-        % --- Set Blend Function
-        % We want these squares to override whatever they're on top of
-        p.trial.display.sourceFactorNew = GL_ONE;
-        p.trial.display.destinationFactorNew = GL_ONE;
-        
-        Screen('BlendFunction', p.trial.display.ptr, p.trial.display.sourceFactorNew, p.trial.display.destinationFactorNew);
+%         % --- Set Blend Function
+%         % We want these squares to override whatever they're on top of
+%         p.trial.display.sourceFactorNew = GL_ONE;
+%         p.trial.display.destinationFactorNew = GL_ONE;
+%         
+%         Screen('BlendFunction', p.trial.display.ptr, p.trial.display.sourceFactorNew, p.trial.display.destinationFactorNew);
         
         p.trial.(sn).hSquares.setRandomSeed(p.trial.(sn).rngs.trialSeeds(p.trial.pldaps.iTrial)); % setup random seed
 
@@ -100,17 +117,18 @@ switch state
         if p.trial.(sn).minFixation > 0 % fixation is required
 
             if p.trial.fixflash.hFix.isFixated % is fixation obtained?
-
-                % check if it's time to turn on the object
-                if (p.trial.ttime + p.trial.trstart) > (p.trial.fixflash.hFix.fixlog(end) + p.trial.(sn).minFixation)
+%                 % check if it's time to turn on the object      
+                if  (p.trial.ttime + p.trial.trstart) > (p.trial.fixflash.hFix.fixlog(end) + p.trial.(sn).minFixation)
                     p.trial.(sn).hSquares.stimValue = 1; % turn it on
                 end
+            else
+                p.trial.(sn).hSquares.stimValue = 0; % turn it off
             end
         end
         
         p.trial.(sn).hSquares.frameUpdate(p);
         
-        p.trial.(sn).on(p.trial.iFrame) = p.trial.(sn).hSquares.stimValue;
+        p.trial.(sn).on(p.trial.iFrame)       = p.trial.(sn).hSquares.stimValue;
         p.trial.(sn).pos(:,:, p.trial.iFrame) = p.trial.(sn).hSquares.rect;
         
     case p.trial.pldaps.trialStates.frameDraw

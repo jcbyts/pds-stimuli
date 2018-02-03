@@ -33,6 +33,16 @@ settingsStruct.(sn).minFixDuration = .2;
 settingsStruct.(sn).fixationJitter = false;
 settingsStruct.(sn).fixationJitterSize = 0;
 
+sn = 'spatialSquares';
+settingsStruct.(sn).stateFunction.name  = 'stimuli.modules.mapping.spatialSquares';
+settingsStruct.(sn).stateFunction.order = -1;
+settingsStruct.(sn).use = true;
+settingsStruct.(sn).N = 4;
+settingsStruct.(sn).contrast = 1;
+settingsStruct.(sn).size = .5;
+settingsStruct.(sn).position = [0 0 5 -5];
+settingsStruct.(sn).minFixation = .01;
+
 % run pldaps
 p = pldaps(@stimuli.pldapsDefaultTrial, settingsStruct);
 
@@ -66,6 +76,16 @@ settingsStruct.(sn).minFixDuration = 2;
 settingsStruct.(sn).shrinkTimeConstant = 0;
 settingsStruct.(sn).fixationJitter = false;
 settingsStruct.(sn).fixationJitterSize = 0;
+% 
+sn = 'spatialSquares';
+settingsStruct.(sn).stateFunction.name  = 'stimuli.modules.mapping.spatialSquares';
+settingsStruct.(sn).stateFunction.order = 3;
+settingsStruct.(sn).use = true;
+settingsStruct.(sn).N = 4;
+settingsStruct.(sn).contrast = 1;
+settingsStruct.(sn).size = .5;
+settingsStruct.(sn).position = [0 0 5 -5];
+settingsStruct.(sn).minFixation = .01;
 
 % run pldaps
 p = pldaps(@stimuli.pldapsDefaultTrial, settingsStruct);

@@ -1,4 +1,4 @@
-function trialSetup(p, sn)
+function trialSetupGabors(p, sn)
 
 	if nargin < 2
 		sn = 'dotselection';
@@ -58,56 +58,79 @@ if p.trial.(sn).numBandwidths > 1
 end
 
 % --- setup dots
-numDotApertures = numel(p.trial.(sn).hDots);
-assert(numDotApertures==2, 'This code is not designed for more than 2 apertures')
+numApertures = numel(p.trial.(sn).hTargs);
+assert(numApertures==2, 'This code is not designed for more than 2 apertures')
 
 
-for kDots = 1:numDotApertures
+for kTarg = 1:numApertures
     
-    % dot Range / Bandwidth
-    p.trial.(sn).hDots(kDots).range  = p.trial.(sn).dotRange;
+    % ---------------------------------------------------------------------
+    % IS DOTS?
+    if isa(p.trial.(sn).hTargs(kTarg), 'stimuli.objects.dotsbase') % dots
+        % dot Range / Bandwidth
+        p.trial.(sn).hTargs(kTarg).range  = p.trial.(sn).dotRange;
+        % dot lifetime
+        p.trial.(sn).hTargs(kTarg).dotLifetime = p.trial.(sn).dotLifetime;
+        % dot size (in pixels)
+        p.trial.(sn).hTargs(kTarg).dotSize   = p.trial.(sn).dotSize * ppd; % pixels
+        % dot speed (in pixels/frame)
+        p.trial.(sn).hTargs(kTarg).dotSpeed  = p.trial.(sn).dotSpeed * ppd / fps; % pixels/frame
+        % % dot color
+        p.trial.(sn).hTargs(kTarg).dotColor  = p.trial.display.bgColor + p.trial.(sn).dotContrast;
+        % aperture radius (pixels)
+        p.trial.(sn).hTargs(kTarg).radius    = p.trial.(sn).dotApertureRadius * ppd;
+        % number of dots (integer value, calculate from dot density)
+        p.trial.(sn).hTargs(kTarg).numDots = ceil(p.trial.(sn).dotDensity * pi * p.trial.(sn).dotApertureRadius^2 / fps);
+        % calculate position
+        [th, rho] = cart2pol(p.trial.(sn).RfCenterXy(1),p.trial.(sn).RfCenterXy(2));
+        th = th + p.trial.(sn).DotCenterAngle(kTarg)/180*pi;
+        [xDeg, yDeg] = pol2cart(th, rho);
+        p.trial.(sn).hTargs(kTarg).position    = [xDeg, -1*yDeg] * ppd + ctr;
     
-    % dot lifetime
-    p.trial.(sn).hDots(kDots).dotLifetime = p.trial.(sn).dotLifetime;
+        % direction
+        n = p.trial.(sn).numDirs; % number of directions/choice targets
     
-    % dot size (in pixels)
-    p.trial.(sn).hDots(kDots).dotSize   = p.trial.(sn).dotSize * ppd; % pixels
+        if kTarg > 1 && p.trial.(sn).yokeDirections
+            p.trial.(sn).direction(kTarg) = wrapTo360(p.trial.(sn).direction(kTarg-1) - 180);
+        else
+            p.trial.(sn).direction(kTarg) = ceil(rand(setupRNG)*n)/n*360;
+        end
+        p.trial.(sn).hTargs(kTarg).dotDirection(1) = p.trial.(sn).direction(kTarg);
+    %----------------------------------------------------------------------
+    % IS GABOR?
+    elseif isa(p.trial.(sn).hTargs(kTarg), 'stimuli.objects.gaborTarget')
+%         p.trial.(sn).hTargs(kTarg).setup(p)
+        
+        % calculate position
+        [th, rho] = cart2pol(p.trial.(sn).RfCenterXy(1),p.trial.(sn).RfCenterXy(2));
+        th = th + p.trial.(sn).CenterAngle(kTarg)/180*pi;
+        [xDeg, yDeg] = pol2cart(th, rho);
+        p.trial.(sn).hTargs(kTarg).position    = [xDeg, -1*yDeg] * ppd + ctr;
+        p.trial.(sn).hTargs(kTarg).position 
+        % direction
+        n = p.trial.(sn).numDirs; % number of directions/choice targets
     
-    % dot speed (in pixels/frame)
-    p.trial.(sn).hDots(kDots).dotSpeed  = p.trial.(sn).dotSpeed * ppd / fps; % pixels/frame
-    
-    % % dot color
-    p.trial.(sn).hDots(kDots).dotColor  = p.trial.display.bgColor + p.trial.(sn).dotContrast;
-    
-    % aperture radius (pixels)
-    p.trial.(sn).hDots(kDots).radius    = p.trial.(sn).dotApertureRadius * ppd;
-    
-    % number of dots (integer value, calculate from dot density)
-    p.trial.(sn).hDots(kDots).numDots = ceil(p.trial.(sn).dotDensity * pi * p.trial.(sn).dotApertureRadius^2 / fps);
-    
-    % calculate position
-    [th, rho] = cart2pol(p.trial.(sn).RfCenterXy(1),p.trial.(sn).RfCenterXy(2));
-    
-    th = th + p.trial.(sn).DotCenterAngle(kDots)/180*pi;
-    [xDeg, yDeg] = pol2cart(th, rho);
-    p.trial.(sn).hDots(kDots).position    = [xDeg, -1*yDeg] * ppd + ctr;
-    
-    % direction
-    n = p.trial.(sn).numDirs; % number of directions/choice targets
-    
-    if kDots > 1 && p.trial.(sn).yokeDirections
-        p.trial.(sn).direction(kDots) = wrapTo360(p.trial.(sn).direction(kDots-1) - 180);
-    else
-        p.trial.(sn).direction(kDots) = ceil(rand(setupRNG)*n)/n*360;
+        if kTarg > 1 && p.trial.(sn).yokeDirections
+            p.trial.(sn).direction(kTarg) = wrapTo360(p.trial.(sn).direction(kTarg-1) - 180);
+        else
+            p.trial.(sn).direction(kTarg) = ceil(rand(setupRNG)*n)/n*360;
+        end
+        p.trial.(sn).hTargs(kTarg).theta = p.trial.(sn).direction(kTarg);
+        
+        p.trial.(sn).hTargs(kTarg).sf = p.trial.(sn).sf;
+        p.trial.(sn).hTargs(kTarg).sigma = p.trial.(sn).dotApertureRadius / 7.5;
+        p.trial.(sn).hTargs(kTarg).contrast = p.trial.(sn).contrast;
+        p.trial.(sn).hTargs(kTarg).tf = p.trial.(sn).tf;
+        p.trial.(sn).hTargs(kTarg).phase = randi(360);
     end
-    p.trial.(sn).hDots(kDots).dotDirection(1) = p.trial.(sn).direction(kDots);
+        
     
 end
 
 % (re-)initialize dots
 p.trial.(sn).dotRNG = rng();
-for kDot = 1:numDotApertures
-    p.trial.(sn).hDots(kDot).trialSetup(p);
+for kDot = 1:numApertures
+    p.trial.(sn).hTargs(kDot).trialSetup(p);
 end
 
 % --- setup reward for the trial

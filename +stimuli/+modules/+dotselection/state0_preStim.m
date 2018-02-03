@@ -45,14 +45,14 @@ classdef state0_preStim < stimuli.objects.state
                 % update the position of the dots (relative to fixation
                 % point)
                 fixPos = p.trial.(fixSn).hFix.position; % in pixels
-                for k = 1:numel(p.trial.(sn).hDots)
-                    tmp_ = p.trial.(sn).hDots(k).position;
+                for k = 1:numel(p.trial.(sn).hTargs)
+                    tmp_ = p.trial.(sn).hTargs(k).position;
                     tmp_ = tmp_ - p.trial.display.ctr(1:2);
                     
-                    p.trial.(sn).hDots(k).position = tmp_ + fixPos;
+                    p.trial.(sn).hTargs(k).position = tmp_ + fixPos;
                     
                     % turn on the dots
-                    p.trial.(sn).hDots(k).stimValue = p.trial.(sn).stimVisible(k);
+                    p.trial.(sn).hTargs(k).stimValue = p.trial.(sn).stimVisible(k);
                 end
                 
                 % update fixation behavior to be relative to fixation

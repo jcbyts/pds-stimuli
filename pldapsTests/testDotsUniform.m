@@ -9,6 +9,7 @@ settingsStruct = struct(); % settingsStruct is a structure that modifies pldaps 
 
 settingsStruct.pldaps.nosave = true; % don't save any files
 
+
 % set blend function appropriately
 settingsStruct.display.destinationFactorNew = GL_ONE_MINUS_SRC_ALPHA;
 settingsStruct.display.sourceFactorNew = GL_SRC_ALPHA;

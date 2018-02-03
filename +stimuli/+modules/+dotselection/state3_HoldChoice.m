@@ -15,8 +15,8 @@ classdef state3_HoldChoice < stimuli.objects.state
         % --- Drawing commands
         function frameDraw(~,p,sn)
             
-            for k = 1:numel(p.trial.(sn).hDots)
-                p.trial.(sn).hDots(k).frameDraw(p);
+            for k = 1:numel(p.trial.(sn).hTargs)
+                p.trial.(sn).hTargs(k).frameDraw(p);
             end
             
         end % frameDraw
@@ -31,9 +31,9 @@ classdef state3_HoldChoice < stimuli.objects.state
             startTime = sc.getTxTime(s.id) - p.trial.trstart;
             
             % check if dots are being held
-            p.trial.(sn).hDots(p.trial.(sn).dotsChosen).isHeld([p.trial.eyeX p.trial.eyeY]);
+            p.trial.(sn).hTargs(p.trial.(sn).dotsChosen).isHeld([p.trial.eyeX p.trial.eyeY]);
             
-            if ~p.trial.(sn).hDots(p.trial.(sn).dotsChosen).isFixated
+            if ~p.trial.(sn).hTargs(p.trial.(sn).dotsChosen).isFixated
                 sc.setState(7); % break fixation
                 return
             elseif p.trial.ttime > (startTime + p.trial.(sn).choiceHoldDuration)

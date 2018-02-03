@@ -1,8 +1,12 @@
-function p=runDefaultTrial(p,state, sn)
-% run 
-
+function p=runGaborsTrial(p,state, sn)
+% runTrial operates a trial of the target selection protocol
+% To call, use 
 if nargin<3
     sn='dotselection';
+end
+
+if nargin < 1 % no arguments in: courtesy print default arguments
+   
 end
 
 % --- switch PLDAPS trial states
@@ -25,18 +29,17 @@ switch state
         % --- setup default parameters that don't depend on other variables
         defaultArgs = {...
             'RfCenterXy',               [5, -5], ...    % degrees
-            'dotSize',                  0.1, ...        % degrees (diameter)
-            'dotSpeed',                 8.0, ...        % dot speed (deg/sec)
-            'dotContrast',              -0.5, ...       % - 0.5 yo 0.5
-            'dotRange',                 0.0, ...        % degrees (range of uniform distribution over direction)
-            'dotDensity',               400, ...        % dots / deg^2 / sec 
-            'dotContrast',              5, ...
-            'dotLifetime',              12, ...         % frames
+            'speed',                    nan, ...        % drift speed (deg/sec)
+            'contrast',                 .25, ...        % - 0.5 yo 0.5
+            'difficulty',               nan, ...        % degrees (range of uniform distribution over direction)
+            'tf',                       10, ...        % dots / deg^2 / sec 
+            'sf',                       2, ...
+            'lifetime',                 nan, ...         % frames
             'maxBandwidth',             0.0, ...
             'minBandwidth',             0.0, ...
             'numBandwidths',            1, ...
             'numDirs',                  8, ...
-            'DotCenterAngle',           [0 180], ...
+            'CenterAngle',              [0 180], ...
             'rewardUpdateFun',          @stimuli.modules.dotselection.rewardUpdateSwitchRule, ...
             'rewardUpdateArgs',         {.1}, ...
             'rewardForFixation',        false, ...
@@ -82,14 +85,18 @@ switch state
         p.trial.(sn).hFace      = stimuli.objects.face(p);
         p.trial.(sn).hFace.id   = p.trial.(sn).faceIndex;
         
-        % --- Dots
-        p.trial.(sn).hDots(1)   = stimuli.objects.dotsUniform();
-        p.trial.(sn).hDots(2)   = stimuli.objects.dotsUniform();
+        % --- Targs
+        if ~isfield(p.trial.(sn), 'hTargs')
+            p.trial.(sn).hTargs(1)   = stimuli.objects.gaborTarget();
+            p.trial.(sn).hTargs(2)   = stimuli.objects.gaborTarget();
+        end
+        
+        
 
 	% --- Called before the main trial loop. Sets up all parameters
     case p.trial.pldaps.trialStates.trialSetup
          
-        stimuli.modules.dotselection.trialSetup(p, sn);
+        stimuli.modules.dotselection.trialSetupGabors(p, sn);
         
 
     % --- Draw task semantics using info from hTrial

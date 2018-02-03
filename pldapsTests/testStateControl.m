@@ -1,36 +1,33 @@
+% Test state control
 
+% set up a state control objects
+sc = stimuli.objects.stateControl();
 
-% addlistener(fig,'Color','PostSet',@(src,evnt)disp('Color changed'));
-sc = stimuli.stateControl();
+% initialize three states that don't do anything
+sc.addState(stimuli.objects.state(0))
+sc.addState(stimuli.objects.state(1))
+sc.addState(stimuli.objects.state(2))
 
-sc.addState(stimuli.state(0))
-sc.addState(stimuli.state(1))
-sc.addState(stimuli.state(2))
-
-
-%%
-sc = stimuli.fixflash.fixFlashStates;
-
-
-
-%%
+% step through each state and set the current state to that state
 sc.setState(0);
 sc.setState(0);
 sc.setState(1);
 sc.setState(2);
 
+% start of the experiment
 t0 = GetSecs;
-ttime = GetSecs;
+ttime = t0;
 stateId = 0;
 frameId = 1;
 
-frameLog = nan(10e3,1);
+nFrames = 10e3;
+frameLog = nan(nFrames,1);
 
-while frameId < 10e3
+while frameId < nFrames
     
-    ttime = GetSecs;
+    ttime = GetSecs; % check the time
     
-    if mod(frameId, 10)==0
+    if mod(frameId, 100)==0
         sc.setState(stateId)
         stateId = mod(stateId+1, 3);
     end
@@ -48,3 +45,5 @@ hold on
 plot(sc.getLog(1)-t0, .1, 'r.')
 plot(sc.getLog(0)-t0, .11, 'g.')
 plot(sc.getLog(2)-t0, .12, 'b.')
+ylabel('ms')
+xlabel('seconds')

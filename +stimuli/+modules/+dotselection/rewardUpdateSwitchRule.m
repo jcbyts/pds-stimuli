@@ -25,7 +25,7 @@ varargout{3} = stimVis;
 
 if (stimVis(3) == 0)
 
- if (LeftC >= TF) | (RightC >= TF)
+ if (LeftC >= TF) || (RightC >= TF)
     
    if (LeftC >= TF)  % if going all left, change right to max reward
        varargout{1} = max(rate1,rate2);  %right reward

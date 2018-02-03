@@ -1,4 +1,4 @@
-function p=runDefaultTrial(p,state, sn)
+function p=runDotsTrial(p,state, sn)
 % run 
 
 if nargin<3
