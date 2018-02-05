@@ -68,9 +68,13 @@ classdef directionprior < handle
             
         end
         
-        function phi = drawfromprior(pr)
+        function phi = drawfromprior(pr, setupRNG)
             % uniform random number between 0-1
-            rnd = rand;
+            if nargin > 1 && isa(setupRNG, 'RandStream')
+                rnd = rand(setupRNG);
+            else
+                rnd = rand;
+            end
             
             % function for indexing into available directions
             binfun = @(x) 1 + (x == 0) + ceil(x / mean(diff(pr.direction)));
