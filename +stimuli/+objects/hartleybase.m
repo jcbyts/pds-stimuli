@@ -75,9 +75,11 @@ classdef hartleybase < stimuli.objects.stimulus
             if ~obj.stimValue
                 return
             end
-                
+               
+            Screen('BlendFunction', p.trial.display.ptr, GL_ONE, GL_ONE);
             Screen('DrawTexture', p.trial.display.ptr, obj.tex, [], [0 0 obj.dim], 0, [], [], [], [], kPsychDontDoRotation, [obj.kx, obj.ky, p.trial.display.ppd, obj.contrast, obj.M, obj.phi, 0, 0]);
-                
+            Screen('BlendFunction', p.trial.display.ptr, p.trial.display.sourceFactorNew, p.trial.display.destinationFactorNew);
+
         end
         
     end
