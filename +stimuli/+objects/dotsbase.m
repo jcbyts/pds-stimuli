@@ -23,7 +23,7 @@ classdef dotsbase < stimuli.objects.target % (Abstract) % should this be abstrac
     
     properties (Access = public),
         radius@double       = 150;  % pixels TODO: should this be deg
-        dotSpeed@double     = 2;   % pixels/s
+        dotSpeed@double     = 2;    % pixels/s
         dotDirection@double = 0;    % deg.
         dotSize@double      = 2;    % pixels (radius?)
         

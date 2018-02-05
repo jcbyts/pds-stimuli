@@ -7,11 +7,28 @@ if nargin<3
     sn='natImgBackground';
 end
 
+% -------------------------------------------------------------------------
+% This is just a courtesy: lists all the possible arguments and a
+% description of what they are. The
+if nargin < 1
+    defaultArgs = {...
+        'imgDir',         'full path to images', ...
+        'fileList',       'list of images as struct array (out put of dir() )', ...
+        'numToShow',      'number to show per trial (default: 1)', ...
+        'imageContrast',  'contrast of the background image', ...
+        };
+    fprintf('No arguments passed in: call from within pldaps\n')
+    fprintf('<strong>Optional Parameters:</strong>\n')
+    fprintf('<strong>%s</strong>\t\t\t%s\n', defaultArgs{:})
+    return
+end
+
+
 
 switch state
     case p.trial.pldaps.trialStates.experimentPreOpenScreen
         
-        p.defaultParameters.(sn).stateFunction.acceptsLocationInput = true; % is this necessary
+        p.defaultParameters.(sn).stateFunction.acceptsLocationInput = true;
         % setup states that will be called by this module
         p.defaultParameters.(sn).stateFunction.requestedStates.experimentPostOpenScreen = true;
         p.defaultParameters.(sn).stateFunction.requestedStates.trialSetup = true;
@@ -20,20 +37,37 @@ switch state
         p.defaultParameters.(sn).stateFunction.requestedStates.trialCleanUpandSave = true;
 
         p = stimuli.setupRandomSeed(p, sn);
-        
-%         p.defaultParameters.(sn).rngs.randomNumberGenerater='mrg32k3a';
-%         p.defaultParameters.(sn).rngs.trialSeeds = randi(2^32, [3e3 1]);
-        
-    case p.trial.pldaps.trialStates.framePrepareDrawing
-        
-        p.trial.(sn).texShown(p.trial.iFrame)=p.trial.(sn).texToDraw;
-        
-    case p.trial.pldaps.trialStates.frameDraw
+
+    %--------------------------------------------------------------------------
+    % --- After screen is open: Setup default parameters
+    case p.trial.pldaps.trialStates.experimentPostOpenScreen
         
         %------------------------------------------------------------------
-        % Draw Background
-        Screen('DrawTexture', p.trial.display.ptr, p.trial.(sn).tex(p.trial.(sn).texToDraw), [], [0 0 p.trial.display.pWidth p.trial.display.pHeight], [], [], [], [], [], kPsychDontDoRotation)
+        % Setup IMG directory and random seeds
+        if ~isfield(p.trial.(sn), 'imgDir')
+            
+            impath = getpref('pep', 'imgDir');
+            assert(exist(impath, 'dir'), 'imgDir path does not exist. You have to set that up for natImgBackgorund to run')
+            
+            p.trial.(sn).imgDir   = impath;
+        end
         
+        if ~isfield(p.trial.(sn), 'fileList')
+            flist = [dir(fullfile(p.trial.(sn).imgDir, '*.JPG')) dir(fullfile(p.trial.(sn).imgDir, '*.PNG'))];
+            p.trial.(sn).fileList = flist;
+        end
+        
+        if ~isfield(p.trial.(sn), 'numToShow')
+            p.trial.(sn).numToShow=10;
+        end
+        
+        if ~isfield(p.trial.(sn), 'imageContrast')
+            p.trial.(sn).imageContrast = .5;
+        end
+   
+	%--------------------------------------------------------------------------
+    % --- Trial Setup: pre-allocate important variables for storage and
+    %     generate stimulus sequence
     case p.trial.pldaps.trialStates.trialSetup
         
         %------------------------------------------------------------------
@@ -47,7 +81,8 @@ switch state
         p.trial.(sn).imgIndex = randi(p.trial.(sn).rngs.conditionerRNG, numel(p.trial.(sn).fileList), p.trial.(sn).numToShow, 1);
         p.trial.(sn).tex = nan(p.trial.(sn).numToShow,1);
         
-        p.trial.(sn).texToDraw=randi(p.trial.(sn).rngs.conditionerRNG, p.trial.(sn).numToShow);
+        % randomly sample from the list of files
+        p.trial.(sn).texToDraw = randi(p.trial.(sn).rngs.conditionerRNG, p.trial.(sn).numToShow);
         
         blendFlag = strcmp(p.trial.display.destinationFactorNew, GL_ONE);
         for i=1:p.trial.(sn).numToShow
@@ -66,28 +101,17 @@ switch state
         
         p.trial.(sn).texShown=nan(1,10e3);
         
+    case p.trial.pldaps.trialStates.framePrepareDrawing
         
-    case p.trial.pldaps.trialStates.experimentPostOpenScreen
+        p.trial.(sn).texShown(p.trial.iFrame)=p.trial.(sn).texToDraw;
+        
+    case p.trial.pldaps.trialStates.frameDraw
         
         %------------------------------------------------------------------
-        % Setup IMG directory and random seeds
-        if ~isfield(p.trial.(sn), 'imgDir')
-            cguipath = which('calibrationGUI');
-            pathto = fileparts(cguipath);
-            
-            p.trial.(sn).imgDir   = fullfile(pathto, 'Backgrounds');
-            p.trial.(sn).fileList = dir(fullfile(p.trial.(sn).imgDir, '*.JPG'));
-
-        end
+        % Draw Background
+        Screen('DrawTexture', p.trial.display.ptr, p.trial.(sn).tex(p.trial.(sn).texToDraw), [], [0 0 p.trial.display.pWidth p.trial.display.pHeight], [], [], [], [], [], kPsychDontDoRotation)
         
-        if ~isfield(p.trial.(sn), 'numToShow')
-            p.trial.(sn).numToShow=10;
-        end
-        
-        if ~isfield(p.trial.(sn), 'imageContrast')
-            p.trial.(sn).imageContrast = .5;
-        end
-        
+    
         
     case p.trial.pldaps.trialStates.trialCleanUpandSave
         p.trial.(sn).texShown(p.trial.iFrame+1:end)=[];
