@@ -21,11 +21,19 @@ classdef face < stimuli.objects.textures
             o.maxContrast = ip.Results.maxContrast;
             
             % load marmoset face textures
-            MFL=load(fullfile(marmoview.supportDataDir,'MarmosetFaceLibrary.mat'));
-            MFL = struct2cell(MFL);
-            MFL = MFL([7,10,13,17:20,24,25,27]); % these faces seem most centered
+            facelib=getpref('pep', 'marmosetFaceLibrary');
+            facelist = [dir(fullfile(facelib, '*.JPEG')) dir(fullfile(facelib, '*.JPG')) dir(fullfile(facelib, '*.PNG'))];
+            nFaces = numel(facelist);
+            MFL = cell(nFaces,1);
+            for iFace = 1:nFaces
+                MFL{iFace} = imread(fullfile(facelib, facelist(iFace).name));
+            end
             
-            for id = 1:length(MFL)
+%             MFL=load(fullfile(marmoview.supportDataDir,'MarmosetFaceLibrary.mat'));
+%             MFL = struct2cell(MFL);
+%             MFL = MFL([7,10,13,17:20,24,25,27]); % these faces seem most centered
+            
+            for id = 1:nFaces
                 img = MFL{id};
                 
                 sz = size(img);
