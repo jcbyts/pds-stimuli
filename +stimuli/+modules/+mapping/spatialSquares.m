@@ -6,7 +6,6 @@ if nargin<3
 end
 
 % -------------------------------------------------------------------------
-% COPY THIS INTO EACH PROTOCOL
 % This is just a courtesy: lists all the possible arguments and a
 % description of what they are. The
 if nargin < 1
@@ -17,6 +16,7 @@ if nargin < 1
         'lifetime',       'square lifetime (frames)', ...
         'position',       'rectangle for stimulus location (degrees ptb rect [x,y,x,y])', ...
         'minFixation',    'time fixation required (default: nan - no fixation required)', ...
+        'fixationBehavior', 'field that points to the module for fixation', ...
         };
     fprintf('No arguments passed in: call from within pldaps\n')
     fprintf('<strong>Optional Parameters:</strong>\n')
@@ -58,6 +58,7 @@ switch state
             'lifetime',             3, ...   % frames
             'position',             win, ... % rectangle for stimulus location (degrees)
             'minFixation',          nan, ... % time fixation has been held before showing stimulus (default: no fixation)
+            'fixationBehavior',     'fixflash', ... % module for fixation
             };
         
         % step through argument pairs and add them to the module
@@ -72,7 +73,9 @@ switch state
         end
 
         % setup default object
-        p.trial.(sn).hSquares = stimuli.objects.spatialSquares(p);
+        if ~(isfield(p.trial.(sn), 'hSquares') && isa(p.trial.(sn).hSquares, 'stimuli.objects.stimulus'))
+            p.trial.(sn).hSquares = stimuli.objects.spatialSquares(p);
+        end
         
     %--------------------------------------------------------------------------
     % --- Trial Setup: pre-allocate important variables for storage and
@@ -115,10 +118,12 @@ switch state
         
         % check if the stimulus should be on or off
         if p.trial.(sn).minFixation > 0 % fixation is required
-
-            if p.trial.fixflash.hFix.isFixated % is fixation obtained?
+            fixfield=p.trial.(sn).fixationBehavior;
+            if ~(isfield(p.trial, fixfield) && isfield(p.trial.(fixfield), 'hFix'))
+                warning('fixationBehavior is not a valid module')
+            elseif p.trial.(fixfield).hFix.isFixated % is fixation obtained?
 %                 % check if it's time to turn on the object      
-                if  (p.trial.ttime + p.trial.trstart) > (p.trial.fixflash.hFix.fixlog(end) + p.trial.(sn).minFixation)
+                if  (p.trial.ttime + p.trial.trstart) > (p.trial.(fixfield).hFix.fixlog(end) + p.trial.(sn).minFixation)
                     p.trial.(sn).hSquares.stimValue = 1; % turn it on
                 end
             else
