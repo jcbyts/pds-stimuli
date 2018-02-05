@@ -20,11 +20,11 @@ switch state
     % --- After screen is open: Setup default parameters
     case p.trial.pldaps.trialStates.experimentPostOpenScreen
         
-        % BLEND FUNCTION MUST BE GL_ONE, GL_ONE FOR THIS MODULE TO WORK
-        p.trial.display.sourceFactorNew      = GL_ONE;
-        p.trial.display.destinationFactorNew = GL_ONE;
+        % % BLEND FUNCTION MUST BE GL_ONE, GL_ONE FOR THIS MODULE TO WORK - should vbe able to switch online
+        % p.trial.display.sourceFactorNew      = GL_ONE;
+        % p.trial.display.destinationFactorNew = GL_ONE;
         
-        Screen('BlendFunction', p.trial.display.ptr, p.trial.display.sourceFactorNew, p.trial.display.destinationFactorNew);
+        % Screen('BlendFunction', p.trial.display.ptr, p.trial.display.sourceFactorNew, p.trial.display.destinationFactorNew);
         
         % --- set up default parameters
         defaultArgs = {...
