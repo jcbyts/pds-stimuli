@@ -3,6 +3,7 @@
 
 Collection of stimulus protocols for [PLDAPS](https://github.com/huklab/PLDAPS).
 
+[setup](#setup)
 
 The basic philosophy is that building new experimental *protocols* should be easy because the hard work is done for you by existing *modules*, *state machines*, and *objects*
 
@@ -302,6 +303,13 @@ sc.setState(0); % initialize state machine
 The `stimuli.objects` in pds-stimuli are a set of classes that support the easy insertion of particular type of stimulus, such as **dots**, **fixation points**, **gabors**, **faces**, etc. The idea is to wrap all of the Psychtoolbox functions in a single object that makes setting up the `Screen` calls easy. Additionally, these objects will track certain things in their behavior automagically: when they turn on/ off; whether the subject is looking at them. The way it works is each of these stimulus objects is a `stimuli.stimulus` such that when they are created they inherit all of the properties and methods of `.stimulus`
 
 For more information on how objects work and examples of specific objects, see the [readme](./+stimuli/+objects/README.md) for objects.
+
+# Setup PEP
+There are some things that you need to do before PEP will run smoothly. These involve setting the preferences of your matlab environment.
+```matlab
+setpref('pep', 'marmosetFaceLibrary', 'full\path\to\your\face\library\')
+setpref('pep', 'colonyPics', 'full\path\to\your\colony\library\')
+```
 
 # Quick primer on PLDAPS
 
