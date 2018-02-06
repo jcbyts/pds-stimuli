@@ -10,6 +10,7 @@ classdef spatialSquares < stimuli.objects.stimulus %#ok<*MCSUP>
         size@double         % size of each square (degrees)
         contrast            % contrast of each square (positive=white, negative=black)
         lifetime            % max lifetime (in frames)
+        gridded             % are the squares fixed to a grid (spaced by size)
     end
     
     properties (SetAccess = ?stimuli.objects.stimulus, GetAccess = public)
@@ -51,10 +52,11 @@ classdef spatialSquares < stimuli.objects.stimulus %#ok<*MCSUP>
             ip = inputParser();
             ip.KeepUnmatched = true;
             ip.addParameter('position',  win) % rectangle for stimulus location (degrees [x, y, x, y])
-            ip.addParameter('N',         10) % number of squares on each frame
-            ip.addParameter('size',      2)  % size of each square (degrees)
-            ip.addParameter('contrast',  []) % contrast of the squares
-            ip.addParameter('lifetime',  []) % in frames
+            ip.addParameter('N',         10)  % number of squares on each frame
+            ip.addParameter('size',      2)   % size of each square (degrees)
+            ip.addParameter('contrast',  [])  % contrast of the squares
+            ip.addParameter('lifetime',  [])  % in frames
+            ip.addParameter('gridded', false) % are the squares in a grid?
             ip.parse(varargin{:});
             
             nextargs = [fieldnames(ip.Unmatched) struct2cell(ip.Unmatched)]';
@@ -84,11 +86,18 @@ classdef spatialSquares < stimuli.objects.stimulus %#ok<*MCSUP>
             pUly    = obj.pxwin(2); % upper right corner
 
             % initialize squares
-            obj.life = randi(obj.rng, obj.lifetime, 1, obj.N); % lifetime 
-            xpos = round(rand(obj.rng, obj.N, 1)*pWidth)  + pUlx;  % x position of the upper left corner of each square
-            ypos = round(rand(obj.rng, obj.N, 1)*pHeight) + pUly;  % y position of the upper left corner of each square
-            szpx = obj.size * p.trial.display.ppd;
-
+            obj.life = randi(obj.rng, obj.lifetime, 1, obj.N); % lifetime
+            if obj.gridded
+                szpx  = obj.size * p.trial.display.ppd;
+                nGridX = ceil(pWidth/szpx);
+                nGridY = ceil(pHeight/szpx);
+                xpos = randi(obj.rng, nGridX, obj.N, 1)*szpx  + pUlx;  % x position of the upper left corner of each square
+                ypos = randi(obj.rng, nGridY, obj.N, 1)*szpx + pUly;  % y position of the upper left corner of each square
+            else
+                xpos = round(rand(obj.rng, obj.N, 1)*pWidth)  + pUlx;  % x position of the upper left corner of each square
+                ypos = round(rand(obj.rng, obj.N, 1)*pHeight) + pUly;  % y position of the upper left corner of each square
+                szpx = obj.size * p.trial.display.ppd;
+            end
             obj.rect = [xpos(:) ypos(:) xpos(:) + szpx ypos(:) + szpx]';
 
         end
@@ -104,11 +113,17 @@ classdef spatialSquares < stimuli.objects.stimulus %#ok<*MCSUP>
                     pHeight = obj.pxwin(4) - obj.pxwin(2); % height
                     pUlx    = obj.pxwin(1); % upper left corner
                     pUly    = obj.pxwin(2); % upper right corner
-                    
-                    xpos = round(rand(obj.rng, sum(idx), 1)*pWidth)  + pUlx;  % x position of the upper left corner of each square
-                    ypos = round(rand(obj.rng, sum(idx), 1)*pHeight) + pUly;  % y position of the upper left corner of each square
-                    szpx = obj.size * p.trial.display.ppd;
-                    
+                    if obj.gridded
+                        szpx  = obj.size * p.trial.display.ppd;
+                        nGridX = ceil(pWidth/szpx);
+                        nGridY = ceil(pHeight/szpx);
+                        xpos = randi(obj.rng, nGridX, obj.N, 1)*szpx  + pUlx;  % x position of the upper left corner of each square
+                        ypos = randi(obj.rng, nGridY, obj.N, 1)*szpx + pUly;  % y position of the upper left corner of each square
+                    else
+                        xpos = round(rand(obj.rng, sum(idx), 1)*pWidth)  + pUlx;  % x position of the upper left corner of each square
+                        ypos = round(rand(obj.rng, sum(idx), 1)*pHeight) + pUly;  % y position of the upper left corner of each square
+                        szpx = obj.size * p.trial.display.ppd;
+                    end
                     obj.rect(:,idx) = [xpos(:) ypos(:) xpos(:) + szpx ypos(:) + szpx]';
                 end
 
