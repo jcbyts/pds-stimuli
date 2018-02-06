@@ -5,6 +5,24 @@ if nargin<3
     sn='hartley';
 end
 
+% -------------------------------------------------------------------------
+% This is just a courtesy: lists all the possible arguments and a
+% description of what they are. The
+if nargin < 1
+    defaultArgs = {...
+        'OnDuration',           'time constant of on (frames)', ...
+        'OffDuration',          'time constant of inter stimulus interval (frames)',...
+        'MaxDuration',          'maximum time on (frames), truncates the exponential', ...
+        'contrast',           	'Michelson contrast of the gratings', ...
+        'tfs',                  'temporal frequencies showns', ...
+        'nOctaves',             'number of octaves to show above base frequency', ...
+        'Freq0',                'Base frequence (cycles/deg)', ...
+        };
+    fprintf('No arguments passed in: call from within pldaps\n')
+    fprintf('<strong>Optional Parameters:</strong>\n')
+    fprintf('<strong>%s</strong>\t\t\t%s\n', defaultArgs{:})
+    return
+end
 
 switch state
         
@@ -19,12 +37,6 @@ switch state
     %--------------------------------------------------------------------------
     % --- After screen is open: Setup default parameters
     case p.trial.pldaps.trialStates.experimentPostOpenScreen
-        
-        % % BLEND FUNCTION MUST BE GL_ONE, GL_ONE FOR THIS MODULE TO WORK - should vbe able to switch online
-        % p.trial.display.sourceFactorNew      = GL_ONE;
-        % p.trial.display.destinationFactorNew = GL_ONE;
-        
-        % Screen('BlendFunction', p.trial.display.ptr, p.trial.display.sourceFactorNew, p.trial.display.destinationFactorNew);
         
         % --- set up default parameters
         defaultArgs = {...
@@ -58,8 +70,6 @@ switch state
         p.trial.(sn).count = 1;
         [p.trial.(sn).kxgrid, p.trial.(sn).kygrid]=meshgrid(p.trial.(sn).kxs, p.trial.(sn).kys);
         
-        p = stimuli.setupRandomSeed(p, sn);
-        
         % --- instantiate Hartley object
         p.trial.(sn).hHart = stimuli.objects.hartleybase(p, 'maskType', 1, 'maskParam', 2, 'position', p.trial.display.ctr(1:2));
         
@@ -86,7 +96,6 @@ switch state
         p.trial.(sn).phi = nan(p.trial.(sn).maxFrames,  p.trial.(sn).count);
         p.trial.(sn).tf  = nan(p.trial.(sn).maxFrames,  p.trial.(sn).count);
         
-        % exponential decay
         p.trial.(sn).M = 1; % grid size
         
         freqs = sort([-2.^(0:(p.trial.(sn).nOctaves-1))*p.trial.(sn).Freq0 0 2.^(0:(p.trial.(sn).nOctaves-1))*p.trial.(sn).Freq0]);

@@ -5,6 +5,24 @@ if nargin<3
     sn='hartley';
 end
 
+% -------------------------------------------------------------------------
+% This is just a courtesy: lists all the possible arguments and a
+% description of what they are. The
+if nargin < 1
+    defaultArgs = {...
+        'OnDuration',           'fixed duration on (frames)', ...
+        'OffDuration',          'fixed duration inter stimulus interval (frames)',...
+        'MaxDuration',          'maximum time on (frames), truncates the exponential', ...
+        'contrast',           	'Michelson contrast of the gratings', ...
+        'tfs',                  'temporal frequencies showns', ...
+        'nOctaves',             'number of octaves to show above base frequency', ...
+        'Freq0',                'Base frequence (cycles/deg)', ...
+        };
+    fprintf('No arguments passed in: call from within pldaps\n')
+    fprintf('<strong>Optional Parameters:</strong>\n')
+    fprintf('<strong>%s</strong>\t\t\t%s\n', defaultArgs{:})
+    return
+end
 
 switch state
         
@@ -86,7 +104,6 @@ switch state
         p.trial.(sn).phi = nan(p.trial.(sn).maxFrames,  p.trial.(sn).count);
         p.trial.(sn).tf  = nan(p.trial.(sn).maxFrames,  p.trial.(sn).count);
         
-        % exponential decay
         p.trial.(sn).M = 1; % grid size
         
         freqs = sort([-2.^(0:(p.trial.(sn).nOctaves-1))*p.trial.(sn).Freq0 0 2.^(0:(p.trial.(sn).nOctaves-1))*p.trial.(sn).Freq0]);

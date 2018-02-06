@@ -5,6 +5,20 @@ if nargin<3
     sn='csdFlash';
 end
 
+% -------------------------------------------------------------------------
+% This is just a courtesy: lists all the possible arguments and a
+% description of what they are. The
+if nargin < 1
+    defaultArgs = {...
+            'onDuration',               'frames flash is on', ...
+            'offDuration',              'frames flash is off', ...
+            'onColor',                  'color [1 x 3] during flash', ...
+            };
+    fprintf('No arguments passed in: call from within pldaps\n')
+    fprintf('<strong>Optional Parameters:</strong>\n')
+    fprintf('<strong>%s</strong>\t\t\t%s\n', defaultArgs{:})
+    return
+end
 
 switch state
     
@@ -24,7 +38,7 @@ switch state
             
             % is it time to turn off?
             if frameCtr > p.trial.(sn).onDuration    
-                disp('turned off')
+%                 disp('turned off')
                 % turn it off
                 p.trial.(sn).isOn = false;
                 p.trial.(sn).hFlash.stimValue = false;
@@ -34,7 +48,7 @@ switch state
             
             % is it time to turn on?
             if frameCtr > p.trial.(sn).offDuration    
-                disp('flash on')
+%                 disp('flash on')
                 % turn it off
                 p.trial.(sn).isOn = true;
                 p.trial.(sn).hFlash.stimValue = true;
@@ -77,7 +91,9 @@ switch state
         end
         
         % --- create object
-        p.trial.(sn).hFlash = stimuli.objects.ffflash('color', p.trial.(sn).onColor);
+        if ~isfield(p.trial.(sn), 'hFlash')
+            p.trial.(sn).hFlash = stimuli.objects.ffflash('color', p.trial.(sn).onColor);
+        end
         
         
     case p.trial.pldaps.trialStates.trialCleanUpandSave
