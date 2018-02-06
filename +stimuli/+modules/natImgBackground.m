@@ -47,7 +47,7 @@ switch state
         if ~isfield(p.trial.(sn), 'imgDir')
             
             impath = getpref('pep', 'imgDir');
-            assert(exist(impath, 'dir'), 'imgDir path does not exist. You have to set that up for natImgBackgorund to run')
+            assert(isdir(impath), 'imgDir path does not exist. You have to set that up for natImgBackgorund to run')
             
             p.trial.(sn).imgDir   = impath;
         end
