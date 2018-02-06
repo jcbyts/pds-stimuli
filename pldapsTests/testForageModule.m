@@ -43,13 +43,14 @@ settingsStruct.(sn).N = 4;
 settingsStruct.(sn).contrast = 1;
 settingsStruct.(sn).size = 1;
 settingsStruct.(sn).position = [-5 5 5 -5];
+settingsStruct.(sn).minFixation = nan;
 
 sn = 'forage';
 % settingsStruct.(sn).stateFunction.name = 'stimuli.modules.fixflash.runDefaultTrial';
 settingsStruct.(sn).stateFunction.name = 'stimuli.modules.forage.forage';
 settingsStruct.(sn).stateFunction.order = 2;
 settingsStruct.(sn).use = true;
-
+settingsStruct.(sn).maxContrast = 1;
 % settingsStruct.(sn).staircaseOn = true;
 % settingsStruct.(sn).minFixDuration = .2;
 % settingsStruct.(sn).fixationJitter = false;
