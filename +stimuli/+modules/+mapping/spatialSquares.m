@@ -17,6 +17,7 @@ if nargin < 1
         'position',       'rectangle for stimulus location (degrees ptb rect [x,y,x,y])', ...
         'minFixation',    'time fixation required (default: nan - no fixation required)', ...
         'fixationBehavior', 'field that points to the module for fixation', ...
+        'gridded',          '(true or false) are the revco squares gridded or randomly placed within the rect', ...
         };
     fprintf('No arguments passed in: call from within pldaps\n')
     fprintf('<strong>Optional Parameters:</strong>\n')
@@ -59,6 +60,7 @@ switch state
             'position',             win, ... % rectangle for stimulus location (degrees)
             'minFixation',          nan, ... % time fixation has been held before showing stimulus (default: no fixation)
             'fixationBehavior',     'fixflash', ... % module for fixation
+            'gridded',              false, ... % are the spatial squares placed in a grid or randomly
             };
         
         % step through argument pairs and add them to the module
@@ -97,6 +99,7 @@ switch state
         p.trial.(sn).hSquares.size     = p.trial.(sn).size;
         p.trial.(sn).hSquares.contrast = p.trial.(sn).contrast;
         p.trial.(sn).hSquares.lifetime = p.trial.(sn).lifetime;
+        p.trial.(sn).hSquares.gridded  = p.trial.(sn).gridded;
 
         % prepare object for trial
         p.trial.(sn).hSquares.trialSetup(p);

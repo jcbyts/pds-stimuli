@@ -282,8 +282,8 @@ classdef butterfly < stimuli.objects.stimulus
         function frameUpdate(obj, p)
             
             % --- move objects
-            obj.isheld(p);
             obj.move(p);
+            obj.isheld(p);
             
             
             % --- update objects

@@ -59,19 +59,19 @@ classdef textures < stimuli.objects.target
             o = o@stimuli.objects.target(varargin{:});
             
             o.winPtr = winPtr;
-            
-            if ~isnan(o.winPtr)
-                try
-                [sourceFactorOld, destinationFactorOld]=Screen('BlendFunction', o.winPtr);
-                
-                if strcmp(sourceFactorOld, GL_SRC_ALPHA) && strcmp(destinationFactorOld, GL_ONE_MINUS_SRC_ALPHA)
-                    o.texMode = [];
-                else
-                    o.texMode=2;
-                end
-                end
-            end
-            
+%             o.texMode = [];
+%             if ~isnan(o.winPtr)
+%                 try
+%                 [sourceFactorOld, destinationFactorOld]=Screen('BlendFunction', o.winPtr);
+%                 
+%                 if strcmp(sourceFactorOld, GL_SRC_ALPHA) && strcmp(destinationFactorOld, GL_ONE_MINUS_SRC_ALPHA)
+%                     o.texMode = [];
+%                 else
+%                     o.texMode=2;
+%                 end
+%                 end
+%             end
+%             
             if nargin == 1
                 return
             end
@@ -124,8 +124,11 @@ classdef textures < stimuli.objects.target
             
             filterMode = 1; % bilinear interpolation
             if ~isnan(o.winPtr)
+                Screen('BlendFunction', p.trial.display.ptr, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
                 Screen('DrawTextures',p.trial.display.ptr,texPtr,[],rect',[],filterMode,o.alpha);
+                Screen('BlendFunction', p.trial.display.ptr, p.trial.display.sourceFactorNew, p.trial.display.destinationFactorNew);
             end
+            
         end
         
 %         function frameUpdate(o)
@@ -143,6 +146,9 @@ classdef textures < stimuli.objects.target
             % values. Alpha values range between 0 (transparent) and 255 (opaque)
             
             % FIXME: extend this to take an optional ALPHA value
+            if o.texMode==2
+                img = double(img)/255;
+            end
             
             if ~isnan(o.winPtr)
                 texPtr = Screen('MakeTexture',o.winPtr,img, [], [], o.texMode, [], o.glsl);

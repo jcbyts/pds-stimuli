@@ -44,22 +44,22 @@ classdef face < stimuli.objects.textures
                 g = g - min(g(:));
                 g = g./max(g(:));
                 
-                
-                
-                if strcmp(p.trial.display.sourceFactorNew, GL_SRC_ALPHA) && strcmp(p.trial.display.destinationFactorNew, GL_ONE_MINUS_SRC_ALPHA)
-                    img(:,:,4) = uint8(255.*g); % alpha channel: 0 = transparent, 255 = opaque
-                else
-                    img = double(img);
-%                     img(:,:,4) = 255*g;
-                    img = (img - 127)/127;
-                    for i = 1:3
-                        img(:,:,i) = img(:,:,i).*g;
-                    end
-                    
-                    if strcmp(p.trial.display.sourceFactorNew, GL_ONE)
-                        img = img .* o.maxContrast;
-                    end
-                end
+                % assuming we can switch blend functions on the fly
+                img(:,:,4) = uint8(255.*g); % alpha channel: 0 = transparent, 255 = opaque
+%                 if strcmp(p.trial.display.sourceFactorNew, GL_SRC_ALPHA) && strcmp(p.trial.display.destinationFactorNew, GL_ONE_MINUS_SRC_ALPHA)
+%                     img(:,:,4) = uint8(255.*g); % alpha channel: 0 = transparent, 255 = opaque
+%                 else
+%                     img = double(img);
+% %                     img(:,:,4) = 255*g;
+%                     img = (img - 127)/127;
+%                     for i = 1:3
+%                         img(:,:,i) = img(:,:,i).*g;
+%                     end
+%                     
+%                     if strcmp(p.trial.display.sourceFactorNew, GL_ONE)
+%                         img = img .* o.maxContrast;
+%                     end
+%                 end
                 
                 o.addTexture(id, img);
             end
