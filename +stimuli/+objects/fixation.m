@@ -51,10 +51,12 @@ classdef fixation < stimuli.objects.target
   %         targ.frameDraw(p)
   
   properties (Access = public),
-    radius@double = 5; % pixels
-    color@double  = ones(1,3);
-    ctrColor@double = -ones(1,3);
+    radius@double       = 5; % pixels
+    color@double        = ones(1,3);
+    ctrColor@double     = -ones(1,3);
     wincolor
+    shrinkTimeConstant@double =nan;
+    sz
   end
   
   methods (Access = public)
@@ -87,6 +89,7 @@ classdef fixation < stimuli.objects.target
           o.radius      = args.radius;
           o.color       = args.color;
           o.position    = args.position;
+          o.sz          = o.radius;
       end
       
       
@@ -103,12 +106,12 @@ classdef fixation < stimuli.objects.target
           end
           
           
-          r = o.radius; % radius in pixels
+          r = o.sz; % radius in pixels
           
           rect = kron([1,1],o.position) + kron(r(:),[-1, -1, +1, +1]);
           Screen('FillOval',p.trial.display.overlayptr, o.color,rect');
           
-          r = o.radius/2; % radius in pixels
+          r = o.sz/2; % radius in pixels
           
           rect = kron([1,1],o.position) + kron(r(:),[-1, -1, +1, +1]);
           Screen('FillOval',p.trial.display.overlayptr, o.ctrColor,rect');
@@ -129,6 +132,16 @@ classdef fixation < stimuli.objects.target
           if nargin < 2
               warning('needs a pldaps to run')
               return
+          end
+          
+          % shrinking window
+          if ~isnan(o.shrinkTimeConstant)
+              % exponential decay since last time on
+              tt = p.trial.trstart + p.trial.ttime - o.log(2,end);
+              
+              o.sz = max(exp(-tt/o.shrinkTimeConstant)*p.trial.display.pWidth, o.radius);
+          else
+              o.sz = o.radius;
           end
           
           o.isHeld([p.trial.eyeX p.trial.eyeY])

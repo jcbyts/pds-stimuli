@@ -117,13 +117,11 @@ classdef fixationImg < stimuli.objects.target
         %------------------------------------------------------------------
         % Setup IMG directory
         if isempty(o.imgDir)
-            cguipath = which('calibrationGUI');
-            pathto = fileparts(cguipath);
-            
-            o.imgDir   = fullfile(pathto, 'Colony');
-            if isempty(o.fileList)
-                o.fileList = dir(fullfile(o.imgDir, '*.JPG'));
-            end
+            o.imgDir   = getpref('pep', 'colonyPics');
+        end
+        
+        if isempty(o.fileList)
+            o.fileList = [dir(fullfile(o.imgDir, '*.JPG')) dir(fullfile(o.imgDir, '*.PNG'))];
         end
         
       end
