@@ -117,8 +117,8 @@ classdef spatialSquares < stimuli.objects.stimulus %#ok<*MCSUP>
                         szpx  = obj.size * p.trial.display.ppd;
                         nGridX = ceil(pWidth/szpx);
                         nGridY = ceil(pHeight/szpx);
-                        xpos = randi(obj.rng, nGridX, obj.N, 1)*szpx  + pUlx;  % x position of the upper left corner of each square
-                        ypos = randi(obj.rng, nGridY, obj.N, 1)*szpx + pUly;  % y position of the upper left corner of each square
+                        xpos = randi(obj.rng, nGridX,sum(idx), 1)*szpx  + pUlx;  % x position of the upper left corner of each square
+                        ypos = randi(obj.rng, nGridY, sum(idx), 1)*szpx + pUly;  % y position of the upper left corner of each square
                     else
                         xpos = round(rand(obj.rng, sum(idx), 1)*pWidth)  + pUlx;  % x position of the upper left corner of each square
                         ypos = round(rand(obj.rng, sum(idx), 1)*pHeight) + pUly;  % y position of the upper left corner of each square
