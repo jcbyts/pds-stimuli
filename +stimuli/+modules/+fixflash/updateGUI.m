@@ -10,8 +10,12 @@ if nargin < 2
     sn = 'fixflash';
 end
 
+
+% only analyze trials that ran the fixflash protocol
+trialIx = cellfun(@(x) isfield(x, 'fixflash') & isfield(x.fixflash, 'error'), p.data);
+
 % get coded trial outcomes
-outcomes = [cellfun(@(x) x.(sn).error, p.data) p.trial.(sn).error];
+outcomes = [cellfun(@(x) x.(sn).error, p.data(trialIx)) p.trial.(sn).error];
 errs = [0 1 2]; % outcomes of interest (0 - completed)
 n = numel(errs);
 num = zeros(n,1);
@@ -23,7 +27,7 @@ end
 handles.plots.outcomeBar.YData = num;
 
 % get all hold durations
-tmp = [cellfun(@(x) x.(sn).holdDuration, p.data) p.trial.(sn).holdDuration];
+tmp = [cellfun(@(x) x.(sn).holdDuration, p.data(trialIx)) p.trial.(sn).holdDuration];
 
 handles.plots.holdDurHist.Data = tmp;
 handles.text.holdTitle.String  = sprintf('Hold Duration (%02.2f, %02.2f, %02.2f)', min(handles.plots.holdDurHist.Data(outcomes==0)), mean(handles.plots.holdDurHist.Data(outcomes==0)), max(handles.plots.holdDurHist.Data));
@@ -39,16 +43,16 @@ handles.plots.textOutcome1.String   = num2str(handles.plots.outcomeBar.YData(2))
 handles.plots.textOutcome2.Position = [handles.plots.outcomeBar.XData(3) handles.plots.outcomeBar.YData(3) 0];
 handles.plots.textOutcome2.String   = num2str(handles.plots.outcomeBar.YData(3));
 
-handles.plots.fixScatter.XData = [cellfun(@(x) x.(sn).holdXY(1), p.data) p.trial.(sn).holdXY(1)];
-handles.plots.fixScatter.YData = [cellfun(@(x) x.(sn).holdXY(2), p.data) p.trial.(sn).holdXY(2)];
+handles.plots.fixScatter.XData = [cellfun(@(x) x.(sn).holdXY(1), p.data(trialIx)) p.trial.(sn).holdXY(1)];
+handles.plots.fixScatter.YData = [cellfun(@(x) x.(sn).holdXY(2), p.data(trialIx)) p.trial.(sn).holdXY(2)];
 
 handles.plots.staircaseMin.XData = 1:p.trial.pldaps.iTrial;
 handles.plots.staircaseMax.XData = 1:p.trial.pldaps.iTrial;
 
-tmp1 = [cellfun(@(x) x.(sn).fixDuration, p.data) p.trial.(sn).minFixDuration];
+tmp1 = [cellfun(@(x) x.(sn).fixDuration, p.data(trialIx)) p.trial.(sn).minFixDuration];
 tmp1(tmp1 > 10) = nan;
 handles.plots.staircaseMin.YData = tmp1;
-tmp2 = [cellfun(@(x) x.(sn).holdDuration, p.data) p.trial.(sn).holdDuration];
+tmp2 = [cellfun(@(x) x.(sn).holdDuration, p.data(trialIx)) p.trial.(sn).holdDuration];
 tmp2(tmp2 > 10) = nan;
 handles.plots.staircaseMax.YData = tmp2;
 
