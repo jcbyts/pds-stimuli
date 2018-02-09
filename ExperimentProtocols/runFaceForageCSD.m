@@ -35,7 +35,7 @@ settingsStruct.session.experimentName = mfilename;
 % Add CSD module
 sn = 'csdFlash';
 settingsStruct.(sn).stateFunction.name  = 'stimuli.modules.csd.basicFlash';
-settingsStruct.(sn).stateFunction.order = -1; % draw before behavior
+settingsStruct.(sn).stateFunction.order = -2; % draw before behavior
 settingsStruct.(sn).use = true;
 % parameters of csdFlash
 settingsStruct.(sn).onDuration  = ip.Results.onDuration;
@@ -59,7 +59,7 @@ settingsStruct.(sn).imgDir = ip.Results.imgDir;
 % Add foraging module
 sn = 'forage';
 settingsStruct.(sn).stateFunction.name = 'stimuli.modules.forage.forage';
-settingsStruct.(sn).stateFunction.order = 2;
+settingsStruct.(sn).stateFunction.order = -1;
 settingsStruct.(sn).use = true;
 % foraging parameters
 settingsStruct.(sn).MotN                 = 3;            % number of moving targets

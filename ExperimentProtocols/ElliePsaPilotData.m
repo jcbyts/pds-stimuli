@@ -1,11 +1,12 @@
 
-subject = 'Ellie';
-pauseBeforeExperiment = false;
+subject = 'Jude';
+pauseBeforeExperiment = true;
 
 %% Natural Image Free View: warm up
-imgDir = './Colony';
 
-runBackgroundImage('behavior', 'freeview', 'imgDir', imgDir)
+runNaturalImageFreeView('subject', subject, ...
+    'pauseBefore', pauseBeforeExperiment, ...
+    'imgDir', getpref('pep', 'colonyPics'))
 
 
 %% Face Forage with CSD
@@ -33,5 +34,6 @@ runFixFlashSpatialMap('subject', subject,...
     'spatialSquares', spatialSquaresOpts)
 
 %% 
-
+runGaborTargetSelection('subject', subject,...
+    'pauseBefore', pauseBeforeExperiment)
 

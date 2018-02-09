@@ -22,7 +22,7 @@ classdef face < stimuli.objects.textures
             
             % load marmoset face textures
             facelib=getpref('pep', 'marmosetFaceLibrary');
-            facelist = [dir(fullfile(facelib, '*.JPEG')) dir(fullfile(facelib, '*.JPG')) dir(fullfile(facelib, '*.PNG'))];
+            facelist = [dir(fullfile(facelib, '*.JPEG')) dir(fullfile(facelib, '*.jpg')) dir(fullfile(facelib, '*.JPG')) dir(fullfile(facelib, '*.png')) dir(fullfile(facelib, '*.PNG'))];
             nFaces = numel(facelist);
             MFL = cell(nFaces,1);
             for iFace = 1:nFaces

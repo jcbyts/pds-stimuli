@@ -23,7 +23,6 @@ ip.addParameter('minFixation', .5)
 ip.addParameter('fixPreStim', .01)
 ip.addParameter('staircaseFixation', false)
 ip.addParameter('fixationPoint', 'bullseye')
-ip.addParameter('spatialSquares', [])
 ip.parse(varargin{:})
 
 % setup pldaps and testing modules
@@ -48,7 +47,7 @@ settingsStruct.display.sourceFactorNew = GL_SRC_ALPHA;
 % dot selection requires a fixation behavior
 sn = 'fixflash';
 settingsStruct.(sn).stateFunction.name = 'stimuli.modules.fixflash.runDefaultTrial';
-settingsStruct.(sn).stateFunction.order = 1;
+settingsStruct.(sn).stateFunction.order = -1;
 settingsStruct.(sn).use = true;
 
 settingsStruct.(sn).staircaseOn    = false;
@@ -69,7 +68,16 @@ settingsStruct.(sn).minFixDuration = .2;
 settingsStruct.(sn).fixationJitter = false;
 settingsStruct.(sn).fixationJitterSize = 0;
 
-% run pldaps
+
+if ip.Results.pauseBefore
+    settingsStruct.pldaps.pause.preExperiment = true;
+else
+    settingsStruct.pldaps.pause.preExperiment = false;
+end
+
+settingsStruct = loadCalibration(settingsStruct);
+
+% --- Open PLDAPS
 p = pldaps(@stimuli.pldapsDefaultTrial, settingsStruct);
 
 p.run

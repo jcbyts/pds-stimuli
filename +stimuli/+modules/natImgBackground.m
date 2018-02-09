@@ -53,7 +53,7 @@ switch state
         end
         
         if ~isfield(p.trial.(sn), 'fileList')
-            flist = [dir(fullfile(p.trial.(sn).imgDir, '*.JPG')) dir(fullfile(p.trial.(sn).imgDir, '*.PNG'))];
+            flist = [dir(fullfile(p.trial.(sn).imgDir, '*.JPG')) dir(fullfile(p.trial.(sn).imgDir, '*.PNG')) dir(fullfile(p.trial.(sn).imgDir, '*.jpg')) dir(fullfile(p.trial.(sn).imgDir, '*.png'))];
             p.trial.(sn).fileList = flist;
         end
         

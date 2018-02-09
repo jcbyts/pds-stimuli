@@ -33,12 +33,8 @@ end
 sz = p.trial.(sn).fixPointRadius * ppd;
 p.trial.(sn).hFix.radius     = sz;
 if p.trial.display.useOverlay
-    p.trial.(sn).hFix.color    = p.trial.display.clut.white;
-    p.trial.(sn).hFix.ctrColor = p.trial.display.clut.black;
-else
-    p.trial.(sn).hFix.color    = ones(1,3);
-    p.trial.(sn).hFix.ctrColor = -ones(1,3);
-end
+    p.trial.(sn).hFix.color = p.trial.display.clut.white;
+    p.trial.(sn).hFix.color =      = ones(1,3);
 % p.trial.(sn).hFix.ctrColor   = -ones(1,3);
 p.trial.(sn).hFix.position      = [xpos ypos] * ppd + ctr;
 p.trial.(sn).hFix.winRadius  = p.trial.(sn).fixWinRadius * ppd;
