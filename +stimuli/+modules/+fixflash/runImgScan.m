@@ -147,13 +147,17 @@ switch state
         % --- Instantiate classes
         
         % --- Fixation
-        p.trial.(sn).hFix   = stimuli.objects.fixationImg('position', p.trial.display.ctr(1:2));
+        if ~(isfield(p.trial.(sn), 'hFix') && isa(p.trial.(sn).hFix, 'stimuli.objects.target'))
+            p.trial.(sn).hFix   = stimuli.objects.fixationImg('position', p.trial.display.ctr(1:2));
+        end
         
         % apply specialized parameters
         p.trial.(sn).hFix.shrinkTimeConstant = p.trial.(sn).shrinkTimeConstant;
         
         % --- Reward Face
-        p.trial.(sn).hFace  = stimuli.objects.face(p);
+        if ~(isfield(p.trial.(sn), 'hFace') && isa(p.trial.(sn).hFace, 'stimuli.objects.target'))
+            p.trial.(sn).hFace  = stimuli.objects.face(p);
+        end
         
         % --- Plotting
         p.functionHandles.fixFlashPlot = stimuli.modules.fixflash.fixFlashPlot;
