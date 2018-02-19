@@ -34,6 +34,10 @@ classdef state1_showStim < stimuli.objects.state
                 p.trial.(sn).hTargs(k).frameUpdate(p);
             end
             
+            if ~p.trial.(fixSn).hFix.isFixated
+                sc.setState(7); % break fixation
+            end
+            
             if p.trial.(fixSn).states.currentState.id > 2 % fixHold has finished
                 
                 sc.setState(2);

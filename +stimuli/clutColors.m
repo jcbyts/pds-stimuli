@@ -2,7 +2,7 @@ function p = clutColors(p)
 
 isOverlay=(p.defaultParameters.display.useOverlay == 2) | (p.defaultParameters.display.useOverlay & p.defaultParameters.datapixx.use);
 % build up the CLUT for the overlay pointer
-kColor=12;
+kColor=15;
 p.defaultParameters.display.monkeyCLUT(kColor+1,:)=[1 0 0];
 p.defaultParameters.display.humanCLUT(kColor+1,:)=[0 1 0];
 if isOverlay

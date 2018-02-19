@@ -54,8 +54,9 @@ classdef hartleybase < stimuli.objects.stimulus
             % functions on the graphics card when the texture is drawn.
             % They take in parameters, such sas the contrst, phase,
             % spatial freq, etc.
+%             Screen('BlendFunction', p.trial.display.ptr, GL_ONE, GL_ONE);
             obj.tex  = CreateProceduralHartleyBasis(p.trial.display.ptr, obj.dim(1), obj.dim(2), obj.bgColorOffset, [], .5);
-            
+%             Screen('BlendFunction', p.trial.display.ptr, p.trial.display.sourceFactorNew, p.trial.display.destinationFactorNew);
         end
         
         

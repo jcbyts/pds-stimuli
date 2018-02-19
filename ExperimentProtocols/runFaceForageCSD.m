@@ -1,4 +1,4 @@
-function runFaceForageCSD(varargin)
+function p = runFaceForageCSD(varargin)
 % <strong>runFaceForageCSD</strong> runs a full-field flash with marmoset
 % faces doing a random walk on top of it interleaved with trials consisting
 % of natural images.
@@ -149,4 +149,4 @@ for iTrial = (numel(p.data)+1):p.defaultParameters.pldaps.finish
 end
 
 % --- Run
-p.run
+p = p.run;

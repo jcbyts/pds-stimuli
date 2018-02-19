@@ -51,9 +51,9 @@ defopts = struct('N', 4, ...
     'minFixation',  .01, ...
     'gridded',      true);
 
-settingsStruct.(sn) = dvmergefield(settingsStruct.(sn), defopts);
+settingsStruct.(sn) = dvmergefield(settingsStruct.(sn), defopts, 1);
 if ~isempty(ip.Results.(sn)) && isstruct(ip.Results.(sn))
-    settingsStruct.(sn) = dvmergefield(ip.Results.(sn), settingsStruct.(sn));
+    settingsStruct.(sn) = dvmergefield(ip.Results.(sn), settingsStruct.(sn), 1);
 end
 
 %--------------------------------------------------------------------------
@@ -108,7 +108,10 @@ settingsStruct.(sn).staircaseOn = true;
 settingsStruct.(sn).minFixDuration = .2;
 settingsStruct.(sn).fixationJitter = false;
 settingsStruct.(sn).fixationJitterSize = 0;
-
+settingsStruct.(sn).maxFixDuration = 1.5;
+settingsStruct.(sn).staircaseStep = .075;
+settingsStruct.(sn).staircaseMax = 1.5;
+settingsStruct.(sn).fixWinRadius = 1;
 
 if ip.Results.pauseBefore
     settingsStruct.pldaps.pause.preExperiment = true;
@@ -168,6 +171,6 @@ for iTrial = (numel(p.data)+1):p.defaultParameters.pldaps.finish
 end
 
 % --- Run
-p.run
+p = p.run;
 
 

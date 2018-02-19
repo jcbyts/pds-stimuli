@@ -136,9 +136,18 @@ end
 % --- setup reward for the trial
 
 %********* This is where we could build in a contingency on past choices
+% switched DotsNRewarded to a vector for easier implentation
+p.trial.(sn).isRewarded(1) = rand(setupRNG) < p.trial.(sn).rewardDot1Rate;
+p.trial.(sn).isRewarded(2) = rand(setupRNG) < p.trial.(sn).rewardDot2Rate;
 
-p.trial.(sn).Dots1Rewarded = rand(setupRNG) < p.trial.(sn).rewardDot1Rate;
-p.trial.(sn).Dots2Rewarded = rand(setupRNG) < p.trial.(sn).rewardDot2Rate;
+for kTarg = 1:numel(p.trial.(sn).hTargs)
+    p.trial.(sn).hTargs(kTarg).winRadius = p.trial.(sn).targWinRadius*p.trial.display.ppd;
+    if p.trial.(sn).isRewarded(kTarg)
+        p.trial.(sn).hTargs(kTarg).wincolor = p.trial.display.clut.greenbg;
+    else
+        p.trial.(sn).hTargs(kTarg).wincolor = p.trial.display.clut.redbg;
+    end
+end
 
 %****************************
 
@@ -169,4 +178,5 @@ p.trial.(sn).states.setState(0);
 p.trial.(sn).frameFixationObtained = nan;
 p.trial.(sn).preStimWaitFrames     = round(p.trial.(sn).fixPreStimDuration * p.trial.display.frate);
 p.trial.(sn).dotsChosen            = nan;
+p.trial.(sn).rewardAmount          = p.trial.(sn).maxRewardCnt; % will be overwritten by the choice
 

@@ -72,8 +72,8 @@ switch state
         
         %------------------------------------------------------------------
         % Select images to draw this trial
-        p.trial.display.sourceFactorNew = GL_SRC_ALPHA;
-        Screen('BlendFunction', p.trial.display.ptr, p.trial.display.sourceFactorNew, p.trial.display.destinationFactorNew);
+%         p.trial.display.sourceFactorNew = GL_SRC_ALPHA;
+%         Screen('BlendFunction', p.trial.display.ptr, p.trial.display.sourceFactorNew, p.trial.display.destinationFactorNew);
         
         % setup random seed
         p.trial.(sn).rngs.conditionerRNG = RandStream(p.trial.(sn).rngs.randomNumberGenerater, 'seed', p.trial.(sn).rngs.trialSeeds(p.trial.pldaps.iTrial));

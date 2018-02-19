@@ -25,6 +25,9 @@ ip.parse(varargin{:})
 % setup pldaps and testing modules
 settingsStruct = struct(); % settingsStruct is a structure that modifies pldaps default parameters
 
+settingsStruct.display.sourceFactorNew = GL_ONE;
+settingsStruct.display.destinationFactorNew = GL_ONE;
+
 settingsStruct.pldaps.useModularStateFunctions = true;
 settingsStruct.pldaps.trialMasterFunction='runModularTrial';
 
@@ -46,9 +49,9 @@ settingsStruct.(sn).stateFunction.order = -1; % draw before behavior
 settingsStruct.(sn).use = true;
 settingsStruct.(sn).OnDuration  = 2;
 settingsStruct.(sn).OffDuration = 2;
-settingsStruct.(sn).contrast    = .2;  % Michelson contrast of the gratings (DEPENDS ON BLEND FUNCTION)
+settingsStruct.(sn).contrast    = .15;  % Michelson contrast of the gratings (DEPENDS ON BLEND FUNCTION)
 settingsStruct.(sn).tfs         = 0;   % temporal frequencies showns
-settingsStruct.(sn).nOctaves    = 4;   % number of octaves to show above base frequency
+settingsStruct.(sn).nOctaves    = 5;   % number of octaves to show above base frequency
 settingsStruct.(sn).Freq0       = .2;  % Base frequence (cycles/deg)
 
 %--------------------------------------------------------------------------
@@ -57,7 +60,7 @@ sn='natImgBackground';
 settingsStruct.(sn).stateFunction.name = 'stimuli.modules.natImgBackground';
 settingsStruct.(sn).stateFunction.order = -1;
 settingsStruct.(sn).use = true;
-settingsStruct.(sn).imageContrast = .5;
+settingsStruct.(sn).imageContrast = .4;
 settingsStruct.(sn).numToShow     = 1; % number of images to show per trial
 settingsStruct.(sn).imgDir = ip.Results.imgDir;
 % settingsStruct.(sn).imgDir = '/media/marmorig/Data/RangeDatabase1080p/';
@@ -153,4 +156,4 @@ for iTrial = (numel(p.data)+1):p.defaultParameters.pldaps.finish
 end
 
 % --- Run
-p.run
+p = p.run;

@@ -21,7 +21,7 @@ ip.parse(varargin{:})
 settingsStruct = ip.Results.settingsStruct;
 
 % Open GL Blend Function
-settingsStruct.display.destinationFactorNew = GL_ONE;
+settingsStruct.display.destinationFactorNew = GL_ONE_MINUS_SRC_ALPHA;
 settingsStruct.display.sourceFactorNew      = GL_SRC_ALPHA;
 
 settingsStruct.pldaps.useModularStateFunctions = true;
@@ -78,4 +78,4 @@ end
 
 p = pldaps(@stimuli.pldapsDefaultTrial, settingsStruct);
 
-p.run
+p = p.run;

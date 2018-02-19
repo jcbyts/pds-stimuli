@@ -31,7 +31,11 @@ classdef state3_HoldChoice < stimuli.objects.state
             startTime = sc.getTxTime(s.id) - p.trial.trstart;
             
             % check if dots are being held
-            p.trial.(sn).hTargs(p.trial.(sn).dotsChosen).isHeld([p.trial.eyeX p.trial.eyeY]);
+%             p.trial.(sn).hTargs(p.trial.(sn).dotsChosen).isHeld([p.trial.eyeX p.trial.eyeY]);
+            for k = 1:numel(p.trial.(sn).hTargs)
+                p.trial.(sn).hTargs(k).frameUpdate(p);
+            end
+
             
             if ~p.trial.(sn).hTargs(p.trial.(sn).dotsChosen).isFixated
                 sc.setState(7); % break fixation

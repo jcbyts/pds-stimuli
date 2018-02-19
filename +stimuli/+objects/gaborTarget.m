@@ -3,7 +3,7 @@ classdef gaborTarget < stimuli.objects.target
     %   Detailed explanation goes here
     
     properties (Access = public),
-        radius@double = 500; % pixels
+        radius@double = 300; % pixels
         color@double  = ones(1,3);
         ctrColor@double = -ones(1,3);
         wincolor
@@ -63,7 +63,9 @@ classdef gaborTarget < stimuli.objects.target
 %           modulateColor = [.5 .5 .5 0];
             modulateColor = [0 0 0 0];
           obj.gabortex = CreateProceduralGabor(p.trial.display.ptr, obj.radius, obj.radius, [], modulateColor, disableNormalization,contrastPreMultiplicator);
-        
+%         obj.gabortex = CreateProceduralGabor(p.trial.display.ptr, obj.radius, obj.radius, 1);
+%             gabortex = CreateProceduralGabor(win, tw, th, 1);
+
       end
       
       
@@ -86,6 +88,7 @@ classdef gaborTarget < stimuli.objects.target
 %           rect
           gaborParams = [180-o.phase, o.sf/o.ppd, o.sigma*o.ppd, o.contrast, 1, 0, 0, 0];
 
+%           Screen('BlendFunction', p.trial.display.ptr, GL_ONE, GL_ONE);
           Screen('BlendFunction', p.trial.display.ptr, GL_ONE, GL_ONE);
           Screen('DrawTexture', p.trial.display.ptr, o.gabortex, [], rect', o.theta, [], [], [], [], kPsychDontDoRotation, gaborParams);
           Screen('BlendFunction', p.trial.display.ptr, p.trial.display.sourceFactorNew, p.trial.display.destinationFactorNew);

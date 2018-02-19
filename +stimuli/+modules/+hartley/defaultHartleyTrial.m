@@ -71,7 +71,7 @@ switch state
         [p.trial.(sn).kxgrid, p.trial.(sn).kygrid]=meshgrid(p.trial.(sn).kxs, p.trial.(sn).kys);
         
         % --- instantiate Hartley object
-        p.trial.(sn).hHart = stimuli.objects.hartleybase(p, 'maskType', 1, 'maskParam', 2, 'position', p.trial.display.ctr(1:2));
+        p.trial.(sn).hHart = stimuli.objects.hartleybase(p, 'position', p.trial.display.ctr(1:2));
         
         
     %--------------------------------------------------------------------------
@@ -110,43 +110,43 @@ switch state
         % In this default version of hartely, we will switch the stimulus
         % after a random delay that was set previously by the nextSwitch
         % variable
-        
-        d = p.trial.iFrame - p.trial.(sn).nextSwitch;
-            if d <= 0 % time to swtich
-
-                switch p.trial.(sn).hHart.stimValue % stim off
-               
-                    case 1 % stim is on currently, turn it off
-                        
-                        p.trial.(sn).hHart.stimValue = 0; % turn stimulus off
-                        
-                        % generate exponentially distributed random variable using the
-                        % exponential inverse cdf -- we call it this way so that we can
-                        % pass in the random number generater argument
-                        rnd = rand(p.trial.(sn).rngs.conditionerRNG); % uniform random number
-                        dur = ceil( -p.trial.(sn).OffDuration .* log(rnd)); % convert to exponential
-   
+%         disp([p.trial.iFrame p.trial.(sn).nextSwitch])
+        d = p.trial.(sn).nextSwitch - p.trial.iFrame;
+        if d <= 0 % time to swtich
+            
+            switch p.trial.(sn).hHart.stimValue % stim off
+                
+                case 1 % stim is on currently, turn it off
                     
-                    case 0 % stim is off currently, turn it on
-                        
-                        p.trial.(sn).hHart.stimValue = 1; % turn stimulus off
-                        
-                        rnd = rand(p.trial.(sn).rngs.conditionerRNG); % uniform random number
-                        dur = ceil( -p.trial.(sn).OnDuration .* log(rnd)); % convert to exponential
-                            
-                        % set up next stimulus
-                        n = numel(p.trial.(sn).kxs);
-                        p.trial.(sn).hHart.kx = p.trial.(sn).kxs(randi(p.trial.(sn).rngs.conditionerRNG, n));
-                        p.trial.(sn).hHart.ky = p.trial.(sn).kys(randi(p.trial.(sn).rngs.conditionerRNG, n));
-                        p.trial.(sn).hHart.tf = p.trial.(sn).tfs(randi(p.trial.(sn).rngs.conditionerRNG, numel(p.trial.(sn).tfs)));
-                        
-                        p.trial.(sn).hHart.phi = rand(p.trial.(sn).rngs.conditionerRNG)*2*pi;
-                        
-                end
-                
-                p.trial.(sn).nextSwitch = p.trial.iFrame + dur;
-                
+                    p.trial.(sn).hHart.stimValue = 0; % turn stimulus off
+                    
+                    % generate exponentially distributed random variable using the
+                    % exponential inverse cdf -- we call it this way so that we can
+                    % pass in the random number generater argument
+                    rnd = rand(p.trial.(sn).rngs.conditionerRNG); % uniform random number
+                    dur = ceil( -p.trial.(sn).OffDuration .* log(rnd)); % convert to exponential
+                    
+                    
+                case 0 % stim is off currently, turn it on
+                    
+                    p.trial.(sn).hHart.stimValue = 1; % turn stimulus off
+                    
+                    rnd = rand(p.trial.(sn).rngs.conditionerRNG); % uniform random number
+                    dur = ceil( -p.trial.(sn).OnDuration .* log(rnd)); % convert to exponential
+                    
+                    % set up next stimulus
+                    n = numel(p.trial.(sn).kxs);
+                    p.trial.(sn).hHart.kx = p.trial.(sn).kxs(randi(p.trial.(sn).rngs.conditionerRNG, n));
+                    p.trial.(sn).hHart.ky = p.trial.(sn).kys(randi(p.trial.(sn).rngs.conditionerRNG, n));
+                    p.trial.(sn).hHart.tf = p.trial.(sn).tfs(randi(p.trial.(sn).rngs.conditionerRNG, numel(p.trial.(sn).tfs)));
+                    
+                    p.trial.(sn).hHart.phi = rand(p.trial.(sn).rngs.conditionerRNG)*2*pi;
+                    
             end
+            
+            p.trial.(sn).nextSwitch = p.trial.iFrame + dur;
+            
+        end
             
             % save the current values
             p.trial.(sn).on(p.trial.iFrame) = p.trial.(sn).hHart.stimValue;

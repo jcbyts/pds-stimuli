@@ -109,8 +109,16 @@ classdef dotsbase < stimuli.objects.target % (Abstract) % should this be abstrac
                 return
             end
             
-            % Draw Dots
-            Screen('DrawDots',p.trial.display.overlayptr,[o.x(:), -1*o.y(:)]', o.dotSize, o.dotColor, o.position, o.dotType);
+            if numel(o.dotColor)==1 % it's a clut index
+                % Draw Dots
+                Screen('DrawDots',p.trial.display.overlayptr,[o.x(:), -1*o.y(:)]', o.dotSize, o.dotColor, o.position, o.dotType);
+            else
+                Screen('BlendFunction', p.trial.display.ptr, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+                Screen('DrawDots',p.trial.display.ptr,[o.x(:), -1*o.y(:)]', o.dotSize, o.dotColor, o.position, o.dotType);
+                Screen('BlendFunction', p.trial.display.ptr, p.trial.display.sourceFactorNew, p.trial.display.destinationFactorNew);
+            end
+          
+            
         end
         
         function frameUpdate(o, ~)
