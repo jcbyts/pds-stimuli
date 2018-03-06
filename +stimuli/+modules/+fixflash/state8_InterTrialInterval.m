@@ -17,7 +17,9 @@ classdef state8_InterTrialInterval < stimuli.objects.state
         
         function frameDraw(~,p,sn)
             
-            p.trial.(sn).hFace.frameDraw(p); % show face
+            if (p.trial.(sn).rewardFaceDuration > 0)
+               p.trial.(sn).hFace.frameDraw(p); % show face
+            end
             
         end % beforeFrame
         

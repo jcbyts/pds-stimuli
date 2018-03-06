@@ -119,7 +119,7 @@ switch state
         % after a random delay that was set previously by the nextSwitch
         % variable
         
-        d = p.trial.iFrame - p.trial.(sn).nextSwitch;
+        d = p.trial.(sn).nextSwitch - p.trial.iFrame;
             if d <= 0 % time to swtich
 
                 switch p.trial.(sn).hHart.stimValue % stim off

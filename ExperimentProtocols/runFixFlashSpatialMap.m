@@ -51,9 +51,9 @@ defopts = struct('N', 4, ...
     'minFixation',  .01, ...
     'gridded',      true);
 
-settingsStruct.(sn) = dvmergefield(settingsStruct.(sn), defopts);
+settingsStruct.(sn) = dvmergefield(settingsStruct.(sn), defopts, 1);
 if ~isempty(ip.Results.(sn)) && isstruct(ip.Results.(sn))
-    settingsStruct.(sn) = dvmergefield(ip.Results.(sn), settingsStruct.(sn));
+    settingsStruct.(sn) = dvmergefield(ip.Results.(sn), settingsStruct.(sn), 1);
 end
 
 %--------------------------------------------------------------------------
@@ -108,7 +108,10 @@ settingsStruct.(sn).staircaseOn = true;
 settingsStruct.(sn).minFixDuration = .2;
 settingsStruct.(sn).fixationJitter = false;
 settingsStruct.(sn).fixationJitterSize = 0;
-
+settingsStruct.(sn).maxFixDuration = 1.5;
+settingsStruct.(sn).staircaseStep = .075;
+settingsStruct.(sn).staircaseMax = 1.5;
+settingsStruct.(sn).fixWinRadius = 1.8;
 
 if ip.Results.pauseBefore
     settingsStruct.pldaps.pause.preExperiment = true;
@@ -159,7 +162,7 @@ for iCond = 1:numel(c)
     condNums = [condNums ones(1,condN(iCond))*iCond]; %#ok<AGROW>
 end
 
-p.defaultParameters.pldaps.finish = 45; % complete ~15 minutes of data in 45 trials
+p.defaultParameters.pldaps.finish = 200;
 
 condIdx = repmat(condNums, 1, ceil(p.defaultParameters.pldaps.finish/numel(condNums)));
 
@@ -168,6 +171,6 @@ for iTrial = (numel(p.data)+1):p.defaultParameters.pldaps.finish
 end
 
 % --- Run
-p.run
+p = p.run;
 
 

@@ -12,3 +12,9 @@ catch
     warning('error loading calibration: it didn''t work')
     return
 end
+
+if (strcmp(S.session.subject,'test'))
+  S.eyelink.use = false;
+  S.eyelink.useAsEyepos = false;
+  S.mouse.useAsEyepos = true;
+end

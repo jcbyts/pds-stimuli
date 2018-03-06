@@ -32,7 +32,13 @@ end
 % --- Set Fixation Point Properties
 sz = p.trial.(sn).fixPointRadius * ppd;
 p.trial.(sn).hFix.radius     = sz;
-p.trial.(sn).hFix.color      = ones(1,3);
+if p.trial.display.useOverlay
+    p.trial.(sn).hFix.color    = p.trial.display.clut.white;
+    p.trial.(sn).hFix.ctrColor = p.trial.display.clut.black;
+else
+    p.trial.(sn).hFix.color    = ones(1,3);
+    p.trial.(sn).hFix.ctrColor = -ones(1,3);
+end
 % p.trial.(sn).hFix.ctrColor   = -ones(1,3);
 p.trial.(sn).hFix.position      = [xpos ypos] * ppd + ctr;
 p.trial.(sn).hFix.winRadius  = p.trial.(sn).fixWinRadius * ppd;
@@ -42,6 +48,7 @@ p.trial.(sn).hFix.wincolor   = p.trial.display.clut.bg_white;
 % fixation duration
 p.trial.(sn).fixDuration = p.trial.(sn).minFixDuration;
 p.trial.(sn).fixStartOffset = 0; % offset for fixation duration -- can be used by other modules to extend fixation
+p.trial.(sn).rewardedfixation = false;
 
 % initialize some measurements of interest
 p.trial.(sn).holdXY = nan(1,2); % x,y position of fixation

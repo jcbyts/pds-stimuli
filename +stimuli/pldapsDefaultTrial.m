@@ -38,9 +38,11 @@ else
                 p.trial.flagNextTrial=true;
             end
             
-        case p.trial.pldaps.trialStates.trialCleanUpandSave
-            Screen('FillRect', p.trial.display.overlayptr, p.trial.display.bgColor)
-            Screen('Flip', p.trial.display.ptr)
+        case p.trial.pldaps.trialStates.trialItiDraw
+            
+            % Flip a blank screen
+            Screen('FillRect', p.trial.display.overlayptr, p.trial.display.bgColor);
+            Screen('Flip', p.trial.display.ptr);
             
     end
 end

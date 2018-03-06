@@ -43,10 +43,10 @@ switch state
             'rewardUpdateFun',          @stimuli.modules.dotselection.rewardUpdateSwitchRule, ...
             'rewardUpdateArgs',         {.1}, ...
             'rewardForFixation',        false, ...
-            'rewardFaceDuration',       0.2, ...
+            'rewardFaceDuration',       0, ...
             'yokeDirections',           false, ...      % yoke the direction of dots for dots1 and dots2
-            'rewardDot1Rate',           0.1, ...
-            'rewardDot2Rate',           0.85, ...
+            'rewardDot1Rate',           1, ...
+            'rewardDot2Rate',           0, ...
             'maxRewardCnt',             2, ...          % max drops of juice
             'faceIndex',                1, ...
             'minFixPreStim',            0.1, ...
@@ -78,6 +78,10 @@ switch state
             p.trial.(sn).dotApertureRadius = norm(p.trial.(sn).RfCenterXy)/3;     % degrees
         end
         
+        if ~isfield(p.trial.(sn), 'targWinRadius')
+            p.trial.(sn).targWinRadius = p.trial.(sn).dotApertureRadius;
+        end
+        
         % -------------------------------------------------------------------------
         % --- setup stimuli and prepare to run
         
@@ -90,72 +94,21 @@ switch state
             p.trial.(sn).hTargs(1)   = stimuli.objects.gaborTarget();
             p.trial.(sn).hTargs(2)   = stimuli.objects.gaborTarget();
         end
-        
-        
+             
 
 	% --- Called before the main trial loop. Sets up all parameters
     case p.trial.pldaps.trialStates.trialSetup
          
         stimuli.modules.dotselection.trialSetupGabors(p, sn);
         
+%         % call support functions before
+%         p.trial.(sn).hTargs(1).frameUpdate(p);
+%         p.trial.(sn).hTargs(1).frameUpdate(p);
 
     % --- Draw task semantics using info from hTrial
     case p.trial.pldaps.trialStates.framePrepareDrawing
        
         p.trial.(sn).states.frameUpdate(p, sn);
-
-        
-        
-        
-%         ctr=p.trial.display.ctr(1:2);
-%         switch p.trial.(sn).hTrial.stateId
-%             case 0 % FixWait
-%                 fixClr = p.trial.display.clut.bg_white;
-%             case {1,2,3,4} % FixHold
-%                 fixClr = p.trial.display.clut.bg_green;
-%             case {5,6}
-%                 fixClr = p.trial.display.clut.bg;
-%             case 7
-%                 fixClr = p.trial.display.clut.bg_red;
-%             case 8
-%                 fixClr = p.trial.display.clut.bg;
-%                 choXY=[p.trial.(sn).hTrial.choiceX -p.trial.(sn).hTrial.choiceY]*p.trial.display.ppd + ctr;
-%                 Screen('DrawDots', p.trial.display.overlayptr, choXY, 15, p.trial.display.clut.bg_red, [], 2);
-%         end
-% %         kron([1,1],[50 50]) 
-% %         targColor=p.trial.display.clut.bg_green;
-% 
-% %         if p.trial.(sn).hTrial.showChoice
-% %             % choice window
-% %             th=p.trial.(sn).direction:360+p.trial.(sn).direction;
-% %             x=cosd(th);
-% %             y=-sind(th);
-% %             winpolyx=[p.trial.(sn).choiceWinMinRadius*x p.trial.(sn).choiceWinMaxRadius*fliplr(x)]*p.trial.display.ppd;
-% %             winpolyy=[p.trial.(sn).choiceWinMinRadius*y p.trial.(sn).choiceWinMaxRadius*fliplr(y)]*p.trial.display.ppd;
-% %             
-% %             Screen('FramePoly', p.trial.display.overlayptr, fixClr, [winpolyx(:)+ctr(1), winpolyy(:)+ctr(2)]);
-% %             
-% %             % reward window
-% %             th=p.trial.(sn).direction-p.trial.(sn).rewardWindow:p.trial.(sn).direction+p.trial.(sn).rewardWindow;
-% %             x=cosd(th);
-% %             y=-sind(th);
-% %             winpolyx=[p.trial.(sn).choiceWinMinRadius*x p.trial.(sn).choiceWinMaxRadius*fliplr(x) p.trial.(sn).choiceWinMinRadius*x(1)]*p.trial.display.ppd;
-% %             winpolyy=[p.trial.(sn).choiceWinMinRadius*y p.trial.(sn).choiceWinMaxRadius*fliplr(y) p.trial.(sn).choiceWinMinRadius*y(1)]*p.trial.display.ppd;
-% %             ctr=p.trial.display.ctr(1:2);
-% %             Screen('FramePoly', p.trial.display.overlayptr, targColor, [winpolyx(:)+ctr(1), winpolyy(:)+ctr(2)]);
-% %         end
-% 
-%         if p.trial.(sn).hTrial.showDots
-%             for kDots = 1:2
-%                 fixRect = [p.trial.(sn).hTrial.hDots(kDots).position p.trial.(sn).hTrial.hDots(kDots).position] + kron(p.trial.(sn).hTrial.hDots(kDots).maxRadius + p.trial.(sn).hTrial.rewardWindow * p.trial.display.ppd,[-1, -1, +1, +1]);
-%                 Screen('FrameOval', p.trial.display.overlayptr, fixClr, fixRect);
-%             end
-%         end
-%         
-%         if p.trial.(sn).hTrial.showFix
-%             fixRect = p.trial.display.ctr + kron(p.trial.(sn).fixWinRadius * p.trial.display.ppd,[-1, -1, +1, +1]);
-%             Screen('FrameOval', p.trial.display.overlayptr, fixClr, fixRect);
-%         end
     
 
 	% --- All Screen() calls go here
@@ -169,14 +122,26 @@ switch state
         % this is where we update the reward rates
 %         hasData = ~cellfun(@isempty, p.data(:));
         hasData = cellfun(@(x) isfield(x, sn), p.data(:));
-        choices = cellfun(@(x) x.(sn).dotsChosen, p.data(hasData));
+        choices  = cellfun(@(x) x.(sn).dotsChosen, p.data(hasData));
+        rewarded = cellfun(@(x) x.(sn).rewardAmount, p.data(hasData));
         choices = [choices p.trial.(sn).dotsChosen];
+        rewarded = [rewarded p.trial.(sn).rewardAmount];
         
+%         figure(1); clf
+%         for i = 1:2
+%             ix = find(choices==i);
+%             
+%             wasRewarded = rewarded(ix)>0;
+%             
+%             plot(ix(wasRewarded), i*ones(1,sum(wasRewarded)), 'og'); hold on
+%             plot(ix(~wasRewarded), i*ones(1,sum(~wasRewarded)), 'or');
+%         end
+            
+
         [p.trial.(sn).rewardDot1Rate, p.trial.(sn).rewardDot2Rate, p.trial.(sn).stimVisible] = ...
             p.trial.(sn).rewardUpdateFun(choices, p.trial.(sn).rewardDot1Rate, p.trial.(sn).rewardDot2Rate, ...
                                            p.trial.(sn).stimVisible,p.trial.(sn).rewardUpdateArgs{:});
-        
-       
+                
         %upload to conditions for next trial to live on
         stimuli.updateConditions(p, sn, 'rewardDot1Rate', p.trial.(sn).rewardDot1Rate);
         stimuli.updateConditions(p, sn, 'rewardDot2Rate', p.trial.(sn).rewardDot2Rate);

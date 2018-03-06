@@ -15,7 +15,7 @@ settingsStruct.pldaps.trialMasterFunction='runModularTrial';
 
 % make everything bigger (viewdist scales the pixels per degree
 % calculation)
-settingsStruct.display.viewdist = 100; % cm
+% settingsStruct.display.viewdist = 100; % cm
 
 % dot selection requires a fixation behavior
 sn = 'fixflash';

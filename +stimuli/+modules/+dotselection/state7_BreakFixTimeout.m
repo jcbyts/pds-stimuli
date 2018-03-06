@@ -21,6 +21,11 @@ classdef state7_BreakFixTimeout < stimuli.objects.state
         % get the state controller ready
         sc = s.sc;
         
+        % make sure gabors are off
+        for k = 1:numel(p.trial.(sn).hTargs)
+            p.trial.(sn).hTargs(k).stimValue = 0; % does nothing if already off
+        end
+            
         % --- Save start of state
         tStart = sc.getTxTime(s.id) - p.trial.trstart;
         

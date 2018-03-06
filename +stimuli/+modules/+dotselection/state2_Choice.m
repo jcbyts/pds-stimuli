@@ -39,9 +39,12 @@ classdef state2_Choice < stimuli.objects.state
             % check if a target is fixated
             for k = 1:numel(p.trial.(sn).hTargs)
                 p.trial.(sn).hTargs(k).frameUpdate(p);
-                p.trial.(sn).hTargs(k).isHeld([p.trial.eyeX p.trial.eyeY]);
                 
                 if p.trial.(sn).hTargs(k).isFixated
+                    if ~p.trial.(sn).isRewarded(k)
+                        p.trial.(sn).rewardAmount = 0;
+                    end
+                        
                     p.trial.(sn).dotsChosen = k;
                     sc.setState(3);
                     return

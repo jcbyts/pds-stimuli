@@ -181,4 +181,8 @@ p.run
 
 %%
 figure(1); clf
-plot(p.data{1}.timing.frameStateChangeTimes'*1000, '-')
+for i = 1:numel(p.data)
+plot(p.data{i}.timing.frameStateChangeTimes'*1000, '-')
+title(sprintf('Trial %d', i))
+pause
+end

@@ -26,7 +26,6 @@ classdef state8_InterTrialInterval < stimuli.objects.state
             if isnan(s.tStart) % <-- first frame
                 s.tStart = sc.getTxTime(s.id) - p.trial.trstart;
                 p.trial.(sn).error = 0;
-                p.trial.(sn).rewardAmount = p.trial.(sn).maxRewardCnt;
                 fprintf('Reward amount: %d\n', p.trial.(sn).rewardAmount)
             end
             
