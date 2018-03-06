@@ -1,5 +1,6 @@
 function p = runNaturalImageFreeView(subject, pauseBeforeStart, settingsStruct)
-
+% This is just a warm up with natural images
+% p = runNaturalImageFreeView(subject, pauseBeforeStart, settingsStruct)
 if nargin <3
     settingsStruct = struct();
     if nargin < 2
@@ -24,7 +25,7 @@ settingsStruct.session.subject=subject;
 %--------------------------------------------------------------------------
 % Add natural background module
 sn='natImgBackground';
-settingsStruct.(sn).stateFunction.name = 'v1mapping.natImgBackground';
+settingsStruct.(sn).stateFunction.name = 'stimuli.modules.natImgBackground';
 settingsStruct.(sn).stateFunction.order = -1;
 settingsStruct.(sn).use = true;
 settingsStruct.(sn).imageContrast = .5;
@@ -39,13 +40,13 @@ settingsStruct.(sn).numToShow     = 1; % number of images to show per trial
 % settingsStruct.(sn).stateFunction.name = 'stimuli.forage.forage';
 % settingsStruct.(sn).stateFunction.order = 2;
 % settingsStruct.(sn).use = true;
-
-% -------------------------------------------------------------------------
-% Add fixflash module
-sn = 'fixflash';
-settingsStruct.(sn).stateFunction.name = 'stimuli.fixflash.default';
-settingsStruct.(sn).stateFunction.order = 2;
-settingsStruct.(sn).use = true;
+% 
+% % -------------------------------------------------------------------------
+% % Add fixflash module
+% sn = 'fixflash';
+% settingsStruct.(sn).stateFunction.name = 'stimuli.fixflash.default';
+% settingsStruct.(sn).stateFunction.order = 2;
+% settingsStruct.(sn).use = true;
 
 if pauseBeforeStart
     settingsStruct.pldaps.pause.preExperiment = true;

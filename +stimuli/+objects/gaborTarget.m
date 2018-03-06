@@ -15,6 +15,7 @@ classdef gaborTarget < stimuli.objects.target
         ppd=1
         sigma=1     % deg
         tf=0
+        track=true
     end
     
     methods (Access = public)
@@ -34,7 +35,7 @@ classdef gaborTarget < stimuli.objects.target
           ip.addParameter('radius', obj.radius,   @isfloat); % pixels
           ip.addParameter('color',  obj.color,    @isfloat); % color r,g,b triplet
           ip.addParameter('position',  obj.position,    @isfloat); % [x,y] (pixels)
-          
+          ip.addParameter('track', obj.track)
           try
               ip.parse(varargin{:});
           catch
@@ -47,6 +48,7 @@ classdef gaborTarget < stimuli.objects.target
           obj.radius      = args.radius;
           obj.color       = args.color;
           obj.position    = args.position;
+          obj.track       = args.track;
       end
       
       
@@ -114,7 +116,9 @@ classdef gaborTarget < stimuli.objects.target
           
           phaseinc = 360 * (o.tf / p.trial.display.frate);
           o.phase = o.phase + phaseinc;
-          o.isHeld([p.trial.eyeX p.trial.eyeY])
+          if o.track
+            o.isHeld([p.trial.eyeX p.trial.eyeY])
+          end
       end
     end
     
