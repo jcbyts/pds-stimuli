@@ -57,9 +57,10 @@ settingsStruct.(sn).fixationJitter     = false;
 settingsStruct.(sn).fixationJitterSize = 0;
 settingsStruct.(sn).rewardLevels       = inf; % no amount of fixation could ever yield reward
 settingsStruct.(sn).showGUI            = false;
+settingsStruct.(sn).fixWinRadius       = 1.2; 
 settingsStruct.(sn).rewardFaceDuration =     0;
-%settingsStruct.(sn).rewardForFixation  = 0.2; 
-settingsStruct.(sn).rewardForFixation  = -0.2;  % if positive, it is a probability to reward for 
+settingsStruct.(sn).rewardForFixation  = 0.5; 
+%settingsStruct.(sn).rewardForFixation  = -0.2;  % if positive, it is a probability to reward for 
                                                 % holding fixation, if
                                                 % negative then it is time
                                                 % in seconds that if you

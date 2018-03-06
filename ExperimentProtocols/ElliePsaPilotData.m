@@ -32,7 +32,7 @@ spatialSquaresOpts.lifetime = 2; % lifetime of squares frames
 % spatialSquaresOpts.size = .5;
 spatialSquaresOpts.position = [-5 5 5 -5]; % stimulus rect (in degrees) 
 spatialSquaresOpts.size = .5;
-spatialSquaresOpts.contrast = 1.0;
+spatialSquaresOpts.contrast = .8;
 
 p = runFixFlashSpatialMap('subject', subject,...
     'pauseBefore', pauseBeforeExperiment,...
