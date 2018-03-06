@@ -31,7 +31,7 @@ settingsStruct.(sn).use = true;
 settingsStruct.(sn).staircaseOn = true;
 settingsStruct.(sn).minFixDuration = .2;
 settingsStruct.(sn).fixationJitter = false;
-settingsStruct.(sn).fixationJitterSize = 0;
+settingsStruct.(sn).fixationJitterSize = 0.008;
 
 sn = 'spatialSquares';
 settingsStruct.(sn).stateFunction.name  = 'stimuli.modules.mapping.spatialSquares';
