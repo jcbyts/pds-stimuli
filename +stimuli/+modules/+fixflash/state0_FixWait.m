@@ -30,7 +30,7 @@ classdef state0_FixWait < stimuli.objects.state
         
         % -- Evaluate state logic (prepare before drawing)
         function frameUpdate(s,p,sn)
-            
+              
             % get the state controller ready
             sc = s.sc;
             
@@ -61,14 +61,13 @@ classdef state0_FixWait < stimuli.objects.state
                 p.trial.(sn).hFace.stimValue = false;
                 p.trial.(sn).hFix.stimValue  = false;
             end
-                
-
-            
             
             
             % --- Never obtained fixation
             if p.trial.ttime > p.trial.(sn).trialTimeout
                 % failed to initiate the trial... move to state 7 - timeout interval
+                p.trial.(sn).hFix.stimValue = false; % make sure fixation point is on
+                p.trial.(sn).hFace.stimValue = false; % make sure face is off
                 sc.setState(7);
                 return
             end
@@ -77,7 +76,7 @@ classdef state0_FixWait < stimuli.objects.state
             if p.trial.(sn).hFix.isFixated
                 
                 p.trial.(sn).hFix.stimValue = true; % make sure fixation point is on
-                p.trial.(sn).hFace.stimValue = true; % make sure face is off
+                p.trial.(sn).hFace.stimValue = false; % make sure face is off
                 
                 % move to state 1 - fixation grace period
                 sc.setState(1);

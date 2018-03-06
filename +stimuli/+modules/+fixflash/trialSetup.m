@@ -48,6 +48,7 @@ p.trial.(sn).hFix.wincolor   = p.trial.display.clut.bg_white;
 % fixation duration
 p.trial.(sn).fixDuration = p.trial.(sn).minFixDuration;
 p.trial.(sn).fixStartOffset = 0; % offset for fixation duration -- can be used by other modules to extend fixation
+p.trial.(sn).rewardedfixation = false;
 
 % initialize some measurements of interest
 p.trial.(sn).holdXY = nan(1,2); % x,y position of fixation

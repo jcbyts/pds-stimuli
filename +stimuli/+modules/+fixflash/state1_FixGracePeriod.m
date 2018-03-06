@@ -22,7 +22,7 @@ classdef state1_FixGracePeriod < stimuli.objects.state
         
         % -- Evaluate state logic (prepare before drawing)
         function frameUpdate(s,p,sn)
-            
+              
             % get the state controller ready
             sc = s.sc;
             
@@ -41,10 +41,10 @@ classdef state1_FixGracePeriod < stimuli.objects.state
                 return;
             end
             
-            if p.trial.(sn).rewardForObtainFixation
+            %if p.trial.(sn).rewardForObtainFixation
                 % move to state 2 - hold fixation
-                pds.behavior.reward.give(p);
-            end
+            %    pds.behavior.reward.give(p);
+            %end
             
             sc.setState(2); % ---> to fix hold
             

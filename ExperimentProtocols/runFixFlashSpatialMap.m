@@ -111,7 +111,7 @@ settingsStruct.(sn).fixationJitterSize = 0;
 settingsStruct.(sn).maxFixDuration = 1.5;
 settingsStruct.(sn).staircaseStep = .075;
 settingsStruct.(sn).staircaseMax = 1.5;
-settingsStruct.(sn).fixWinRadius = 1;
+settingsStruct.(sn).fixWinRadius = 1.8;
 
 if ip.Results.pauseBefore
     settingsStruct.pldaps.pause.preExperiment = true;
@@ -162,7 +162,7 @@ for iCond = 1:numel(c)
     condNums = [condNums ones(1,condN(iCond))*iCond]; %#ok<AGROW>
 end
 
-p.defaultParameters.pldaps.finish = 45; % complete ~15 minutes of data in 45 trials
+p.defaultParameters.pldaps.finish = 200;
 
 condIdx = repmat(condNums, 1, ceil(p.defaultParameters.pldaps.finish/numel(condNums)));
 

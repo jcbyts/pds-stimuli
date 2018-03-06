@@ -65,7 +65,7 @@ switch state
             'offLifetime',              240, ...    % time objects remain off (frames)
             'onLifetime',               100, ...    % time objects remain on (frames)
             'maxContrast',              .5, ...     % contrast of the objects
-            'holdDuration',             60, ...     % frames to hold fixation before reward
+            'holdDuration',             30, ...     % frames to hold fixation before reward
             'radius',                   1, ...      % radius of the objects (deg)
             'motionType',               'randomwalk', ... % randomwalk, linear
             };

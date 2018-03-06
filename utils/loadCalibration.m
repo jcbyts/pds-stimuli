@@ -13,6 +13,8 @@ catch
     return
 end
 
-% S.eyelink.use = false;
-% S.eyelink.useAsEyepos = false;
-% S.mouse.useAsEyepos = true;
+if (strcmp(S.session.subject,'test'))
+  S.eyelink.use = false;
+  S.eyelink.useAsEyepos = false;
+  S.mouse.useAsEyepos = true;
+end
