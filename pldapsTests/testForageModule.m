@@ -31,9 +31,11 @@ settingsStruct.(sn).stateFunction.order = -1; % draw before behavior
 settingsStruct.(sn).use = false;
 
 sn = 'hartley';
-settingsStruct.(sn).stateFunction.name  = 'stimuli.modules.hartley.defaultHartleyTrial';
+% settingsStruct.(sn).stateFunction.name  = 'stimuli.modules.hartley.defaultHartleyTrial';
+settingsStruct.(sn).stateFunction.name  = 'stimuli.modules.hartley.hartleyTrialWeightedProbability';
 settingsStruct.(sn).stateFunction.order = -1; % draw before behavior
 settingsStruct.(sn).use = true;
+settingsStruct.(sn).pBlank = .5;
 
 sn = 'spatialSquares';
 settingsStruct.(sn).stateFunction.name  = 'stimuli.modules.mapping.spatialSquares';

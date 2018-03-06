@@ -19,7 +19,7 @@ ip.addParameter('subject', 'jnk')
 ip.addParameter('pauseBefore', false)
 ip.addParameter('imageEveryNTrials', 4)
 ip.addParameter('imgDir', getpref('pep', 'colonyPics'))
-ip.addParameter('autoCorr', 'fixed')
+ip.addParameter('autoCorr', 'pBlank')
 ip.parse(varargin{:})
 
 % setup pldaps and testing modules
@@ -42,13 +42,17 @@ sn = 'hartley';
 switch ip.Results.autoCorr
     case 'exponential'
         settingsStruct.(sn).stateFunction.name  = 'stimuli.modules.hartley.defaultHartleyTrial';
+        settingsStruct.(sn).OffDuration = 2;
     case 'fixed'
         settingsStruct.(sn).stateFunction.name  = 'stimuli.modules.hartley.hartleyTrialFixedDuration';
+        settingsStruct.(sn).OffDuration = 2;
+    case 'pBlank'
+        settingsStruct.(sn).stateFunction.name  = 'stimuli.modules.hartley.hartleyTrialWeightedProbability';
+        settingsStruct.(sn).pBlank = .2;
 end
 settingsStruct.(sn).stateFunction.order = -1; % draw before behavior
 settingsStruct.(sn).use = true;
 settingsStruct.(sn).OnDuration  = 2;
-settingsStruct.(sn).OffDuration = 2;
 settingsStruct.(sn).contrast    = .15;  % Michelson contrast of the gratings (DEPENDS ON BLEND FUNCTION)
 settingsStruct.(sn).tfs         = 0;   % temporal frequencies showns
 settingsStruct.(sn).nOctaves    = 5;   % number of octaves to show above base frequency
