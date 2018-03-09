@@ -22,6 +22,9 @@ if nargin==1 %initial call to setup conditions
     p.defaultParameters.pldaps.trialMasterFunction = 'runModularTrial';
     p.defaultParameters.pldaps.trialFunction = 'stimuli.pldapsDefaultTrial';
     
+    % track this git repo
+    p = pds.git.track(p, mfilename);
+    
     % seconds per trial
     p.trial.pldaps.maxTrialLength = 20;
     p.trial.pldaps.maxFrames = p.trial.pldaps.maxTrialLength*p.trial.display.frate;
