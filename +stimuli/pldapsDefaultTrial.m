@@ -23,7 +23,7 @@ if nargin==1 %initial call to setup conditions
     p.defaultParameters.pldaps.trialFunction = 'stimuli.pldapsDefaultTrial';
     
     % track this git repo
-    p = pds.git.track(p, mfilename);
+    p = pds.git.track(p, 'calibrationGUI', 'pep');
     
     % seconds per trial
     p.trial.pldaps.maxTrialLength = 20;
