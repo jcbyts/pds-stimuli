@@ -41,7 +41,7 @@ p = runFixFlashSpatialMap('subject', subject,...
     'fixationPoint', 'bullseye');
 
 %% Presaccadic selection with gabors
-SingleTarget = 1;
+SingleTarget = 0;
 runGaborTargetSelection('subject', subject,...
     'pauseBefore', pauseBeforeExperiment,'SingleTarget', SingleTarget)
 
