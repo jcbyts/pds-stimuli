@@ -109,9 +109,9 @@ settingsStruct.(sn).minFixDuration = .2;
 settingsStruct.(sn).fixationJitter = false;
 settingsStruct.(sn).fixationJitterSize = 0;
 settingsStruct.(sn).maxFixDuration = 1.5;
-settingsStruct.(sn).staircaseStep = .075;
-settingsStruct.(sn).staircaseMax = 1.5;
-settingsStruct.(sn).fixWinRadius = 1.2;
+settingsStruct.(sn).staircaseStep = .05;
+settingsStruct.(sn).staircaseMax = 1;
+settingsStruct.(sn).fixWinRadius = 1.8;
 
 if ip.Results.pauseBefore
     settingsStruct.pldaps.pause.preExperiment = true;

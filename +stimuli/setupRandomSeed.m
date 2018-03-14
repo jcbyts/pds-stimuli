@@ -17,4 +17,7 @@ if datenum(version('-date')) >= datenum('February 9, 2012') %strcmp(version, '7.
 else
     RandStream.setDefaultStream(p.trial.(sn).rngs.sessionRNG); 
 end
-p.defaultParameters.(sn).rngs.trialSeeds = randi(2^32, [3e3 1]);
+
+if ~isfield(p.defaultParameters.(sn).rngs, 'trialSeeds')
+    p.defaultParameters.(sn).rngs.trialSeeds = randi(2^32, [3e3 1]);
+end

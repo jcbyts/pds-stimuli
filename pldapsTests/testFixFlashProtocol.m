@@ -66,6 +66,9 @@ settingsStruct.pldaps.trialMasterFunction='runModularTrial';
 % calculation)
 settingsStruct.display.viewdist = 100; % cm
 
+settingsStruct.eyelink.use = false;
+settingsStruct.mouse.use = true;
+settingsStruct.mouse.useAsEyepos = true;
 
 sn = 'fixflash';
 settingsStruct.(sn).stateFunction.name = 'stimuli.modules.fixflash.runImgScan';
@@ -73,7 +76,7 @@ settingsStruct.(sn).stateFunction.order = 2;
 settingsStruct.(sn).use = true;
 settingsStruct.(sn).staircaseOn = false;
 settingsStruct.(sn).minFixDuration = 2;
-settingsStruct.(sn).shrinkTimeConstant = 0;
+settingsStruct.(sn).shrinkTimeConstant = .05;
 settingsStruct.(sn).fixationJitter = false;
 settingsStruct.(sn).fixationJitterSize = 0;
 % 
