@@ -51,8 +51,14 @@ classdef state0_preStim < stimuli.objects.state
                     
                     p.trial.(sn).hTargs(k).position = tmp_ + fixPos;
                     
-                    % turn on the dots
-                    p.trial.(sn).hTargs(k).stimValue = p.trial.(sn).stimVisible(k);
+                    % turn on the dots, with given contrast 0 to 1 by stimVis
+                    if (p.trial.(sn).stimVisible(k) > 0)
+                       p.trial.(sn).hTargs(k).stimValue = true;
+                       p.trial.(sn).hTargs(k).contrast = ...
+                             ( p.trial.(sn).stimVisible(k) * p.trial.(sn).contrast);
+                    else
+                       p.trial.(sn).hTargs(k).stimValue = false; 
+                    end
                 end
                 
                 % update fixation behavior to be relative to fixation

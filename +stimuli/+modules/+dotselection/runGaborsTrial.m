@@ -60,7 +60,8 @@ switch state
             'rewardcount',              zeros(1,2), ... % two targets, only two states
         	'rewardtravel',             4, ...          % must choose this many times before move
             'rewardtransit',            1.0, ...        % prob to transition reward state
-            'stimVisible',              [true true true], ... % will the dots be shown
+            'stimVisible',              [1 0 1 0 0], ... % will the dots be shown
+            'trialsToSwap',             16, ...     % if dual targs, stay this long in on one side
             };
         
         for iArg = 1:2:numel(defaultArgs)
@@ -140,7 +141,8 @@ switch state
 
         [p.trial.(sn).rewardDot1Rate, p.trial.(sn).rewardDot2Rate, p.trial.(sn).stimVisible] = ...
             p.trial.(sn).rewardUpdateFun(choices, p.trial.(sn).rewardDot1Rate, p.trial.(sn).rewardDot2Rate, ...
-                                           p.trial.(sn).stimVisible,p.trial.(sn).rewardUpdateArgs{:});
+                                           p.trial.(sn).stimVisible,p.trial.(sn).rewardUpdateArgs{:},...
+                                           p.trial.(sn).trialsToSwap);
                 
         %upload to conditions for next trial to live on
         stimuli.updateConditions(p, sn, 'rewardDot1Rate', p.trial.(sn).rewardDot1Rate);

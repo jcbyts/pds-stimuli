@@ -41,6 +41,19 @@ classdef state3_HoldChoice < stimuli.objects.state
                 sc.setState(7); % break fixation
                 return
             elseif p.trial.ttime > (startTime + p.trial.(sn).choiceHoldDuration)
+                
+                
+                %******* find which target is correct, put face there ***
+                if (p.trial.(sn).rewardDot1Rate > p.trial.(sn).rewardDot2Rate)
+                   k = 1;  % left target was correct 
+                else
+                   k = 2;  % right target was correct 
+                end
+                %****** set face position to correct target location
+                p.trial.(sn).hFace.position = p.trial.(sn).hTargs(k).position;
+                p.trial.(sn).hFace.id = randi( p.trial.(sn).hFace.numTex );  %any random face
+                %****************************
+                
                 sc.setState(8); % reward ITI
                 return
             end
