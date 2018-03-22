@@ -41,8 +41,7 @@ settingsStruct.(sn).stateFunction.order = -1;
 settingsStruct.(sn).use = true;
 settingsStruct.(sn).imageContrast = .5;
 settingsStruct.(sn).numToShow     = 1; % number of images to show per trial
-% settingsStruct.(sn).imgDir = '/media/marmorig/Data/RangeDatabase1080p/';
-% settingsStruct.(sn).fileList=dir(fullfile(p.trial.(sn).imgDir, 'lImage*V.png'));
+settingsStruct.(sn).imgDir = ip.Results.imgDir; %'/media/marmorig/Data/RangeDatabase1080p/';
 
 
 % %--------------------------------------------------------------------------

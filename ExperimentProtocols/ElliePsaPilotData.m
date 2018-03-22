@@ -1,4 +1,4 @@
-subject = 'Ellie'; %'Ellie'; %'test'
+subject = 'test'; %'Ellie'; %'test'
 pauseBeforeExperiment = false;
 
 %% Natural Image Free View: warm up

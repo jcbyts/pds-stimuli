@@ -53,10 +53,13 @@ end
 settingsStruct.(sn).stateFunction.order = -1; % draw before behavior
 settingsStruct.(sn).use = true;
 settingsStruct.(sn).OnDuration  = 2;
-settingsStruct.(sn).contrast    = .15;  % Michelson contrast of the gratings (DEPENDS ON BLEND FUNCTION)
+settingsStruct.(sn).contrast    = .05;  % Michelson contrast of the gratings (DEPENDS ON BLEND FUNCTION)
 settingsStruct.(sn).tfs         = 0;   % temporal frequencies showns
 settingsStruct.(sn).nOctaves    = 5;   % number of octaves to show above base frequency
 settingsStruct.(sn).Freq0       = .2;  % Base frequence (cycles/deg)
+
+% frozen seed
+settingsStruct.(sn).rngs.trialSeeds = repmat(666, 3e3, 1);
 
 %--------------------------------------------------------------------------
 % Add natural background module
@@ -91,7 +94,7 @@ settingsStruct.(sn).maxContrast          = 1;            % contrast of the objec
 settingsStruct.(sn).radius               = 1;            % radius of the objects (deg)
 settingsStruct.(sn).onLifetime           = 1 * 120;      % time objects remain on (frames)
 settingsStruct.(sn).offLifetime          = 2 * 120;      % time objects remain off (frames)   
-
+settingsStruct.(sn).holdDuration         = 2;
 
 if ip.Results.pauseBefore
     settingsStruct.pldaps.pause.preExperiment = true;
