@@ -20,14 +20,14 @@ settingsStruct.display.colorclamp = 1;
 settingsStruct.display.destinationFactorNew = GL_ONE;
 settingsStruct.display.sourceFactorNew = GL_ONE;
 
-settingsStruct.display.useOverlay = 2;
+settingsStruct.display.useOverlay = 0;
 
 settingsStruct.pldaps.useModularStateFunctions = true;
 settingsStruct.pldaps.trialMasterFunction='runModularTrial';
 
 % make everything bigger (viewdist scales the pixels per degree
 % calculation)
-% settingsStruct.display.viewdist = 100; % cm
+settingsStruct.display.viewdist = 100; % cm
 settingsStruct.pldaps.pause.preExperiment = false;
 
 %% add module to test
