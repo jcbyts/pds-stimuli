@@ -58,7 +58,7 @@ settingsStruct.(sn).fixationJitterSize = 0;
 settingsStruct.(sn).rewardLevels       = inf; % no amount of fixation could ever yield reward
 settingsStruct.(sn).showGUI            = false;
 settingsStruct.(sn).fixWinRadius       = 1.2; 
-settingsStruct.(sn).rewardFaceDuration =     0;
+settingsStruct.(sn).rewardFaceDuration =   0;
 settingsStruct.(sn).rewardForFixation  = 0.5; 
 %settingsStruct.(sn).rewardForFixation  = -0.2;  % if positive, it is a probability to reward for 
                                                 % holding fixation, if
@@ -83,9 +83,9 @@ settingsStruct.(sn).sf=                       4;
 settingsStruct.(sn).numDirs=                  8;
 settingsStruct.(sn).CenterAngle=              [0 -90];
 settingsStruct.(sn).rewardUpdateFun=          @stimuli.modules.dotselection.rewardUpdateSwitchRule;
-settingsStruct.(sn).rewardUpdateArgs=         {0.15};  % how often to swap trials
+ settingsStruct.(sn).rewardUpdateArgs=        {0.25};  % swap duration (only if single target)
 settingsStruct.(sn).rewardForFixation=        false;
-settingsStruct.(sn).rewardFaceDuration=       0;
+settingsStruct.(sn).rewardFaceDuration=       0.5;
 settingsStruct.(sn).yokeDirections=           false;      % yoke the direction of dots for dots1 and dots2
 settingsStruct.(sn).rewardDot1Rate=           1.0; %1;
 settingsStruct.(sn).rewardDot2Rate=           0.0; %0.85;
@@ -96,17 +96,18 @@ settingsStruct.(sn).maxFixPreStim=            0.2;
 settingsStruct.(sn).minFixPostStim=           0.1;
 settingsStruct.(sn).maxFixPostStim=           0.2;        % seconds (wrt dot motion onset)
 settingsStruct.(sn).fixHoldTau=               0.2;        % seconds(time constant of exponential)
-settingsStruct.(sn).choiceGracePeriod=        0.2; %1.4;  % grace period for decision time (seconds)
-settingsStruct.(sn).choiceHoldDuration=       0.025;      % minimum choice hold duration (seconds)
+settingsStruct.(sn).choiceGracePeriod=        0.2;  %1.4; % grace period for decision time (seconds)
+settingsStruct.(sn).choiceHoldDuration=       0.1;      % minimum choice hold duration (seconds)
 settingsStruct.(sn).iti=                      1.0;
 settingsStruct.(sn).rewardcount=              zeros(1,2); % two targets, only two states
 settingsStruct.(sn).rewardtravel=             4;          % must choose this many times before move
 settingsStruct.(sn).rewardtransit=            1.0;        % prob to transition reward state
 
 if (ip.Results.SingleTarget == 1)
-  settingsStruct.(sn).stimVisible=              [1 0 1]; % will the dots be shown   
+  settingsStruct.(sn).stimVisible=              [1 0 1 0 0]; % single target shown    
 else
-  settingsStruct.(sn).stimVisible=              [1 1 0]; % will the dots be shown
+  settingsStruct.(sn).stimVisible=              [1 0.05 0 0 0]; % both targets be shown
+  settingsStruct.(sn).trialsToSwap =            8;   % this many trials correct, then swap
 end
 
 if ip.Results.pauseBefore
