@@ -19,75 +19,36 @@ switch state
         
         kTarg = 1;
         p.trial.(sn).hTarg(kTarg).setup(p); % setup with pldaps
-        p.trial.(sn).hTarg(kTarg).position = p.trial.display.ctr(1:2) + [50 0];
-        p.trial.(sn).hTarg(kTarg).theta = randi(360);
-        p.trial.(sn).hTarg(kTarg).sf = 3;
-        p.trial.(sn).hTarg(kTarg).sigma = .25;
+        p.trial.(sn).hTarg(kTarg).position = p.trial.display.ctr(1:2);
+        p.trial.(sn).hTarg(kTarg).theta = [0 120 240];
+        p.trial.(sn).hTarg(kTarg).sf = 2;
+        p.trial.(sn).hTarg(kTarg).sigma = .3;
         p.trial.(sn).hTarg(kTarg).contrast = .2;
-        p.trial.(sn).hTarg(kTarg).tf = 2;
-        p.trial.(sn).hTarg(kTarg).phase = randi(360);
+        p.trial.(sn).hTarg(kTarg).tf = 4;
+        phi = randi(360,1,3);
+        p.trial.(sn).hTarg(kTarg).phase = phi;
+        
         kTarg = 2;
-        angleOffset = 120;
         p.trial.(sn).hTarg(kTarg).setup(p); % setup with pldaps
-        p.trial.(sn).hTarg(kTarg).position = p.trial.(sn).hTarg(kTarg-1).position;
-        p.trial.(sn).hTarg(kTarg).theta = p.trial.(sn).hTarg(kTarg-1).theta + angleOffset;
-        p.trial.(sn).hTarg(kTarg).sf = p.trial.(sn).hTarg(kTarg-1).sf;
-        p.trial.(sn).hTarg(kTarg).sigma = p.trial.(sn).hTarg(kTarg-1).sigma;
+        p.trial.(sn).hTarg(kTarg).position = p.trial.(sn).hTarg(1).position - [150 0];
+        p.trial.(sn).hTarg(kTarg).theta = [0 120 240];
+        p.trial.(sn).hTarg(kTarg).sf = 2;
+        p.trial.(sn).hTarg(kTarg).sigma = .3;
         p.trial.(sn).hTarg(kTarg).contrast = .2;
-        p.trial.(sn).hTarg(kTarg).tf = p.trial.(sn).hTarg(kTarg-1).tf;
-        p.trial.(sn).hTarg(kTarg).phase = randi(360);
+        p.trial.(sn).hTarg(kTarg).tf = 4;
+%         p.trial.(sn).hTarg(kTarg).phase = randi(360, 1, 3);
+        p.trial.(sn).hTarg(kTarg).phase = phi;
+        
         kTarg = 3;
         p.trial.(sn).hTarg(kTarg).setup(p); % setup with pldaps
-        p.trial.(sn).hTarg(kTarg).position = p.trial.(sn).hTarg(kTarg-1).position;
-        p.trial.(sn).hTarg(kTarg).theta = p.trial.(sn).hTarg(kTarg-1).theta + angleOffset;
-        p.trial.(sn).hTarg(kTarg).sf = p.trial.(sn).hTarg(kTarg-1).sf;
-        p.trial.(sn).hTarg(kTarg).sigma = p.trial.(sn).hTarg(kTarg-1).sigma;
+        p.trial.(sn).hTarg(kTarg).position = p.trial.(sn).hTarg(1).position + [150 0];
+        p.trial.(sn).hTarg(kTarg).theta = [0 120 240];
+        p.trial.(sn).hTarg(kTarg).sf = 2;
+        p.trial.(sn).hTarg(kTarg).sigma = .3;
         p.trial.(sn).hTarg(kTarg).contrast = .2;
-        p.trial.(sn).hTarg(kTarg).tf = p.trial.(sn).hTarg(kTarg-1).tf;
-        p.trial.(sn).hTarg(kTarg).phase = randi(360);
-        
-        
-        kTarg = 4;
-        p.trial.(sn).hTarg(kTarg).setup(p); % setup with pldaps
-        p.trial.(sn).hTarg(kTarg).position = p.trial.(sn).hTarg(1).position - [150 0];
-        p.trial.(sn).hTarg(kTarg).theta = p.trial.(sn).hTarg(1).theta;
-        p.trial.(sn).hTarg(kTarg).sf = p.trial.(sn).hTarg(kTarg-1).sf;
-        p.trial.(sn).hTarg(kTarg).sigma = p.trial.(sn).hTarg(kTarg-1).sigma;
-        p.trial.(sn).hTarg(kTarg).contrast = .2;
-        p.trial.(sn).hTarg(kTarg).tf = p.trial.(sn).hTarg(kTarg-1).tf;
-        p.trial.(sn).hTarg(kTarg).phase = randi(360);
-        
-        kTarg = 5;
-        p.trial.(sn).hTarg(kTarg).setup(p); % setup with pldaps
-        p.trial.(sn).hTarg(kTarg).position = p.trial.(sn).hTarg(1).position - [150 0];
-        p.trial.(sn).hTarg(kTarg).theta = p.trial.(sn).hTarg(1).theta+angleOffset;
-        p.trial.(sn).hTarg(kTarg).sf = p.trial.(sn).hTarg(kTarg-1).sf;
-        p.trial.(sn).hTarg(kTarg).sigma = p.trial.(sn).hTarg(kTarg-1).sigma;
-        p.trial.(sn).hTarg(kTarg).contrast = .2;
-        p.trial.(sn).hTarg(kTarg).tf = p.trial.(sn).hTarg(kTarg-1).tf;
-        p.trial.(sn).hTarg(kTarg).phase = randi(360);
-        
-        
-        
-        kTarg = 6;
-        p.trial.(sn).hTarg(kTarg).setup(p); % setup with pldaps
-        p.trial.(sn).hTarg(kTarg).position = p.trial.(sn).hTarg(1).position - [150 0];
-        p.trial.(sn).hTarg(kTarg).theta = p.trial.(sn).hTarg(1).theta+angleOffset+angleOffset;
-        p.trial.(sn).hTarg(kTarg).sf = p.trial.(sn).hTarg(kTarg-1).sf;
-        p.trial.(sn).hTarg(kTarg).sigma = p.trial.(sn).hTarg(kTarg-1).sigma;
-        p.trial.(sn).hTarg(kTarg).contrast = .2;
-        p.trial.(sn).hTarg(kTarg).tf = p.trial.(sn).hTarg(kTarg-1).tf;
-        p.trial.(sn).hTarg(kTarg).phase = randi(360);
-        
-%         kTarg = 7;
-%         p.trial.(sn).hTarg(kTarg).setup(p); % setup with pldaps
-%         p.trial.(sn).hTarg(kTarg).position = p.trial.(sn).hTarg(1).position - [150 0];
-%         p.trial.(sn).hTarg(kTarg).theta = p.trial.(sn).hTarg(1).theta+120;
-%         p.trial.(sn).hTarg(kTarg).sf = p.trial.(sn).hTarg(kTarg-1).sf;
-%         p.trial.(sn).hTarg(kTarg).sigma = p.trial.(sn).hTarg(kTarg-1).sigma;
-%         p.trial.(sn).hTarg(kTarg).contrast = .2;
-%         p.trial.(sn).hTarg(kTarg).tf = p.trial.(sn).hTarg(kTarg-1).tf;
-%         p.trial.(sn).hTarg(kTarg).phase = randi(360);
+        p.trial.(sn).hTarg(kTarg).tf = 4;
+        p.trial.(sn).hTarg(kTarg).phase = phi;
+
         
     % --- Draw task semantics using info from hTrial
     case p.trial.pldaps.trialStates.framePrepareDrawing
@@ -167,8 +128,10 @@ switch state
             end 
         end
         
-        for kTarg = 1:6
-            p.trial.(sn).hTarg(kTarg) = stimuli.objects.gaborTarget('track', false);
+        
+        
+        for kTarg = 1:3
+            p.trial.(sn).hTarg(kTarg) = stimuli.objects.plaidGaborTarget();
         end
         
 
