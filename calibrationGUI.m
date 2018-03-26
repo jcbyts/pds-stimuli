@@ -256,7 +256,7 @@ end
 
 % --- Executes on button press in TargetGrid.
 function TargetGrid_Callback(hObject, eventdata, handles)
-nFrames=100;
+nFrames=400;
 xy=[0 0; 0 -5; 0 5; -5 0; 5 0; 10 0; 0 10; -10 0; 0 -10];
 handles=drawCalibrationTargets(handles, xy, nFrames);
 guidata(hObject, handles)
@@ -264,7 +264,7 @@ guidata(hObject, handles)
 
 % --- Executes on button press in TargetU.
 function TargetU_Callback(hObject, eventdata, handles)
-nFrames=100;
+nFrames=400;
 xy=[0 0; 0 5];
 handles=drawCalibrationTargets(handles, xy, nFrames);
 guidata(hObject, handles)
@@ -272,7 +272,7 @@ guidata(hObject, handles)
 
 % --- Executes on button press in TargetD.
 function TargetD_Callback(hObject, eventdata, handles)
-nFrames=100;
+nFrames=400;
 xy=[0 0; 0 -5];
 handles=drawCalibrationTargets(handles, xy, nFrames);
 guidata(hObject, handles)
@@ -280,7 +280,7 @@ guidata(hObject, handles)
 
 % --- Executes on button press in TargetL.
 function TargetL_Callback(hObject, eventdata, handles)
-nFrames=100;
+nFrames=400;
 xy=[0 0; -5 0];
 handles=drawCalibrationTargets(handles, xy, nFrames);
 guidata(hObject, handles)
@@ -288,7 +288,7 @@ guidata(hObject, handles)
 
 % --- Executes on button press in TargetR.
 function TargetR_Callback(hObject, eventdata, handles)
-nFrames=100;
+nFrames=400;
 xy=[0 0; 5 0; 10 0];
 handles=drawCalibrationTargets(handles, xy, nFrames);
 guidata(hObject, handles)
@@ -296,7 +296,7 @@ guidata(hObject, handles)
 
 % --- Executes on button press in TargetRandom.
 function TargetRandom_Callback(hObject, eventdata, handles)
-nFrames=100;
+nFrames=400;
 xy=rand(4, 2)*20-10;
 handles=drawCalibrationTargets(handles, xy, nFrames);
 guidata(hObject, handles)
@@ -304,7 +304,7 @@ guidata(hObject, handles)
 
 % --- Executes on button press in TargetFix.
 function TargetFix_Callback(hObject, eventdata, handles)
-nFrames=100;
+nFrames=400;
 xy=[0 0];
 handles=drawCalibrationTargets(handles, xy, nFrames);
 guidata(hObject, handles)
@@ -312,7 +312,7 @@ guidata(hObject, handles)
 
 % --- Executes on button press in TargetCorners.
 function TargetCorners_Callback(hObject, eventdata, handles)
-nFrames=100;
+nFrames=400;
 xy=[5 8; 8 5];
 handles=drawCalibrationTargets(handles, xy, nFrames);
 guidata(hObject, handles)
