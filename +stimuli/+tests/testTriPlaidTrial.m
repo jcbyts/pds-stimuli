@@ -17,43 +17,45 @@ switch state
     % --- Called before each trial. Sets up all parameters
     case p.trial.pldaps.trialStates.trialSetup
         
+        sf = 3;
+        tf = 3;
         kTarg = 1;
         p.trial.(sn).hTarg(kTarg).setup(p); % setup with pldaps
         p.trial.(sn).hTarg(kTarg).position = p.trial.display.ctr(1:2);
         p.trial.(sn).hTarg(kTarg).theta = [0 120 240];
-        p.trial.(sn).hTarg(kTarg).sf = 2;
-        p.trial.(sn).hTarg(kTarg).sigma = .3;
-        p.trial.(sn).hTarg(kTarg).contrast = .2;
-        p.trial.(sn).hTarg(kTarg).tf = 4;
+        p.trial.(sn).hTarg(kTarg).sf = sf;
+        p.trial.(sn).hTarg(kTarg).sigma = 2;
+        p.trial.(sn).hTarg(kTarg).contrast = .3;
+        p.trial.(sn).hTarg(kTarg).tf = tf;
         phi = randi(360,1,3);
         p.trial.(sn).hTarg(kTarg).phase = phi;
         
         kTarg = 2;
         p.trial.(sn).hTarg(kTarg).setup(p); % setup with pldaps
-        p.trial.(sn).hTarg(kTarg).position = p.trial.(sn).hTarg(1).position - [150 0];
+        p.trial.(sn).hTarg(kTarg).position = p.trial.(sn).hTarg(1).position + [100 100];
         p.trial.(sn).hTarg(kTarg).theta = [0 120 240];
-        p.trial.(sn).hTarg(kTarg).sf = 2;
+        p.trial.(sn).hTarg(kTarg).sf = sf;
         p.trial.(sn).hTarg(kTarg).sigma = .3;
-        p.trial.(sn).hTarg(kTarg).contrast = .2;
-        p.trial.(sn).hTarg(kTarg).tf = 4;
+        p.trial.(sn).hTarg(kTarg).contrast = 0;
+        p.trial.(sn).hTarg(kTarg).tf = tf;
 %         p.trial.(sn).hTarg(kTarg).phase = randi(360, 1, 3);
         p.trial.(sn).hTarg(kTarg).phase = phi;
         
-        kTarg = 3;
-        p.trial.(sn).hTarg(kTarg).setup(p); % setup with pldaps
-        p.trial.(sn).hTarg(kTarg).position = p.trial.(sn).hTarg(1).position + [150 0];
-        p.trial.(sn).hTarg(kTarg).theta = [0 120 240];
-        p.trial.(sn).hTarg(kTarg).sf = 2;
-        p.trial.(sn).hTarg(kTarg).sigma = .3;
-        p.trial.(sn).hTarg(kTarg).contrast = .2;
-        p.trial.(sn).hTarg(kTarg).tf = 4;
-        p.trial.(sn).hTarg(kTarg).phase = phi;
+%         kTarg = 3;
+%         p.trial.(sn).hTarg(kTarg).setup(p); % setup with pldaps
+%         p.trial.(sn).hTarg(kTarg).position = p.trial.(sn).hTarg(1).position + [150 0];
+%         p.trial.(sn).hTarg(kTarg).theta = [0 120 240];
+%         p.trial.(sn).hTarg(kTarg).sf = sf;
+%         p.trial.(sn).hTarg(kTarg).sigma = .3;
+%         p.trial.(sn).hTarg(kTarg).contrast = .2;
+%         p.trial.(sn).hTarg(kTarg).tf = tf;
+%         p.trial.(sn).hTarg(kTarg).phase = phi;
 
         
     % --- Draw task semantics using info from hTrial
     case p.trial.pldaps.trialStates.framePrepareDrawing
         
-        angleOffset = 120;
+        angleOffset = 10;
         kTarg = 1;
         phaseinc = 360 * (p.trial.(sn).hTarg(kTarg).tf / p.trial.display.frate);
 %         if (p.trial.(sn).hTarg(kTarg).phase > 360)
@@ -71,7 +73,7 @@ switch state
 
 
             if  p.trial.keyboard.firstPressQ(p.trial.keyboard.codes.kKey)
-                  for kTarg = 4:5
+                  for kTarg = 1
                   p.trial.(sn).hTarg(kTarg).theta = p.trial.(sn).hTarg(kTarg).theta + angleOffset;
                   end
                   
@@ -130,7 +132,7 @@ switch state
         
         
         
-        for kTarg = 1:3
+        for kTarg = 1:2
             p.trial.(sn).hTarg(kTarg) = stimuli.objects.plaidGaborTarget();
         end
         
