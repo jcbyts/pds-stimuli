@@ -33,6 +33,9 @@ classdef stimulus < handle %#ok<*MCSUP>
     %               mt199937ar random number generator with a seed of 0. To
     %               set rng, you can either pass in a RandStream object, or
     %               pass in a seed.
+    %
+    %   tracked     logical, flags whether the stimValue property logs
+    %               itself
     %               
     %  Example Calls:
     %               s = stimuli.stimulus(); % create stimulus object
@@ -57,6 +60,7 @@ classdef stimulus < handle %#ok<*MCSUP>
     properties (Access = public)
         stimValue
         rng@RandStream=RandStream('mt19937ar')
+        tracked@logical=true
     end
     
     properties (SetAccess = ?stimuli.objects.stimulus, GetAccess = public)
@@ -93,7 +97,9 @@ classdef stimulus < handle %#ok<*MCSUP>
                 return
             end
             obj.stimValue = val;
-            obj.log(:,end+1) = [obj.stimValue; GetSecs];
+            if obj.tracked
+                obj.log(:,end+1) = [obj.stimValue; GetSecs];
+            end
         end
         
         % --- Manage the random number generator
