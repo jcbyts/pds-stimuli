@@ -71,7 +71,7 @@ classdef stimulus < handle %#ok<*MCSUP>
     methods
         % --- class constructor
         function obj = stimulus(varargin)
-            obj.stimValue = true; % the stimulus defaults to a value of true
+%             obj.stimValue = true; % the stimulus defaults to a value of true
             
             rngArg  = find(cellfun(@(x) strcmp(x, 'rng'), varargin));
             seedArg = find(cellfun(@(x) strcmp(x, 'seed'), varargin));
