@@ -84,15 +84,14 @@ switch state
     %     generate stimulus sequence
     case p.trial.pldaps.trialStates.trialSetup
         
-%         % --- Set Blend Function
-%         % We want these squares to override whatever they're on top of
-%         p.trial.display.sourceFactorNew = GL_ONE;
-%         p.trial.display.destinationFactorNew = GL_ONE;
-%         
-%         Screen('BlendFunction', p.trial.display.ptr, p.trial.display.sourceFactorNew, p.trial.display.destinationFactorNew);
-        
+        %         % --- Set Blend Function
+        %         % We want these squares to override whatever they're on top of
+        %         p.trial.display.sourceFactorNew = GL_ONE;
+        %         p.trial.display.destinationFactorNew = GL_ONE;
+        %
+        %         Screen('BlendFunction', p.trial.display.ptr, p.trial.display.sourceFactorNew, p.trial.display.destinationFactorNew);
         p.trial.(sn).hSquares.setRandomSeed(p.trial.(sn).rngs.trialSeeds(p.trial.pldaps.iTrial)); % setup random seed
-
+        
         % update variable if they have changed
         p.trial.(sn).hSquares.position = p.trial.(sn).position;
         p.trial.(sn).hSquares.N        = p.trial.(sn).N;
@@ -100,10 +99,10 @@ switch state
         p.trial.(sn).hSquares.contrast = p.trial.(sn).contrast;
         p.trial.(sn).hSquares.lifetime = p.trial.(sn).lifetime;
         p.trial.(sn).hSquares.gridded  = p.trial.(sn).gridded;
-
+        
         % prepare object for trial
         p.trial.(sn).hSquares.trialSetup(p);
-
+        
         if p.trial.(sn).minFixation > 0 % fixation required
             p.trial.(sn).hSquares.stimValue = 0; % make sure squares are off
         else
