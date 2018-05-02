@@ -26,8 +26,8 @@
 
 %%
 % PDS = pds{1};
-tmp = load('Z:\Data\PLDAPS\PDS_bkp\Ellie20180322runNaturalImageFreeView1009.PDS', '-mat');
-PDS = tmp.PDS
+load('Z:\Data\PLDAPS\Ellie\Ellie_2018-04-24_12-05-12_TungMT4\Ellie20180424runNaturalImageFreeView1227.PDS', '-mat');
+
 
 %%
 sca
@@ -36,16 +36,21 @@ sca
 % iTrial=find(cellfun(@(x) x.natImgBackground.use, PDS.conditions));
 % iTrial=iTrial(2);
 
-iTrial = 7;
+iTrial = 14; %iTrial + 1;
 pa.setLevels(trialLevelMatrix(:,iTrial));
 pa.natImgBackground.imgDir = getpref('pep', 'colonyPics');
 pa.natImgBackground
 
 im = imread(fullfile(pa.natImgBackground.imgDir, pa.natImgBackground.fileList(pa.natImgBackground.imgIndex).name));
 figure(1); clf
+subplot(1,2,1)
 imshow(im)
 pa.natImgBackground.texToDraw=pa.natImgBackground.imgIndex;
 pa.pldaps.iTrial = iTrial;
+title(iTrial)
+
+subplot(1,2,2)
+plot(PDS.data{iTrial}.behavior.eyeAtFrame')
 %%
 
 
@@ -103,7 +108,7 @@ pa.display.useOverlay = 0;
 pa.display.switchOverlayCLUTs = 1;
 pa.display.overlayptr = pa.display.ptr;
 pa.pldaps.draw.framerate.use = 0; % turn off framerate
-
+pa.pldaps.draw.grid.use = false;
 % pa.display.monkeyCLUT = pa.display.humanCLUT;
 
 p.trial=pa;
@@ -128,7 +133,7 @@ for i = 1:numel(fn)
     p.trial.display.clut.(fn{i}) = p.trial.display.humanCLUT(p.trial.display.clut.(fn{i})(1)+1,:);
 end
 
-[I,I2]=replayModularTrial(p,[0 0 200 200], true, true, [1 1000]);
+[I,I2]=replayModularTrial(p,[-100 -100 100 100], true, true, [100 1100]);
 
 sca
 %
@@ -140,7 +145,7 @@ sca
 
 %% draw full screen
 
-fname='mov1.mp4';
+fname='shanna_trial_mov1.mp4';
 
 % Prepare the new file.
 if exist(fname, 'file')
@@ -178,7 +183,7 @@ close(vidObj);
 %%
 
 %% draw clipped
-fname='mov2.mp4';
+fname='shanna_trial_mov2.mp4';
 
 % Prepare the new file.
 if exist(fname, 'file')
