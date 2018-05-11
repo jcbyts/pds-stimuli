@@ -1,4 +1,4 @@
-function p=defaultHartleyTrial(p, state, sn)
+function p=gratingTrialGazeContingentUpdating(p, state, sn)
 % Draw Hartley Stimuli, module for PLDAPS open reception
 
 if nargin<3
@@ -14,11 +14,11 @@ if nargin < 1
         'OffDuration',          'If "exponential Decay" mode,time constant of inter stimulus interval (frames)',...
         'MaxDuration',          'maximum time on (frames), truncates the exponential', ...
         'contrast',           	'Michelson contrast of the gratings', ...
-        'tfs     ',                  'temporal frequencies showns', ...
-        'nOctaves',             'number of octaves to show above base frequency', ...
-        'Freq0    ',                'Base frequence (cycles/deg)', ...
+        'tfs     ',             'temporal frequencies to show', ...
+        'sfs     ',             'spatial frequencies to show', ...
+        'numOrientations',      'number of orientations', ...
         'generativeModel',      'generative model to use for the sequence', ...
-        'pBlank    ',               'probability of a blank stimulus, if using pBlank generative model', ...
+        'pBlank    ',           'probability of a blank stimulus, if using pBlank generative model', ...
         };
     fprintf('No arguments passed in: call from within pldaps\n')
     fprintf('<strong>Optional Parameters:</strong>\n')
@@ -47,10 +47,10 @@ switch state
             'MaxDuration',          20, ...       % maximum time on (frames), truncates the exponential
             'contrast',           	.2, ...       % Michelson contrast of the gratings (DEPENDS ON BLEND FUNCTION)
             'tfs',                  0, ...        % temporal frequencies showns
-            'nOctaves',             5, ...        % number of octaves to show above base frequency
-            'Freq0',                .1, ...       % Base frequence (cycles/deg)
+            'sfs',                  2, ...        % spatial frequencies shown
+            'numOrientations',      12, ...       % Base frequence (cycles/deg)
             'generativeModel',      'pBlank', ... % which generative model to use for the sequence
-            'pBlank',               0, ... % proportion of stimuli that are blank
+            'pBlank',               0, ...        % proportion of stimuli that are blank
             };
         
         % step through argument pairs and add them to the module
@@ -65,69 +65,75 @@ switch state
         end
         
         
-        p.trial.(sn).M   = 1;
-        freqs = sort([-2.^(0:(p.trial.(sn).nOctaves-1))*p.trial.(sn).Freq0 0 2.^(0:(p.trial.(sn).nOctaves-1))*p.trial.(sn).Freq0]);
-        p.trial.(sn).kxs = freqs;
-        p.trial.(sn).kys = freqs;
-        
-        
-        p.trial.(sn).count = 1;
-        [p.trial.(sn).kxgrid, p.trial.(sn).kygrid]=meshgrid(p.trial.(sn).kxs, p.trial.(sn).kys);
         
     %--------------------------------------------------------------------------
     % --- Trial Setup: pre-allocate important variables for storage and
     % update the object
     case p.trial.pldaps.trialStates.trialSetup
         
+        p.trial.(sn).orientations = 0:(180/p.trial.(sn).numOrientations):(180 - (180/p.trial.(sn).numOrientations));
+        [p.trial.(sn).origrid, p.trial.(sn).sfgrid]=meshgrid(p.trial.(sn).orientations, p.trial.(sn).sfs);
+        
         % --- instantiate Hartley object
-        p.trial.(sn).hHart = stimuli.objects.hartleybase(p, 'position', p.trial.display.ctr(1:2));
+        p.trial.(sn).hHart = stimuli.objects.grating(p, 'position', p.trial.display.ctr(1:2));
         
         % necessary variable
         p.trial.(sn).maxFrames = p.trial.pldaps.maxTrialLength * p.trial.display.frate;
         p.trial.(sn).hHart.contrast = p.trial.(sn).contrast;
-        p.trial.(sn).M = 1; % grid size
-        p.trial.(sn).hHart.M = p.trial.(sn).M;
         
         % setup random seed
         p.trial.(sn).rngs.conditionerRNG = RandStream(p.trial.(sn).rngs.randomNumberGenerater, 'seed', p.trial.(sn).rngs.trialSeeds(p.trial.pldaps.iTrial));
-        
-        % Isn't this already done? Shouldn't we restrict changing kxs
-        % during a session?
-        freqs = sort([-2.^(0:(p.trial.(sn).nOctaves-1))*p.trial.(sn).Freq0 0 2.^(0:(p.trial.(sn).nOctaves-1))*p.trial.(sn).Freq0]);
-        p.trial.(sn).kxs = freqs;
-        p.trial.(sn).kys = freqs;
-        
+                
         % setup sequence
-        p.trial.(sn).sequence = stimuli.modules.hartley.buildHartleySequence(p, sn);
+        p.trial.(sn).sequence.ori = p.trial.(sn).orientations(randi(p.trial.(sn).rngs.conditionerRNG, p.trial.(sn).numOrientations, p.trial.(sn).maxFrames, 1));
+        p.trial.(sn).sequence.sf  = p.trial.(sn).sfs(randi(p.trial.(sn).rngs.conditionerRNG, numel(p.trial.(sn).sfs), p.trial.(sn).maxFrames, 1));
+        p.trial.(sn).sequence.tf  = zeros(p.trial.(sn).maxFrames, 1);
+        p.trial.(sn).sequence.phi = zeros(p.trial.(sn).maxFrames, 1);
+        p.trial.(sn).sequence.on  = rand(p.trial.(sn).rngs.conditionerRNG, p.trial.(sn).maxFrames, 1)>p.trial.(sn).pBlank;
         
         % preallocate variables
-        p.trial.(sn).kx  = nan(p.trial.(sn).maxFrames, 1);
-        p.trial.(sn).ky  = nan(p.trial.(sn).maxFrames, 1);
-        p.trial.(sn).on  = zeros(p.trial.(sn).maxFrames, 1);
+        p.trial.(sn).ori = nan(p.trial.(sn).maxFrames, 1);
+        p.trial.(sn).on  = nan(p.trial.(sn).maxFrames, 1);
+        p.trial.(sn).sf  = nan(p.trial.(sn).maxFrames, 1);
         p.trial.(sn).phi = nan(p.trial.(sn).maxFrames, 1);
         p.trial.(sn).tf  = nan(p.trial.(sn).maxFrames, 1);
+        
         p.trial.(sn).sequenceFrame = 0;
+        p.trial.(sn).LastSwitch = 1;
+        p.trial.(sn).switchRefractoryPeriod = 4; % frames
+        p.trial.(sn).velocityThreshold = 0;
         
 	%--------------------------------------------------------------------------
     % --- Manage stimulus before frame draw
     case p.trial.pldaps.trialStates.framePrepareDrawing
         
         % increment sequence counter
-        p.trial.(sn).sequenceFrame = p.trial.(sn).sequenceFrame + 1;
+        if (p.trial.iFrame - p.trial.(sn).LastSwitch) > p.trial.(sn).switchRefractoryPeriod
+            
+            % detect eye movement
+            pxfr = sqrt(diff(p.trial.behavior.eyeAtFrame(1,p.trial.iFrame+[-1 0])).^2 + diff(p.trial.behavior.eyeAtFrame(1,p.trial.iFrame+[-1 0])).^2);
+            degsec = pxfr/p.trial.display.ppd*p.trial.display.frate;
+            
+            if degsec > p.trial.(sn).velocityThreshold
+                p.trial.(sn).sequenceFrame = p.trial.(sn).sequenceFrame + p.trial.(sn).OnDuration; % skip to next frame
+                p.trial.(sn).LastSwitch = p.trial.iFrame;
+            end
+        end
+        
         
         if p.trial.(sn).sequenceFrame > 0    
             % In this default version, we will simply step through the sequence
             seq = p.trial.(sn).sequence;
             p.trial.(sn).on(p.trial.iFrame)  = seq.on(p.trial.(sn).sequenceFrame);
-            p.trial.(sn).kx(p.trial.iFrame)  = seq.kx(p.trial.(sn).sequenceFrame);
-            p.trial.(sn).ky(p.trial.iFrame)  = seq.ky(p.trial.(sn).sequenceFrame);
+            p.trial.(sn).ori(p.trial.iFrame) = seq.ori(p.trial.(sn).sequenceFrame);
+            p.trial.(sn).sf(p.trial.iFrame)  = seq.sf(p.trial.(sn).sequenceFrame);
             p.trial.(sn).tf(p.trial.iFrame)  = seq.tf(p.trial.(sn).sequenceFrame);
             p.trial.(sn).phi(p.trial.iFrame) = seq.phi(p.trial.(sn).sequenceFrame);
             
             
             p.trial.(sn).hHart.stimValue = p.trial.(sn).on(p.trial.iFrame);
-            p.trial.(sn).hHart.kx        = p.trial.(sn).kx(p.trial.iFrame);
-            p.trial.(sn).hHart.ky        = p.trial.(sn).ky(p.trial.iFrame);
+            p.trial.(sn).hHart.ori       = p.trial.(sn).ori(p.trial.iFrame);
+            p.trial.(sn).hHart.sf        = p.trial.(sn).sf(p.trial.iFrame);
             p.trial.(sn).hHart.tf        = p.trial.(sn).tf(p.trial.iFrame);
             p.trial.(sn).hHart.phi       = p.trial.(sn).phi(p.trial.iFrame);
         end
@@ -147,8 +153,8 @@ switch state
         
         % only save frames that were shown
         ix = 1:p.trial.iFrame;
-        p.trial.(sn).kx  = p.trial.(sn).kx(ix,:);
-        p.trial.(sn).ky  = p.trial.(sn).ky(ix,:);
+        p.trial.(sn).ori = p.trial.(sn).ori(ix,:);
+        p.trial.(sn).sf  = p.trial.(sn).sf(ix,:);
         p.trial.(sn).on  = p.trial.(sn).on(ix,:);
         p.trial.(sn).tf  = p.trial.(sn).tf(ix,:);
         p.trial.(sn).phi = p.trial.(sn).phi(ix,:);

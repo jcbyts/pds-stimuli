@@ -1,14 +1,15 @@
-classdef hartleybase < stimuli.objects.stimulus
-    % HARTLEY draws full-field hartley basis stimuli
+classdef grating < stimuli.objects.stimulus
+    % GRATING draws a sinewave grating
     
     properties
         dim                     % dimensions of the texture (pixels)
+        position                % x, y position pixels
         contrast@double         % Michelson contrast
-        kx@double               % x spatial frequency
-        ky@double               % y spatial frequency
-        M@double                % Scale factor for frequency (default: 1)
+        ori@double              % Orientation
+        sf@double               % spatial frequency
         tf@double               % temporal frequency
         phi@double              % phase
+        rad@double              % radius
     end
     
     properties (Access = private)
@@ -19,13 +20,13 @@ classdef hartleybase < stimuli.objects.stimulus
     
     methods
         % constructor
-        function obj = hartleybase(p, varargin)
+        function obj = grating(p, varargin)
             % hartleybase
             ip = inputParser();
             ip.KeepUnmatched = true;
             ip.addParameter('contrast',  .2)
-            ip.addParameter('M',         1)
-            ip.addParameter('dim',       [])
+            ip.addParameter('position', [])
+            ip.addParameter('rad',        [])
             ip.parse(varargin{:})
             
             nextargs = [fieldnames(ip.Unmatched) struct2cell(ip.Unmatched)]';
@@ -34,18 +35,28 @@ classdef hartleybase < stimuli.objects.stimulus
             
             obj.contrast = ip.Results.contrast;
             
-            obj.M   = ip.Results.M;
+            obj.rad = ip.Results.rad;
             
-            if isempty(ip.Results.dim)
-                obj.dim = p.trial.display.winRect(3:4);
+            ppd = p.trial.display.ppd;
+            
+            if isempty(ip.Results.position)
+                obj.position = p.trial.display.ctr(1:2);
             else
-                obj.dim = ip.Results.dim;
+                obj.position = ip.Results.position;
             end
+               
+            
+            if isempty(obj.rad) % fullfield
+                obj.dim = p.trial.display.winRect(3:4);
+            else 
+                obj.dim = obj.rad * ppd * [1 1];
+            end
+
             
             % initialize some values
             obj.tf  = 0; % temporal frequency
-            obj.kx  = 1; % x spatial frequency
-            obj.ky  = 1; % y spatial frequency
+            obj.ori = 0; % orientation
+            obj.sf  = 2; % spatial frequency
             obj.phi = 0; % phase
 
             obj.bgColorOffset = [0 0 0 0]; % gray
@@ -54,9 +65,9 @@ classdef hartleybase < stimuli.objects.stimulus
             % functions on the graphics card when the texture is drawn.
             % They take in parameters, such sas the contrst, phase,
             % spatial freq, etc.
-%             Screen('BlendFunction', p.trial.display.ptr, GL_ONE, GL_ONE);
-            obj.tex  = CreateProceduralHartleyBasis(p.trial.display.ptr, obj.dim(1), obj.dim(2), obj.bgColorOffset, [], .5);
-%             Screen('BlendFunction', p.trial.display.ptr, p.trial.display.sourceFactorNew, p.trial.display.destinationFactorNew);
+            obj.tex  = CreateBetterProceduralSineGrating(p.trial.display.ptr, obj.dim(1), obj.dim(2), obj.bgColorOffset, obj.rad*ppd, .5);
+%             obj.tex  = CreateProceduralSineGrating(p.trial.display.ptr, obj.dim(1), obj.dim(2), obj.bgColorOffset, obj.rad*ppd, .5);
+
         end
         
         
@@ -65,9 +76,7 @@ classdef hartleybase < stimuli.objects.stimulus
         end
         
         function frameUpdate(~, ~)
-            
-            % Do Nothing
-% %             h.phi=sin(2*pi*h.tf*time);
+
         end
         
         function trialCleanup(obj, ~)
@@ -83,9 +92,12 @@ classdef hartleybase < stimuli.objects.stimulus
             if ~obj.stimValue
                 return
             end
+            dstRect = CenterRectOnPoint([0 0 obj.dim], obj.position(1), obj.position(2));
                
             Screen('BlendFunction', p.trial.display.ptr, GL_ONE, GL_ONE);
-            Screen('DrawTexture', p.trial.display.ptr, obj.tex, [], [0 0 obj.dim], 0, [], [], [], [], kPsychDontDoRotation, [obj.kx, obj.ky, p.trial.display.ppd, obj.contrast, obj.M, obj.phi, 0, 0]);
+%             disp(obj.ori)
+            Screen('DrawTexture', p.trial.display.ptr, obj.tex, [], dstRect, 0, [], [], [], [], [], [obj.phi+180, obj.sf/p.trial.display.ppd, obj.contrast, obj.ori, obj.ori, 0, 0, 0]);
+%             Screen('DrawTexture', p.trial.display.ptr, obj.tex, [], [0 0 obj.dim], obj.ori, [], [], [], [], kPsychDontDoRotation, [obj.phi+180, obj.sf/p.trial.display.ppd, p.trial.display.ppd, obj.contrast, 0]);
             Screen('BlendFunction', p.trial.display.ptr, p.trial.display.sourceFactorNew, p.trial.display.destinationFactorNew);
 
         end

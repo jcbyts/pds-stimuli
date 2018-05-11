@@ -1,4 +1,4 @@
-function p=defaultHartleyTrial(p, state, sn)
+function p=hartleyTrialGazeContingentUpdating(p, state, sn)
 % Draw Hartley Stimuli, module for PLDAPS open reception
 
 if nargin<3
@@ -107,13 +107,25 @@ switch state
         p.trial.(sn).phi = nan(p.trial.(sn).maxFrames, 1);
         p.trial.(sn).tf  = nan(p.trial.(sn).maxFrames, 1);
         p.trial.(sn).sequenceFrame = 0;
+        p.trial.(sn).LastSwitch = 1;
+        p.trial.(sn).switchRefractoryPeriod = 4; % frames
+        p.trial.(sn).velocityThreshold = 100;
         
 	%--------------------------------------------------------------------------
     % --- Manage stimulus before frame draw
     case p.trial.pldaps.trialStates.framePrepareDrawing
         
         % increment sequence counter
-        p.trial.(sn).sequenceFrame = p.trial.(sn).sequenceFrame + 1;
+        if (p.trial.iFrame - p.trial.(sn).LastSwitch) > p.trial.(sn).switchRefractoryPeriod
+            pxfr = sqrt(diff(p.trial.behavior.eyeAtFrame(1,p.trial.iFrame+[-1 0])).^2 + diff(p.trial.behavior.eyeAtFrame(1,p.trial.iFrame+[-1 0])).^2);
+            degsec = pxfr/p.trial.display.ppd*p.trial.display.frate;
+            
+            if degsec > p.trial.(sn).velocityThreshold
+                p.trial.(sn).sequenceFrame = p.trial.(sn).sequenceFrame + p.trial.(sn).OnDuration; % skip to next frame
+                p.trial.(sn).LastSwitch = p.trial.iFrame;
+            end
+        end
+        
         
         if p.trial.(sn).sequenceFrame > 0    
             % In this default version, we will simply step through the sequence

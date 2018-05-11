@@ -32,7 +32,8 @@ settingsStruct.(sn).use = false;
 
 sn = 'hartley';
 % settingsStruct.(sn).stateFunction.name  = 'stimuli.modules.hartley.defaultHartleyTrial';
-settingsStruct.(sn).stateFunction.name  = 'stimuli.modules.hartley.hartleyTrialWeightedProbability';
+% settingsStruct.(sn).stateFunction.name  = 'stimuli.modules.hartley.hartleyTrialGazeContingentUpdating';
+settingsStruct.(sn).stateFunction.name  = 'stimuli.modules.hartley.gratingTrialGazeContingentUpdating';
 settingsStruct.(sn).stateFunction.order = -1; % draw before behavior
 settingsStruct.(sn).use = true;
 settingsStruct.(sn).pBlank = .5;
