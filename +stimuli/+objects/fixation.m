@@ -57,6 +57,7 @@ classdef fixation < stimuli.objects.target
     wincolor
     shrinkTimeConstant@double =nan;
     sz
+    maxRadius@double    = 50
   end
   
   methods (Access = public)
@@ -139,7 +140,7 @@ classdef fixation < stimuli.objects.target
               % exponential decay since last time on
               tt = p.trial.trstart + p.trial.ttime - o.log(2,end);
               
-              o.sz = max(exp(-tt/o.shrinkTimeConstant)*p.trial.display.pWidth, o.radius);
+              o.sz = max(exp(-tt/o.shrinkTimeConstant)*o.maxRadius, o.radius);
           else
               o.sz = o.radius;
           end
