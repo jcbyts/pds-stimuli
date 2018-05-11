@@ -1,0 +1,31 @@
+/*
+ * File: BetterSineGratingShader.frag.txt
+ * Shader for drawing of basic parameterized sine grating patches.
+ *
+ * (c) 2007 by Mario Kleiner, licensed under MIT license.
+ *		 
+ */
+
+uniform vec4 Offset;
+
+varying vec4  baseColor;
+varying float Phase;
+varying float FreqTwoPi;
+varying float Ori;
+
+void main()
+{
+    /* Query current output texel position: */
+    float posx = gl_TexCoord[0].x;
+    float posy = gl_TexCoord[0].y;
+
+    float pos = sin(Ori)*posy + cos(Ori)*posx;
+
+    /* Evaluate sine grating at requested position, frequency and phase: */
+    float sv = sin(pos * FreqTwoPi + Phase);
+
+    /* Multiply/Modulate base color and alpha with calculated sine            */
+    /* values, add some constant color/alpha Offset, assign as final fragment */
+    /* output color: */
+    gl_FragColor = (baseColor * sv) + Offset;
+}
