@@ -1,4 +1,4 @@
-function p=gratingTrialGazeContingentUpdating(p, state, sn)
+function p=gratingTrialRevco(p, state, sn)
 % Draw Hartley Stimuli, module for PLDAPS open reception
 
 if nargin<3
@@ -101,23 +101,18 @@ switch state
         p.trial.(sn).sequenceFrame = 0;
         p.trial.(sn).LastSwitch = 1;
         p.trial.(sn).switchRefractoryPeriod = 4; % frames
-        p.trial.(sn).velocityThreshold = 0;
         
 	%--------------------------------------------------------------------------
     % --- Manage stimulus before frame draw
     case p.trial.pldaps.trialStates.framePrepareDrawing
         
         % increment sequence counter
-        if (p.trial.iFrame - p.trial.(sn).LastSwitch) > p.trial.(sn).switchRefractoryPeriod
+        if (p.trial.iFrame - p.trial.(sn).LastSwitch) > p.trial.(sn).OnDuration
             
-            % detect eye movement
-            pxfr = sqrt(diff(p.trial.behavior.eyeAtFrame(1,p.trial.iFrame+[-1 0])).^2 + diff(p.trial.behavior.eyeAtFrame(1,p.trial.iFrame+[-1 0])).^2);
-            degsec = pxfr/p.trial.display.ppd*p.trial.display.frate;
+            % step in sequence
+            p.trial.(sn).sequenceFrame = p.trial.(sn).sequenceFrame + 1; % skip to next frame
+            p.trial.(sn).LastSwitch = p.trial.iFrame;
             
-            if degsec > p.trial.(sn).velocityThreshold
-                p.trial.(sn).sequenceFrame = p.trial.(sn).sequenceFrame + p.trial.(sn).OnDuration; % skip to next frame
-                p.trial.(sn).LastSwitch = p.trial.iFrame;
-            end
         end
         
         
@@ -131,7 +126,7 @@ switch state
             p.trial.(sn).phi(p.trial.iFrame) = seq.phi(p.trial.(sn).sequenceFrame);
             
             
-            p.trial.(sn).hHart.stimValue = p.trial.(sn).on(p.trial.iFrame);
+            p.trial.(sn).hHart.stimValue = double(p.trial.(sn).on(p.trial.iFrame));
             p.trial.(sn).hHart.ori       = p.trial.(sn).ori(p.trial.iFrame);
             p.trial.(sn).hHart.sf        = p.trial.(sn).sf(p.trial.iFrame);
             p.trial.(sn).hHart.tf        = p.trial.(sn).tf(p.trial.iFrame);
@@ -150,6 +145,10 @@ switch state
         
         % clear textures from graphics card memory
         p.trial.(sn).hHart.trialCleanup(p);
+        
+        p.trial.(sn) = rmfield(p.trial.(sn), 'sequence');
+        p.trial.(sn) = rmfield(p.trial.(sn), 'sfgrid');
+        p.trial.(sn) = rmfield(p.trial.(sn), 'origrid');
         
         % only save frames that were shown
         ix = 1:p.trial.iFrame;

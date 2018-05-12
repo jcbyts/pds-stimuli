@@ -115,7 +115,7 @@ switch state
 	%--------------------------------------------------------------------------
     % --- Manage stimulus before frame draw
     case p.trial.pldaps.trialStates.framePrepareDrawing
-        % In this default version of hartely, we will switch the stimulus
+        % In this default version of hartley, we will switch the stimulus
         % after a random delay that was set previously by the nextSwitch
         % variable
         
