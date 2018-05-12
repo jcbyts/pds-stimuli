@@ -35,8 +35,24 @@ sn = 'hartley';
 % settingsStruct.(sn).stateFunction.name  = 'stimuli.modules.hartley.hartleyTrialGazeContingentUpdating';
 settingsStruct.(sn).stateFunction.name  = 'stimuli.modules.hartley.gratingTrialGazeContingentUpdating';
 settingsStruct.(sn).stateFunction.order = -1; % draw before behavior
-settingsStruct.(sn).use = true;
+settingsStruct.(sn).use = false;
 settingsStruct.(sn).pBlank = .5;
+
+% sn = 'dotmapping';
+% settingsStruct.(sn).stateFunction.name  = 'stimuli.modules.mapping.DotApertureMapping';
+% settingsStruct.(sn).stateFunction.order = -1; % draw before behavior
+% settingsStruct.(sn).use = true;
+
+sn = 'MotionMapping';
+settingsStruct.pldaps.nosave = true; % don't save any files
+
+% settingsStruct.(sn).stateFunction.name  = 'stimuli.modules.mapping.DotMotionMapping';
+settingsStruct.(sn).stateFunction.name  = 'stimuli.modules.mapping.DotsFullFieldDirectionMapping';
+settingsStruct.(sn).stateFunction.order = 2;    % when to run this module with respect to other modules
+settingsStruct.(sn).use                 = true; % use this module    
+settingsStruct.(sn).onDuration = 20;
+settingsStruct.(sn).offDuration = 50;
+settingsStruct.(sn).dotContrast = -.05;
 
 sn = 'spatialSquares';
 settingsStruct.(sn).stateFunction.name  = 'stimuli.modules.mapping.spatialSquares';
