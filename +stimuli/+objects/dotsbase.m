@@ -39,9 +39,7 @@ classdef dotsbase < stimuli.objects.target % (Abstract) % should this be abstrac
         %   2 - round, anti-aliased dots (favour quality)
         %   3 - round, anti-aliased dots (built-in shader)
         %   4 - square dots (built-in shader)
-    end
-    
-    properties (GetAccess = public, SetAccess = protected)
+        
         % cartessian coordinates (relative to center of aperture?)
         x % x coords (pixels)
         y % y coords (pixels)
@@ -49,6 +47,10 @@ classdef dotsbase < stimuli.objects.target % (Abstract) % should this be abstrac
         % cartesian displacements
         dx % pixels per frame?
         dy % pixels per frame?
+    end
+    
+    properties (GetAccess = public, SetAccess = protected)
+        
         
         % frames remaining
         frameCnt
@@ -92,7 +94,7 @@ classdef dotsbase < stimuli.objects.target % (Abstract) % should this be abstrac
             
         end
         
-        function trialSetup(o, p)
+        function trialSetup(o, p, sn)
             o.initDots(1:o.numDots); % <-- provided by the derived class
             
             % initialise frame counts for limited dotLifetime dots
@@ -103,7 +105,7 @@ classdef dotsbase < stimuli.objects.target % (Abstract) % should this be abstrac
             end
         end
         
-        function frameDraw(o,p)
+        function frameDraw(o,p,sn)
             
             if ~o.stimValue
                 return
@@ -121,7 +123,7 @@ classdef dotsbase < stimuli.objects.target % (Abstract) % should this be abstrac
             
         end
         
-        function frameUpdate(o, ~)
+        function frameUpdate(o, ~,~)
             
             % decrement frame counters
             o.frameCnt = o.frameCnt - 1;
