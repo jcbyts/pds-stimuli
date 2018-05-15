@@ -82,14 +82,15 @@ switch state
         
         for kDots = 1:p.trial.(sn).nDotApertures
             
-            p.trial.(sn).hDots(kDots)               = stimuli.dotsUniform(p.trial.display.ptr);
+%             p.trial.(sn).hDots(kDots)               = stimuli.dotsUniform(p.trial.display.ptr);
+            p.trial.(sn).hDots(kDots)   = stimuli.objects.dotsUniform('position', p.trial.display.ctr(1:2), ...
+            'dotSize', 2, 'range', 0);
+        
             p.trial.(sn).hDots(kDots).dotSpeed      = 0;
             p.trial.(sn).hDots(kDots).dotSize       = .1 * p.trial.display.ppd;
             p.trial.(sn).hDots(kDots).dotDirection  = 0;
             p.trial.(sn).hDots(kDots).radius        = p.trial.(sn).apertureSize*p.trial.display.ppd;
             p.trial.(sn).hDots(kDots).dotLifetime   = inf;
-            p.trial.(sn).hDots(kDots).mode          = 0;
-            p.trial.(sn).hDots(kDots).dist          = 0;
             p.trial.(sn).hDots(kDots).range         = 0;
             
             x = rand(setupRNG)*p.trial.display.pWidth - p.trial.display.ctr(1);

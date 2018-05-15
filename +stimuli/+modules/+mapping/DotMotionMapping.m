@@ -86,7 +86,12 @@ switch state
         p.trial.(sn).rngs.conditionerRNG=RandStream(p.trial.(sn).rngs.randomNumberGenerater, 'seed', p.trial.(sn).rngs.trialSeeds(p.trial.pldaps.iTrial));
         setupRNG=p.trial.(sn).rngs.conditionerRNG;
         
-        p.trial.(sn).hDots = stimuli.objects.dotsUniform(p.trial.display.ptr);
+%         p.trial.(sn).hDots = stimuli.objects.dotsUniform(p.trial.display.ptr);
+         % --- Fixation Image Object
+        p.trial.(sn).hDots   = stimuli.objects.dotsUniform('position', p.trial.display.ctr(1:2), ...
+            'dotSize', 2, 'range', 50);
+        p.trial.(sn).hDots.radius = 100; % 20 pixel radius
+        
         nSpeeds = numel(p.trial.(sn).dotSpeeds);
         rnd = randi(setupRNG, nSpeeds);
         p.trial.(sn).speed = p.trial.(sn).dotSpeeds(rnd); % deg/sec
@@ -284,12 +289,12 @@ switch state
         
     case p.trial.pldaps.trialStates.trialCleanUpandSave
         %         if p.trial.(sn).on
-        ix=p.trial.iFrame:size(p.trial.(sn).x,1);
-        p.trial.(sn).x(ix,:)=[];
-        p.trial.(sn).y(ix,:)=[];
-        p.trial.(sn).direction(ix,:)=[];
-        p.trial.(sn).speed(ix,:)=[];
-        p.trial.(sn).size(ix,:)=[];
+        ix=1:p.trial.iFrame;
+        p.trial.(sn).x = p.trial.(sn).x(ix);
+        p.trial.(sn).y = p.trial.(sn).y(ix);
+        p.trial.(sn).direction = p.trial.(sn).direction(ix);
+        p.trial.(sn).speed = p.trial.(sn).speed(ix);
+        p.trial.(sn).size = p.trial.(sn).size(ix);
         %             p.trial.(sn).scale(ix,:)=[];
         %         end
         trialStart = numel(p.data)+1;
