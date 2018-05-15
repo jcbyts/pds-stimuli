@@ -23,7 +23,7 @@ settingsStruct.pldaps.trialMasterFunction='runModularTrial';
 
 % make everything bigger (viewdist scales the pixels per degree
 % calculation)
-settingsStruct.display.viewdist = 100; % cm
+% settingsStruct.display.viewdist = 100; % cm
 
 sn = 'csdFlash';
 settingsStruct.(sn).stateFunction.name  = 'stimuli.modules.csd.basicFlash';
