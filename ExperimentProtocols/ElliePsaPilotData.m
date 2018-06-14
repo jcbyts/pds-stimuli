@@ -36,11 +36,11 @@ pds.plotTiming(p)
 spatialSquaresOpts = struct();
 spatialSquaresOpts.N        = 2; % number of squares on each frame
 spatialSquaresOpts.lifetime = 2; % lifetime of squares frames
-% spatialSquaresOpts.position = [1 -1 5 -5]; % stimulus rect (in degrees) 
-% spatialSquaresOpts.size = .5;
+% spatialSquaresOpts.position = [1 -1 5 -5]; % stimulus rect (in degrpees) 
+% spatialSquaresOpts.size = .25;
 spatialSquaresOpts.position = [-5 5 5 -5]; % stimulus rect (in degrees) 
 spatialSquaresOpts.size = .5;
-spatialSquaresOpts.contrast = .65;
+spatialSquaresOpts.contrast = .75;
 
 p = runFixFlashSpatialMap('subject', subject,...
     'pauseBefore', pauseBeforeExperiment,...
