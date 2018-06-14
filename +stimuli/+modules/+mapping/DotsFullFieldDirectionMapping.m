@@ -179,7 +179,7 @@ switch state
         p.trial.(sn).on = p.trial.(sn).on(ix);
         
         p.trial.(sn) = rmfield(p.trial.(sn), 'sequence');
-        p.trial.(sn) = rmfield(p.trial.(sn), 'sequence');
+%         p.trial.(sn) = rmfield(p.trial.(sn), 'sequence');
         
         
 end

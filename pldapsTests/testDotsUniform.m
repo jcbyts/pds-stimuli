@@ -52,7 +52,14 @@ settingsStruct.pldaps.nosave = true; % don't save any files
 settingsStruct.(sn).stateFunction.name  = 'stimuli.modules.mapping.DotsFullFieldDirectionMapping';
 settingsStruct.(sn).stateFunction.order = 2;    % when to run this module with respect to other modules
 settingsStruct.(sn).use                 = true; % use this module    
+settingsStruct.(sn).onDuration = 40;
 settingsStruct.(sn).onDuration = 20;
+settingsStruct.(sn).numDirections = 12;         % number of directions (evenly spaced between 0 and 360)
+settingsStruct.(sn).dotSpeeds = 12;         % speeds (deg/sec)
+settingsStruct.(sn).dotSize =    .2;         % dot size (radius, degrees)
+settingsStruct.(sn).direction =     0;          % what is this for?
+settingsStruct.(sn).randomizeDirection = true;       % directions in random order (opposed to in sequence)
+settingsStruct.(sn).dotContrast = -.2;        % gray 
 
 % calling pldaps with @stimuli.pldapsDefaultTrial will make sure that
 % pldaps takes all the measurements that are required for our modules
