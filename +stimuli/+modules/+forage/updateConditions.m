@@ -1,3 +1,4 @@
+
 function p = updateConditions(p, sn)
 
 if nargin < 2

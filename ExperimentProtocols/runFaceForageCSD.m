@@ -24,7 +24,7 @@ settingsStruct = struct();
 
 settingsStruct.pldaps.useModularStateFunctions = true;
 settingsStruct.pldaps.trialMasterFunction      ='runModularTrial';
-settingsStruct.behavior.reward.defaultAmount   = 0.025; %.015;
+settingsStruct.behavior.reward.defaultAmount   = 0.02; %.015;
 
 settingsStruct.session.subject = ip.Results.subject;
 
