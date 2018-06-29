@@ -31,14 +31,13 @@ settingsStruct.session.experimentName = mfilename;
 
 %--------------------------------------------------------------------------
 % Add Mapping module module
-settingsStruct = struct(); % settingsStruct is a structure that modifies pldaps default parameters
+% settingsStruct = struct(); % settingsStruct is a structure that modifies pldaps default parameters
 sn = 'MotionMapping';
-settingsStruct.pldaps.nosave = true; % don't save any files
 
 % settingsStruct.(sn).stateFunction.name  = 'stimuli.modules.mapping.DotMotionMapping';
 settingsStruct.(sn).stateFunction.name  = 'stimuli.modules.mapping.DotsFullFieldDirectionMapping';
 settingsStruct.(sn).stateFunction.order = 2;    % when to run this module with respect to other modules
-settingsStruct.(sn).use                 = true; % use this module    
+settingsStruct.(sn).use                 = true; % use this module
 
 %--------------------------------------------------------------------------
 % Add natural background module
@@ -105,7 +104,7 @@ c{iCond}.(sn).onDuration          = 40;
 c{iCond}.(sn).offDuration         = 20;
 c{iCond}.(sn).numDirections       = 12;         % number of directions (evenly spaced between 0 and 360)
 c{iCond}.(sn).dotSpeeds           = 12;         % speeds (deg/sec)
-c{iCond}.(sn).dotSize             = .2;         % dot size (radius, degrees)
+c{iCond}.(sn).dotSize             = .3;         % dot size (radius, degrees)
 c{iCond}.(sn).direction           = 0;          % what is this for?
 c{iCond}.(sn).randomizeDirection  = true;       % directions in random order (opposed to in sequence)
 c{iCond}.(sn).dotContrast         = -.2;        % gray 
