@@ -20,10 +20,10 @@ ip.addParameter('pauseBefore', false)
 ip.addParameter('imageEveryNTrials', 4)
 ip.addParameter('imgDir', getpref('pep', 'colonyPics'))
 ip.addParameter('autoCorr', 'pBlank')
+ip.addParameter('settingsStruct', struct())
 ip.parse(varargin{:})
 
-% setup pldaps and testing modules
-settingsStruct = struct(); % settingsStruct is a structure that modifies pldaps default parameters
+settingsStruct = ip.Results.settingsStruct;
 
 settingsStruct.display.sourceFactorNew = GL_ONE;
 settingsStruct.display.destinationFactorNew = GL_ONE;
@@ -52,8 +52,8 @@ switch ip.Results.autoCorr
 end
 settingsStruct.(sn).stateFunction.order = -1; % draw before behavior
 settingsStruct.(sn).use = true;
-settingsStruct.(sn).OnDuration  = 2;
-settingsStruct.(sn).contrast    = .05;  % Michelson contrast of the gratings (DEPENDS ON BLEND FUNCTION)
+settingsStruct.(sn).OnDuration  = 4;
+settingsStruct.(sn).contrast    = .1;  % Michelson contrast of the gratings (DEPENDS ON BLEND FUNCTION)
 settingsStruct.(sn).tfs         = 0;   % temporal frequencies showns
 settingsStruct.(sn).nOctaves    = 5;   % number of octaves to show above base frequency
 settingsStruct.(sn).Freq0       = .2;  % Base frequence (cycles/deg)

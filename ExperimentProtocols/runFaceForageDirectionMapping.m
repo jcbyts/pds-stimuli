@@ -13,10 +13,10 @@ ip.addParameter('subject', 'jnk')
 ip.addParameter('pauseBefore', false)
 ip.addParameter('imageEveryNTrials', 4)
 ip.addParameter('imgDir', getpref('pep', 'colonyPics'))
+ip.addParameter('settingsStruct', struct())
 ip.parse(varargin{:})
 
-% setup pldaps and testing modules
-settingsStruct = struct(); % settingsStruct is a structure that modifies pldaps default parameters
+settingsStruct = ip.Results.settingsStruct;
 
 settingsStruct.display.sourceFactorNew = GL_ONE;
 settingsStruct.display.destinationFactorNew = GL_ONE;

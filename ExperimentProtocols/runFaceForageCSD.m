@@ -18,9 +18,10 @@ ip.addParameter('imageEveryNTrials', 4)
 ip.addParameter('onDuration', 50)
 ip.addParameter('offDuration', 150)
 ip.addParameter('imgDir', getpref('pep', 'colonyPics'))
+ip.addParameter('settingsStruct', struct())
 ip.parse(varargin{:})
 
-settingsStruct = struct();
+settingsStruct = ip.Results.settingsStruct;
 
 settingsStruct.pldaps.useModularStateFunctions = true;
 settingsStruct.pldaps.trialMasterFunction      ='runModularTrial';

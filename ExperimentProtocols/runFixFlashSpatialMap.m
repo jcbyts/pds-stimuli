@@ -24,10 +24,10 @@ ip.addParameter('fixPreStim', .01)
 ip.addParameter('staircaseFixation', false)
 ip.addParameter('fixationPoint', 'bullseye')
 ip.addParameter('spatialSquares', [])
+ip.addParameter('settingsStruct', struct())
 ip.parse(varargin{:})
 
-% setup pldaps and testing modules
-settingsStruct = struct(); % settingsStruct is a structure that modifies pldaps default parameters
+settingsStruct = ip.Results.settingsStruct;
 
 settingsStruct.pldaps.useModularStateFunctions = true;
 settingsStruct.pldaps.trialMasterFunction='runModularTrial';

@@ -1,11 +1,20 @@
-subject = 'Ellie'; %'test'
+subject = 'test'; %'test'
 pauseBeforeExperiment = false;
+
+settingsStruct = struct();
+
+%% if using digital dual purkinje eye tracker pilow
+sn = 'ddpi';
+settingsStruct.(sn).stateFunction.name = 'stimuli.modules.ddpi.ddpi';
+settingsStruct.(sn).stateFunction.order = -3;
+settingsStruct.(sn).use = true;
 
 %% Natural Image Free View: warm up
 
 p = runNaturalImageFreeView('subject', subject, ...
     'pauseBefore', pauseBeforeExperiment, ...
-    'imgDir', getpref('pep', 'colonyPics')); %#ok<*NASGU>
+    'imgDir', getpref('pep', 'colonyPics'), ...
+    'settingsStruct', settingsStruct);
 
 
 %% Face Forage with CSD
@@ -15,55 +24,59 @@ p = runFaceForageCSD('subject', subject, ...
     'onDuration', 50, ...
     'offDuration', 150, ...
 	'imgDir', getpref('pep', 'colonyPics'), ...
-    'imageEveryNTrials', 10);
+    'imageEveryNTrials', 10, ...
+    'settingsStruct', settingsStruct);
 
 %% Face Forage with Hartley
 p = runFaceForageHartley('subject', subject, ...
     'pauseBefore', pauseBeforeExperiment, ...
     'imageEveryNTrials', 15, ...
-    'autoCorr', 'pBlank');
+    'autoCorr', 'pBlank', ...
+    'settingsStruct', settingsStruct);
 
 %% Face Forage with Hartley
 p = runFaceForageHartley('subject', subject, ...
     'pauseBefore', pauseBeforeExperiment, ...
     'imageEveryNTrials', 15, ...
-    'autoCorr', 'pBlank');
+    'autoCorr', 'pBlank', ...
+    'settingsStruct', settingsStruct);
 
 pds.plotTiming(p)
 
 %% Fixation with spatial mapping
-
 spatialSquaresOpts = struct();
-spatialSquaresOpts.N        = 2; % number of squares on each frame
+spatialSquaresOpts.N        = 20; % number of squares on each frame
 spatialSquaresOpts.lifetime = 2; % lifetime of squares frames
 % spatialSquaresOpts.position = [1 -1 5 -5]; % stimulus rect (in degrpees) 
 % spatialSquaresOpts.size = .25;
 spatialSquaresOpts.position = [-5 5 5 -5]; % stimulus rect (in degrees) 
-spatialSquaresOpts.size = .5;
-spatialSquaresOpts.contrast = .75;
+spatialSquaresOpts.size = .1;
+spatialSquaresOpts.contrast = 1;
 
 p = runFixFlashSpatialMap('subject', subject,...
     'pauseBefore', pauseBeforeExperiment,...
     'spatialSquares', spatialSquaresOpts, ...
     'imageEveryNTrials', 60, ...
-    'fixationPoint', 'bullseye');
+    'fixationPoint', 'bullseye', ...
+    'settingsStruct', settingsStruct);
 
 
 %% Face Forage with spatial mapping
 
 spatialSquaresOpts = struct();
-spatialSquaresOpts.N        = 4; % number of squares on each frame
-spatialSquaresOpts.lifetime = 2; % lifetime of squares frames
+spatialSquaresOpts.N        = 40; % number of squares on each frame
+spatialSquaresOpts.lifetime = 1; % lifetime of squares frames
 % spatialSquaresOpts.position = [1 -1 5 -5]; % stimulus rect (in degrpees) 
 % spatialSquaresOpts.size = .25;
-spatialSquaresOpts.position = [-15 15 15 -15]; % stimulus rect (in degrees) 
-spatialSquaresOpts.size = 1;
-spatialSquaresOpts.contrast = .75;
+spatialSquaresOpts.position = [-10 10 10 -10]; % stimulus rect (in degrees) 
+spatialSquaresOpts.size = .1;
+spatialSquaresOpts.contrast = 1;
 
 p = runFaceForageSpatialMapping('subject', subject,...
     'pauseBefore', pauseBeforeExperiment,...
     'spatialSquares', spatialSquaresOpts, ...
-    'imageEveryNTrials', 10);
+    'imageEveryNTrials', 10, ...
+    'settingsStruct', settingsStruct);
 
 %% Presaccadic selection with gabors
 SingleTarget = 0;

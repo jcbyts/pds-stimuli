@@ -64,7 +64,7 @@ else
     settingsStruct.pldaps.pause.preExperiment = false;
 end
 
-
+settingsStruct = loadCalibration(settingsStruct);
 % try
 %     cm = getpref('marmoview_calibration', subject);
 %     cm2 = cm(:,:,1)';
