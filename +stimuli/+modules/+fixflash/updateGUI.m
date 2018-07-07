@@ -11,6 +11,10 @@ if nargin < 2
 end
 
 
+if ~p.trial.(sn).use
+    return
+end
+
 % only analyze trials that ran the fixflash protocol
 trialIx = cellfun(@(x) isfield(x, 'fixflash') & isfield(x.fixflash, 'error'), p.data);
 
@@ -43,17 +47,28 @@ handles.plots.textOutcome1.String   = num2str(handles.plots.outcomeBar.YData(2))
 handles.plots.textOutcome2.Position = [handles.plots.outcomeBar.XData(3) handles.plots.outcomeBar.YData(3) 0];
 handles.plots.textOutcome2.String   = num2str(handles.plots.outcomeBar.YData(3));
 
-handles.plots.fixScatter.XData = [cellfun(@(x) x.(sn).holdXY(1), p.data(trialIx)) p.trial.(sn).holdXY(1)];
-handles.plots.fixScatter.YData = [cellfun(@(x) x.(sn).holdXY(2), p.data(trialIx)) p.trial.(sn).holdXY(2)];
+hx = [cellfun(@(x) x.(sn).holdXY(1), p.data(trialIx)) p.trial.(sn).holdXY(1)];
+hy = [cellfun(@(x) x.(sn).holdXY(2), p.data(trialIx)) p.trial.(sn).holdXY(2)];
+hxy = [hx; hy];
 
-handles.plots.staircaseMin.XData = 1:p.trial.pldaps.iTrial;
-handles.plots.staircaseMax.XData = 1:p.trial.pldaps.iTrial;
+hxy = bsxfun(@minus, hxy, p.trial.(sn).hFix(1).position');
+hxy = pds.px2deg(hxy, p.trial.display.viewdist, p.trial.display.px2w);
+
+handles.plots.fixScatter.XData = hxy(1,:);
+handles.plots.fixScatter.YData = -hxy(2,:);
+
+tmpTrials = 1:p.trial.pldaps.iTrial;
+tmpTrials = tmpTrials(trialIx);
+tmpTrials = [tmpTrials p.trial.pldaps.iTrial];
+
 
 tmp1 = [cellfun(@(x) x.(sn).fixDuration, p.data(trialIx)) p.trial.(sn).minFixDuration];
 tmp1(tmp1 > 10) = nan;
+handles.plots.staircaseMin.XData = tmpTrials;
 handles.plots.staircaseMin.YData = tmp1;
 tmp2 = [cellfun(@(x) x.(sn).holdDuration, p.data(trialIx)) p.trial.(sn).holdDuration];
 tmp2(tmp2 > 10) = nan;
+handles.plots.staircaseMax.XData = tmpTrials;
 handles.plots.staircaseMax.YData = tmp2;
 
 time  = p.trial.timing.flipTimes(1,:) - p.trial.trstart;
@@ -98,6 +113,7 @@ eyexy = p.trial.behavior.eyeAtFrame;
 %         end
 %         
 %     end
+% end
     
     fpon = p.trial.(sn).states.getTxTime(0) - p.trial.trstart;
     fpentered = p.trial.(sn).states.getTxTime(1) - p.trial.trstart;
@@ -135,6 +151,17 @@ eyexy = p.trial.behavior.eyeAtFrame;
     xlabel(ax, 'Time (seconds')
     title(ax, 'Last Trial')
     
+%     ax = handles.Space;
+%     hxy = cell2mat(cellfun(@(x) x.(sn).holdXY, p.data(trialIx)', 'uni', false));
+%     hxy = [hxy; p.trial.(sn).holdXY];
+%     
+%     hxy = bsxfun(@minus, hxy', p.trial.(sn).hFix(1).position');
+%     hxy = pds.px2deg(hxy, p.trial.display.viewdist, p.trial.display.px2w)';
+%     
+%     hold(ax, 'off')
+%     plot(ax, hxy(:,1), hxy(:,2), '.'); 
+%     hold(ax, 'on');
+%     plot(ax, hxy(end,1), hxy(end,2), '.')
     
     guidata(hObj, handles)
     

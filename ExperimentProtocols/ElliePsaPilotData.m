@@ -4,10 +4,10 @@ pauseBeforeExperiment = false;
 settingsStruct = struct();
 
 %% if using digital dual purkinje eye tracker pilow
-sn = 'ddpi';
-settingsStruct.(sn).stateFunction.name = 'stimuli.modules.ddpi.ddpi';
-settingsStruct.(sn).stateFunction.order = -3;
-settingsStruct.(sn).use = true;
+% sn = 'ddpi';
+% settingsStruct.(sn).stateFunction.name = 'stimuli.modules.ddpi.ddpi';
+% settingsStruct.(sn).stateFunction.order = -3;
+% settingsStruct.(sn).use = true;
 
 %% Natural Image Free View: warm up
 
@@ -50,26 +50,27 @@ spatialSquaresOpts.lifetime = 2; % lifetime of squares frames
 % spatialSquaresOpts.position = [1 -1 5 -5]; % stimulus rect (in degrpees) 
 % spatialSquaresOpts.size = .25;
 spatialSquaresOpts.position = [-5 5 5 -5]; % stimulus rect (in degrees) 
-spatialSquaresOpts.size = .1;
+spatialSquaresOpts.size = .2;
 spatialSquaresOpts.contrast = 1;
 
 p = runFixFlashSpatialMap('subject', subject,...
     'pauseBefore', pauseBeforeExperiment,...
     'spatialSquares', spatialSquaresOpts, ...
-    'imageEveryNTrials', 60, ...
+    'imageEveryNTrials', 50, ...
     'fixationPoint', 'bullseye', ...
+    'staircaseFixation', true, ...
     'settingsStruct', settingsStruct);
 
 
 %% Face Forage with spatial mapping
 
 spatialSquaresOpts = struct();
-spatialSquaresOpts.N        = 40; % number of squares on each frame
+spatialSquaresOpts.N        = 20; % number of squares on each frame
 spatialSquaresOpts.lifetime = 1; % lifetime of squares frames
 % spatialSquaresOpts.position = [1 -1 5 -5]; % stimulus rect (in degrpees) 
 % spatialSquaresOpts.size = .25;
-spatialSquaresOpts.position = [-10 10 10 -10]; % stimulus rect (in degrees) 
-spatialSquaresOpts.size = .1;
+spatialSquaresOpts.position = [-20 20 20 -20]; % stimulus rect (in degrees) 
+spatialSquaresOpts.size = 1;
 spatialSquaresOpts.contrast = 1;
 
 p = runFaceForageSpatialMapping('subject', subject,...

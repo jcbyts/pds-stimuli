@@ -360,6 +360,9 @@ classdef butterfly < stimuli.objects.stimulus
             % calculate the cartesian distance from each object
             dist = sqrt( (xDeg - obj.x).^2 + (yDeg - obj.y).^2 );
             
+            % eliminate invisible faces
+            dist(obj.alpha == 0) = inf;
+            
             % find the objects that are being fixated. 
             iiHeld = dist < (obj.radius + obj.rewardWindow);
             
