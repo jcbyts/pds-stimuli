@@ -24,6 +24,7 @@ classdef spatialSquares < stimuli.objects.stimulus %#ok<*MCSUP>
         w2px            % scalar for converting from the world to pixel values (p.trial.display.w2px)
         viewdist        % view distance (p.trial.display.viewdist)
         life            % current life of each square
+        uniformLifetime % do all the squares update at the same time
     end
     
     methods % set methods
@@ -57,6 +58,7 @@ classdef spatialSquares < stimuli.objects.stimulus %#ok<*MCSUP>
             ip.addParameter('contrast',  [])  % contrast of the squares
             ip.addParameter('lifetime',  [])  % in frames
             ip.addParameter('gridded', false) % are the squares in a grid?
+            ip.addParameter('uniformLifetime', true)
             ip.parse(varargin{:});
             
             nextargs = [fieldnames(ip.Unmatched) struct2cell(ip.Unmatched)]';
@@ -68,6 +70,7 @@ classdef spatialSquares < stimuli.objects.stimulus %#ok<*MCSUP>
             obj.size        = ip.Results.size;
             obj.contrast    = ip.Results.contrast;
             obj.lifetime    = ip.Results.lifetime;
+            obj.uniformLifetime = ip.Results.uniformLifetime;
 
             % setup pldaps variables that are required for the degree 2 pixel computation    
             obj.ctr      = p.trial.display.ctr;
@@ -86,7 +89,12 @@ classdef spatialSquares < stimuli.objects.stimulus %#ok<*MCSUP>
             pUly    = obj.pxwin(2); % upper right corner
 
             % initialize squares
-            obj.life = randi(obj.rng, obj.lifetime, 1, obj.N); % lifetime
+            if obj.uniformLifetime
+                obj.life = repmat(obj.lifetime, 1, obj.N);
+            else
+                obj.life = randi(obj.rng, obj.lifetime, 1, obj.N); % lifetime
+            end
+            
             if obj.gridded
                 szpx  = obj.size * p.trial.display.ppd;
                 nGridX = ceil(pWidth/szpx);

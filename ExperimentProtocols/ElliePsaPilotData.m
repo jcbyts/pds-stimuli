@@ -1,9 +1,9 @@
-subject = 'test'; %'test'
+subject = 'test';% 'Ellie'; %'test'
 pauseBeforeExperiment = false;
 
 settingsStruct = struct();
 
-%% if using digital dual purkinje eye tracker pilow
+%% if using digital dual purkinje eye tracker pilot
 % sn = 'ddpi';
 % settingsStruct.(sn).stateFunction.name = 'stimuli.modules.ddpi.ddpi';
 % settingsStruct.(sn).stateFunction.order = -3;
@@ -43,15 +43,15 @@ p = runFaceForageHartley('subject', subject, ...
 
 pds.plotTiming(p)
 
-%% Fixation with spatial mapping
+%% Fixation with spatial mappingp
 spatialSquaresOpts = struct();
-spatialSquaresOpts.N        = 20; % number of squares on each frame
-spatialSquaresOpts.lifetime = 2; % lifetime of squares frames
+spatialSquaresOpts.N        = 4; % number of squares on each frame
+spatialSquaresOpts.lifetime = 8; % lifetime of squares frames
 % spatialSquaresOpts.position = [1 -1 5 -5]; % stimulus rect (in degrpees) 
 % spatialSquaresOpts.size = .25;
 spatialSquaresOpts.position = [-5 5 5 -5]; % stimulus rect (in degrees) 
-spatialSquaresOpts.size = .2;
-spatialSquaresOpts.contrast = 1;
+spatialSquaresOpts.size = .5;
+spatialSquaresOpts.contrast = .75;
 
 p = runFixFlashSpatialMap('subject', subject,...
     'pauseBefore', pauseBeforeExperiment,...
@@ -65,8 +65,8 @@ p = runFixFlashSpatialMap('subject', subject,...
 %% Face Forage with spatial mapping
 
 spatialSquaresOpts = struct();
-spatialSquaresOpts.N        = 20; % number of squares on each frame
-spatialSquaresOpts.lifetime = 1; % lifetime of squares frames
+spatialSquaresOpts.N        = 10; % number of squares on each frame
+spatialSquaresOpts.lifetime = 8; % lifetime of squares frames
 % spatialSquaresOpts.position = [1 -1 5 -5]; % stimulus rect (in degrpees) 
 % spatialSquaresOpts.size = .25;
 spatialSquaresOpts.position = [-20 20 20 -20]; % stimulus rect (in degrees) 
