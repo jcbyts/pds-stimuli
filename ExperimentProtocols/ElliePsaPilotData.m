@@ -1,4 +1,4 @@
-subject = 'test';% 'Ellie'; %'test'
+subject = 'Ellie';% 'Ellie'; %'test'
 pauseBeforeExperiment = false;
 
 settingsStruct = struct();
@@ -45,13 +45,14 @@ pds.plotTiming(p)
 
 %% Fixation with spatial mappingp
 spatialSquaresOpts = struct();
-spatialSquaresOpts.N        = 4; % number of squares on each frame
+spatialSquaresOpts.N        = 2; % number of squares on each frame
 spatialSquaresOpts.lifetime = 8; % lifetime of squares frames
 % spatialSquaresOpts.position = [1 -1 5 -5]; % stimulus rect (in degrpees) 
 % spatialSquaresOpts.size = .25;
-spatialSquaresOpts.position = [-5 5 5 -5]; % stimulus rect (in degrees) 
-spatialSquaresOpts.size = .5;
-spatialSquaresOpts.contrast = .75;
+%spatialSquaresOpts.position = [-5 5 5 -5]; % stimulus rect (in degrees) 
+spatialSquaresOpts.position = [4 2 12 -6];
+spatialSquaresOpts.size = 0.5;
+spatialSquaresOpts.contrast = 1.0;
 
 p = runFixFlashSpatialMap('subject', subject,...
     'pauseBefore', pauseBeforeExperiment,...
@@ -71,7 +72,7 @@ spatialSquaresOpts.lifetime = 8; % lifetime of squares frames
 % spatialSquaresOpts.size = .25;
 spatialSquaresOpts.position = [-20 20 20 -20]; % stimulus rect (in degrees) 
 spatialSquaresOpts.size = 1;
-spatialSquaresOpts.contrast = 1;
+spatialSquaresOpts.contmrast = 1;
 
 p = runFaceForageSpatialMapping('subject', subject,...
     'pauseBefore', pauseBeforeExperiment,...

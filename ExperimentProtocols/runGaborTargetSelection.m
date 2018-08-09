@@ -76,12 +76,12 @@ settingsStruct.(sn).stateFunction.order = 2;
 settingsStruct.(sn).use = true;
 
 settingsStruct.(sn).fixationBehavior = 'fixflash'; % pointer to the fixation behavior
-settingsStruct.(sn).RfCenterXy   =            [3, -3];
-settingsStruct.(sn).contrast=                 .25;
+settingsStruct.(sn).RfCenterXy   =            [8, -3];
+settingsStruct.(sn).contrast=                 .5;
 settingsStruct.(sn).tf=                       10;
-settingsStruct.(sn).sf=                       4;
+settingsStruct.(sn).sf=                       2;
 settingsStruct.(sn).numDirs=                  8;
-settingsStruct.(sn).CenterAngle=              [0 -90];
+settingsStruct.(sn).CenterAngle=              [0 -135];
 settingsStruct.(sn).rewardUpdateFun=          @stimuli.modules.dotselection.rewardUpdateSwitchRule;
  settingsStruct.(sn).rewardUpdateArgs=        {0.25};  % swap duration (only if single target)
 settingsStruct.(sn).rewardForFixation=        false;

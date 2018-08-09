@@ -52,7 +52,7 @@ switch ip.Results.autoCorr
 end
 settingsStruct.(sn).stateFunction.order = -1; % draw before behavior
 settingsStruct.(sn).use = true;
-settingsStruct.(sn).OnDuration  = 4;
+settingsStruct.(sn).OnDuration  = 6;
 settingsStruct.(sn).contrast    = .1;  % Michelson contrast of the gratings (DEPENDS ON BLEND FUNCTION)
 settingsStruct.(sn).tfs         = 0;   % temporal frequencies showns
 settingsStruct.(sn).nOctaves    = 5;   % number of octaves to show above base frequency
@@ -94,7 +94,7 @@ settingsStruct.(sn).maxContrast          = 1;            % contrast of the objec
 settingsStruct.(sn).radius               = 1;            % radius of the objects (deg)
 settingsStruct.(sn).onLifetime           = 1 * 120;      % time objects remain on (frames)
 settingsStruct.(sn).offLifetime          = 2 * 120;      % time objects remain off (frames)   
-settingsStruct.(sn).holdDuration         = 2;
+settingsStruct.(sn).holdDuration         = 1.5;
 
 if ip.Results.pauseBefore
     settingsStruct.pldaps.pause.preExperiment = true;
