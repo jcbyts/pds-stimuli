@@ -39,27 +39,20 @@ settingsStruct.session.experimentName = mfilename;
 %--------------------------------------------------------------------------
 % Add Hartley module
 sn = 'hartley';
-switch ip.Results.autoCorr
-    case 'exponential'
-        settingsStruct.(sn).stateFunction.name  = 'stimuli.modules.hartley.defaultHartleyTrial';
-        settingsStruct.(sn).OffDuration = 2;
-    case 'fixed'
-        settingsStruct.(sn).stateFunction.name  = 'stimuli.modules.hartley.hartleyTrialFixedDuration';
-        settingsStruct.(sn).OffDuration = 2;
-    case 'pBlank'
-        settingsStruct.(sn).stateFunction.name  = 'stimuli.modules.hartley.hartleyTrialWeightedProbability';
-        settingsStruct.(sn).pBlank = .2;
-end
+settingsStruct.(sn).stateFunction.name  = 'stimuli.modules.hartley.defaultHartleyTrial';
+
+settingsStruct.(sn).generativeModel = ip.Results.autoCorr;
+
+
 settingsStruct.(sn).stateFunction.order = -1; % draw before behavior
 settingsStruct.(sn).use = true;
-settingsStruct.(sn).OnDuration  = 6;
+settingsStruct.(sn).OnDuration  = 6; % if generative model is exponentialDecay or fixed
+settingsStruct.(sn).OffDuration = 2;
+settingsStruct.(sn).pBlank = .2;
 settingsStruct.(sn).contrast    = .1;  % Michelson contrast of the gratings (DEPENDS ON BLEND FUNCTION)
 settingsStruct.(sn).tfs         = 0;   % temporal frequencies showns
 settingsStruct.(sn).nOctaves    = 5;   % number of octaves to show above base frequency
 settingsStruct.(sn).Freq0       = .2;  % Base frequence (cycles/deg)
-
-% frozen seed
-settingsStruct.(sn).rngs.trialSeeds = repmat(666, 3e3, 1);
 
 %--------------------------------------------------------------------------
 % Add natural background module
@@ -111,7 +104,7 @@ p = pldaps(@stimuli.pldapsDefaultTrial, settingsStruct);
 % this is how we interleave trials with different combinations of modules.
 % We build a "condition" and then assign it to different trial numbers
 
-% --- Condition 1: Face Forage with CSD flash
+% --- Condition 1: Face Forage with hartley
 sn  = 'forage';
 iCond = 1;
 c{iCond} = struct(sn, struct());
@@ -160,6 +153,14 @@ condIdx = repmat(condNums, 1, ceil(p.defaultParameters.pldaps.finish/numel(condN
 
 for iTrial = (numel(p.data)+1):p.defaultParameters.pldaps.finish
     p.conditions{iTrial} = c{condIdx(iTrial)};
+end
+
+% --- insert frozen trials
+hartleyTrials = find(cellfun(@(x) x.hartley.use, p.conditions));
+nFrozenTrials = ceil(.1*numel(hartleyTrials));
+frozenTrials = randsample(hartleyTrials, nFrozenTrials, false);
+for iTrial = frozenTrials(:)'
+    p.conditions{iTrial}.hartley.generativeModel = 'frozen';
 end
 
 % --- Run
