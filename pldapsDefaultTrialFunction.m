@@ -146,12 +146,16 @@ end           % % % ****!!!!**** Moved overall function end below all subfunctio
             end
         end
         
-        %get analogData from Datapixx
+        % get analogData from Datapixx
         pds.datapixx.adc.getData(p);
 
-        %get eyelink data
+        % get arrington data
+        pds.arrington.get(p);
+        
+        % get eyelink data (will override arrington)
         pds.eyelink.getQueue(p); 
 
+        
         %get plexon spikes
         % pds.plexon.spikeserver.getSpikes(p);
         
@@ -370,6 +374,8 @@ end           % % % ****!!!!**** Moved overall function end below all subfunctio
         %-------------------------------------------------------------------------%
         % preallocate for all eye samples and event data from the eyelink
         pds.eyelink.startTrial(p);
+        
+        
         
         %%% Spike server
         %-------------------------------------------------------------------------%

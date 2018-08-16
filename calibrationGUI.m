@@ -98,7 +98,17 @@ if handles.p.trial.eyelink.use && handles.p.trial.eyelink.useAsEyepos
             handles.p.trial.eyelink.calibration_matrix(:,:,i) = cm';
         end
     end
-        
+elseif handles.p.trial.arrington.use && handles.p.trial.arrington.useAsEyepos
+    if ~isempty(handles.p.trial.arrington.calibration_matrix)
+        cm = handles.p.trial.arrington.calibration_matrix(:,:,handles.p.trial.arrington.eyeIdx)';
+    else
+        handles.p.trial.arrington.calibration_matrix=[];
+        for i = 1:2 % loop over eye index
+            % get subject specific calibration matrix
+            cm=getCalibrationPref(handles.p,1);
+            handles.p.trial.arrington.calibration_matrix(:,:,i) = cm';
+        end
+    end 
 end
 
 % this is temporary, need to query eye index to get the right calibration
@@ -426,9 +436,18 @@ function marmosetFaceCheckbox_Callback(hObject, eventdata, handles)
 
 % --- load up marmoset face textures
 function handles=loadMarmosetTextures(handles)
-MFL=load(fullfile(marmoview.supportDataDir,'MarmosetFaceLibrary.mat'));
-MFL = struct2cell(MFL);
-MFL = MFL([7,10,13,17:20,24,25,27]); % these faces seem most centered
+% MFL=load(fullfile(marmoview.supportDataDir,'MarmosetFaceLibrary.mat'));
+% MFL = struct2cell(MFL);
+% MFL = MFL([7,10,13,17:20,24,25,27]); % these faces seem most centered
+
+% load marmoset face textures (colony pics)
+facelib=getpref('pep', 'marmosetFaceLibrary');
+facelist = [dir(fullfile(facelib, '*.JPEG')) dir(fullfile(facelib, '*.jpg')) dir(fullfile(facelib, '*.JPG')) dir(fullfile(facelib, '*.png')) dir(fullfile(facelib, '*.PNG'))];
+nFaces = numel(facelist);
+MFL = cell(nFaces,1);
+for iFace = 1:nFaces
+    MFL{iFace} = imread(fullfile(facelib, facelist(iFace).name));
+end
 
 for id = 1:length(MFL)
   img = MFL{id};
@@ -513,10 +532,14 @@ if handles.p.trial.eyelink.use && handles.p.trial.eyelink.useAsEyepos
     handles.p.trial.eyelink.calibration_matrix(:,:,handles.p.trial.eyelink.eyeIdx)=cm';
 end
 
+if handles.p.trial.arrington.use && handles.p.trial.arrington.useAsEyepos
+    handles.p.trial.arrington.calibration_matrix(:,:,handles.p.trial.arrington.eyeIdx)=cm';
+end
+
 
 % --- get recent eye position values
 function [eye, raw]=getEye(p)
-if p.trial.eyelink.use
+if p.trial.eyelink.use && p.trial.eyelink.useAsEyepos
     sample=Eyelink('NewestFloatSample');
     eyeIdx=p.trial.eyelink.eyeIdx;
     if p.trial.eyelink.useRawData
@@ -526,6 +549,13 @@ if p.trial.eyelink.use
         eye=[p.trial.eyelink.gx(eyeIdx); p.trial.eyelink.gy(eyeIdx)];
         raw=eye;
     end
+elseif p.trial.arrington.use && p.trial.arrington.useAsEyepos
+    [x,y] = vpx_GetGazePoint;
+    raw = [x;y];
+    
+    eyeIdx=p.trial.arrington.eyeIdx;
+    
+    eye = p.trial.arrington.calibration_matrix(:,:,eyeIdx)*[raw;1];
 else
     [x,y]=GetMouse;
     eye=[x; y];
@@ -626,6 +656,8 @@ if isempty(cm)
     cm(:,:,2) = c;
 elseif p.trial.eyelink.use && p.trial.eyelink.useAsEyepos
     cm(:,:,p.trial.eyelink.eyeIdx) = c;
+elseif p.trial.arrington.use && p.trial.arrington.useAsEyepos
+    cm(:,:,p.trial.arrington.eyeIdx) = c;
 end
 
 setpref('marmoview_calibration', subj, cm)
@@ -637,6 +669,8 @@ cm=[];
 if p.trial.eyelink.use && p.trial.eyelink.useAsEyepos
 	% marmoview only has one eye
     cm=p.trial.eyelink.calibration_matrix(:,:,p.trial.eyelink.eyeIdx)';
+elseif p.trial.arrington.use && p.trial.arrington.useAsEyepos
+    cm=p.trial.arrington.calibration_matrix(:,:,p.trial.arrington.eyeIdx)'; 
 end
 
 % --- Update the current MarmoView Gains from a calibration matrix
