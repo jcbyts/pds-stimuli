@@ -76,10 +76,10 @@ settingsStruct.(sn).stateFunction.order = 2;
 settingsStruct.(sn).use = true;
 
 settingsStruct.(sn).fixationBehavior = 'fixflash'; % pointer to the fixation behavior
-settingsStruct.(sn).RfCenterXy   =            [8, -3];
+settingsStruct.(sn).RfCenterXy   =            [13, -5]; % RF was in the near periphery the week of 8/6/18
 settingsStruct.(sn).contrast=                 .5;
-settingsStruct.(sn).tf=                       10;
-settingsStruct.(sn).sf=                       2;
+settingsStruct.(sn).tf=                       4;  % picked some numbers based on near periphery in H.H. Yu et al 2010
+settingsStruct.(sn).sf=                       2; % picked some numbers based on H.H. Yu et al 2010
 settingsStruct.(sn).numDirs=                  8;
 settingsStruct.(sn).CenterAngle=              [0 -135];
 settingsStruct.(sn).rewardUpdateFun=          @stimuli.modules.dotselection.rewardUpdateSwitchRule;
