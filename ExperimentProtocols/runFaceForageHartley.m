@@ -8,7 +8,7 @@ function p = runFaceForageHartley(varargin)
 %   'imageEveryNTrials':    show natural image trial every N trials
 %   'imgDir':               full path to images (defaults to pictures of
 %                           colony)
-%   'autoCorr':             'fixed' or 'exponential'
+%   'autoCorr':             'pBlank' or 'exponentialDecay'
 %                           this specifies how the OnDuration and
 %                           OffDuration parameters are interpreted (as taus
 %                           of an exponential distribution, or as fixed
@@ -46,9 +46,9 @@ settingsStruct.(sn).generativeModel = ip.Results.autoCorr;
 
 settingsStruct.(sn).stateFunction.order = -1; % draw before behavior
 settingsStruct.(sn).use = true;
-settingsStruct.(sn).OnDuration  = 6; % if generative model is exponentialDecay or fixed
+settingsStruct.(sn).OnDuration  = 2; % if generative model is exponentialDecay or fixed
 settingsStruct.(sn).OffDuration = 2;
-settingsStruct.(sn).pBlank = .2;
+settingsStruct.(sn).pBlank = .5;
 settingsStruct.(sn).contrast    = .1;  % Michelson contrast of the gratings (DEPENDS ON BLEND FUNCTION)
 settingsStruct.(sn).tfs         = 0;   % temporal frequencies showns
 settingsStruct.(sn).nOctaves    = 5;   % number of octaves to show above base frequency

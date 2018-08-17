@@ -76,12 +76,12 @@ settingsStruct.(sn).stateFunction.order = 2;
 settingsStruct.(sn).use = true;
 
 settingsStruct.(sn).fixationBehavior = 'fixflash'; % pointer to the fixation behavior
-settingsStruct.(sn).RfCenterXy   =            [13, -5]; % RF was in the near periphery the week of 8/6/18
+settingsStruct.(sn).RfCenterXy   =            [13, -3.5]; % RF was in the near periphery the week of 8/6/18
 settingsStruct.(sn).contrast=                 .5;
 settingsStruct.(sn).tf=                       4;  % picked some numbers based on near periphery in H.H. Yu et al 2010
 settingsStruct.(sn).sf=                       2; % picked some numbers based on H.H. Yu et al 2010
 settingsStruct.(sn).numDirs=                  8;
-settingsStruct.(sn).CenterAngle=              [0 -135];
+settingsStruct.(sn).CenterAngle=              [0 30];
 settingsStruct.(sn).rewardUpdateFun=          @stimuli.modules.dotselection.rewardUpdateSwitchRule;
  settingsStruct.(sn).rewardUpdateArgs=        {0.25};  % swap duration (only if single target)
 settingsStruct.(sn).rewardForFixation=        false;
@@ -102,6 +102,8 @@ settingsStruct.(sn).iti=                      1.0;
 settingsStruct.(sn).rewardcount=              zeros(1,2); % two targets, only two states
 settingsStruct.(sn).rewardtravel=             4;          % must choose this many times before move
 settingsStruct.(sn).rewardtransit=            1.0;        % prob to transition reward state
+settingsStruct.(sn).dotApertureRadius=        norm(settingsStruct.(sn).RfCenterXy)/5;
+settingsStruct.(sn).targWinRadius=            settingsStruct.(sn).dotApertureRadius * 1.5;
 
 if (ip.Results.SingleTarget == 1)
   settingsStruct.(sn).stimVisible=              [1 0 1 0 0]; % single target shown    
