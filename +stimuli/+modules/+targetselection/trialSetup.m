@@ -1,19 +1,20 @@
 function trialSetup(p, sn)
 
-	if nargin < 2
-		sn = 'targetselection';
-	end
+if nargin < 2
+    sn = 'targetselection';
+end
 
-p.trial.pldaps.goodtrial = 0; % trial initializes as bad
+p.trial.pldaps.goodtrial = 1;
 
 % --- Useful constants
 ppd   = p.trial.display.ppd;        % pixels per degree (linear approximation)
 fps   = p.trial.display.frate;      % frames per second
-ctr   = p.trial.display.ctr(1:2);   % center of the screen (pixels)
+ctr   = p.trial.display.ctr(1:2);   % center of the screen
 
 % --- Random seed
 p.trial.(sn).rngs.conditionerRNG = RandStream(p.trial.(sn).rngs.randomNumberGenerater, 'seed', p.trial.(sn).rngs.trialSeeds(p.trial.pldaps.iTrial));
 setupRNG = p.trial.(sn).rngs.conditionerRNG;
+
 
 
 % -------------------------------------------------------------------------
@@ -44,9 +45,10 @@ else
 end
 
 % assign position to the fixation object
-p.trial.(sn).hFix.position      = [xpos ypos] * ppd + ctr;
+p.trial.(sn).hFix.position      = pds.deg2px([xpos; ypos], p.trial.display.viewdist, p.trial.display.w2px)' + ctr;
 % assign the radius of the window (for detecting fixation behavior)
-p.trial.(sn).hFix.winRadius  = p.trial.(sn).fixWinRadius * ppd;
+winRadPx = pds.deg2px(p.trial.(sn).fixWinRadius, p.trial.display.viewdist, p.trial.display.w2px);
+p.trial.(sn).hFix.winRadius  = winRadPx(1);
 p.trial.(sn).hFix.wincolor   = p.trial.display.clut.bg_white;
 
 
@@ -79,18 +81,16 @@ end
 p.trial.(sn).fixDurPostStim = p.trial.(sn).minFixPostStim + r; % depending on the order of the modules, might need to set fixDuration directly
 
 % -------------------------------------------------------------------------
-% DOTS: PROPERTIES
+% TARGETS: PROPERTIES
 
 % --- setup trial difficulty
 if p.trial.(sn).numBandwidths > 1
-    % randomly sample from the bandwidths
     rnd=randi(p.trial.(sn).numBandwidths, 1) / p.trial.(sn).numBandwidths;
     p.trial.(sn).bandwdth = (1-rnd) * p.trial.(sn).minBandwidth + rnd * p.trial.(sn).maxBandwidth; 
 end
 
-% --- setup targets
+% --- setup dots
 numApertures = numel(p.trial.(sn).hTargs);
-
 assert(numApertures==2, 'This code is not designed for more than 2 apertures')
 
 
@@ -98,8 +98,7 @@ for kTarg = 1:numApertures
     
     % ---------------------------------------------------------------------
     % IS DOTS?
-    % this if statement checks if the class of the hTarg object is a dotsbase. If it is, it will use dot parameters
-    if isa(p.trial.(sn).hTargs(kTarg), 'stimuli.objects.dotsbase')
+    if isa(p.trial.(sn).hTargs(kTarg), 'stimuli.objects.dotsbase') % dots
         % dot Range / Bandwidth
         p.trial.(sn).hTargs(kTarg).range  = p.trial.(sn).dotRange;
         % dot lifetime
@@ -114,10 +113,9 @@ for kTarg = 1:numApertures
         p.trial.(sn).hTargs(kTarg).radius    = p.trial.(sn).dotApertureRadius * ppd;
         % number of dots (integer value, calculate from dot density)
         p.trial.(sn).hTargs(kTarg).numDots = ceil(p.trial.(sn).dotDensity * pi * p.trial.(sn).dotApertureRadius^2 / fps);
-        
-        % calculate position (currently this is based on polar coordinates with respect to an "RF CENTER")
+        % calculate position
         [th, rho] = cart2pol(p.trial.(sn).RfCenterXy(1),p.trial.(sn).RfCenterXy(2));
-        th = th + p.trial.(sn).CenterAngle(kTarg)/180*pi;
+        th = th + p.trial.(sn).DotCenterAngle(kTarg)/180*pi;
         [xDeg, yDeg] = pol2cart(th, rho);
         p.trial.(sn).hTargs(kTarg).position    = [xDeg, -1*yDeg] * ppd + ctr;
     
@@ -152,10 +150,10 @@ for kTarg = 1:numApertures
         p.trial.(sn).hTargs(kTarg).theta = p.trial.(sn).direction(kTarg);
         
         p.trial.(sn).hTargs(kTarg).sf = p.trial.(sn).sf;
-        p.trial.(sn).hTargs(kTarg).sigma = p.trial.(sn).dotApertureRadius / 7.5; % divide by 7.5 because of standard deviations of a gaussian? why did this look right?
+        p.trial.(sn).hTargs(kTarg).sigma = p.trial.(sn).dotApertureRadius / 7.5;
         p.trial.(sn).hTargs(kTarg).contrast = p.trial.(sn).contrast;
         p.trial.(sn).hTargs(kTarg).tf = p.trial.(sn).tf;
-        p.trial.(sn).hTargs(kTarg).phase = rand(setupRNG)*360; % we're randomizing phase... do we want to
+        p.trial.(sn).hTargs(kTarg).phase = randi(360);
     end
         
     
@@ -163,8 +161,8 @@ end
 
 % (re-)initialize dots
 p.trial.(sn).dotRNG = rng();
-for kTarg = 1:numApertures
-    p.trial.(sn).hTargs(kTarg).trialSetup(p);
+for kDot = 1:numApertures
+    p.trial.(sn).hTargs(kDot).trialSetup(p);
 end
 
 % --- setup reward for the trial
@@ -174,7 +172,6 @@ end
 p.trial.(sn).isRewarded(1) = rand(setupRNG) < p.trial.(sn).rewardDot1Rate;
 p.trial.(sn).isRewarded(2) = rand(setupRNG) < p.trial.(sn).rewardDot2Rate;
 
-% assign a color to the window for each target depending on which one is rewarded
 for kTarg = 1:numel(p.trial.(sn).hTargs)
     p.trial.(sn).hTargs(kTarg).winRadius = p.trial.(sn).targWinRadius*p.trial.display.ppd;
     if p.trial.(sn).isRewarded(kTarg)
@@ -185,14 +182,8 @@ for kTarg = 1:numel(p.trial.(sn).hTargs)
 end
 
 %****************************
-% initialize some measurements of interest
-p.trial.(sn).holdXY = nan(1,2); % x,y position of fixation
-p.trial.(sn).holdDuration = 0;
 
-% --- Reward
-p.trial.(sn).error = 1; % default to "never obtained fixation"
 
-        
 % --- Face for aditional reward
 p.trial.(sn).hFace.texSize  = 2 * ppd;
 p.trial.(sn).hFace.position = ctr;
@@ -209,7 +200,7 @@ p.trial.(sn).states.addState(stimuli.modules.targetselection.state5_HoldChoice)
 p.trial.(sn).states.addState(stimuli.modules.targetselection.state7_BreakFixTimeout)
 p.trial.(sn).states.addState(stimuli.modules.targetselection.state8_InterTrialInterval)
 
-p.trial.(sn).states.setState(0); % initialize state
+p.trial.(sn).states.setState(0);
 
   % 'rewardcount',    p.trial.(sn).rewardcount, ...       % added JM
   % 'rewardtravel',   p.trial.(sn).rewardtravel, ...      % added JM
@@ -220,4 +211,3 @@ p.trial.(sn).frameFixationObtained = nan;
 p.trial.(sn).preStimWaitFrames     = round(p.trial.(sn).fixPreStimDuration * p.trial.display.frate);
 p.trial.(sn).dotsChosen            = nan;
 p.trial.(sn).rewardAmount          = p.trial.(sn).maxRewardCnt; % will be overwritten by the choice
-
