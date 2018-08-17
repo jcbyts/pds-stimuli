@@ -1,4 +1,4 @@
-subject = 'Ellie';% 'Ellie'; %'test'
+subject = 'test';% 'Ellie'; %'test'
 pauseBeforeExperiment = false;
 
 settingsStruct = struct();
@@ -16,6 +16,7 @@ p = runNaturalImageFreeView('subject', subject, ...
     'imgDir', getpref('pep', 'colonyPics'), ...
     'settingsStruct', settingsStruct);
 
+pds.plotTiming(p, true);
 
 %% Face Forage with CSD
 
@@ -34,14 +35,7 @@ p = runFaceForageHartley('subject', subject, ...
     'autoCorr', 'pBlank', ...
     'settingsStruct', settingsStruct);
 
-%% Face Forage with Hartley
-p = runFaceForageHartley('subject', subject, ...
-    'pauseBefore', pauseBeforeExperiment, ...
-    'imageEveryNTrials', 15, ...
-    'autoCorr', 'pBlank', ...
-    'settingsStruct', settingsStruct);
-
-pds.plotTiming(p)
+pds.plotTiming(p, true);
 
 %% Fixation with spatial mappingp
 spatialSquaresOpts = struct();
