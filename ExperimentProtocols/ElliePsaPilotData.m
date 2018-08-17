@@ -71,7 +71,7 @@ spatialSquaresOpts.lifetime = 8; % lifetime of squares frames
 % spatialSquaresOpts.position = [1 -1 5 -5]; % stimulus rect (in degrpees) 
 % spatialSquaresOpts.size = .25;
 spatialSquaresOpts.position = [-20 20 20 -20]; % stimulus rect (in degrees) 
-spatialSquaresOpts.size = .25; % made it smaller. let's see if this works -- Jake
+spatialSquaresOpts.size = 1; % made it smaller. let's see if this works -- Jake
 spatialSquaresOpts.contrast = 1;
 
 p = runFaceForageSpatialMapping('subject', subject,...
@@ -81,7 +81,7 @@ p = runFaceForageSpatialMapping('subject', subject,...
     'settingsStruct', settingsStruct);
 
 %% Presaccadic selection with gabors
-SingleTarget = 1;
+SingleTarget = 0;
 runGaborTargetSelection('subject', subject,...
     'pauseBefore', pauseBeforeExperiment,'SingleTarget', SingleTarget)
 
