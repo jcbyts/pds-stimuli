@@ -23,29 +23,64 @@ function p=runTrial(p,state, sn)
 % 01.06.2016 Jacob L. Yates <jacoby8s@gmail.com> - uses Shaun's class to run states
 
 if nargin<3
-    sn='stimulus';
+    sn='motionestimation';
 end
-
-% --- Gets Eye position and draws default overlays (grid, etc.)
-pldapsDefaultTrialFunction(p,state)
 
 % --- switch PLDAPS trial states
 switch state
 
-    % --- Prepare drawing (All behavior action happens here)
-    case p.trial.pldaps.trialStates.frameUpdate
+    % ---------------------------------------------------------------------
+    % --- What to do before opening the pldaps screen
+    case p.trial.pldaps.trialStates.experimentPreOpenScreen
+        % This code should be copied from protocol to protocol (I know.
+        % There should be a way to make this automatic, but can't think of
+        % an easy way)
         
-        % --- Update info in @dotMotionTrial object
-        if p.trial.(sn).hTrial.done
-            p.trial.flagNextTrial=true;
+        stimuli.setupDefaultFrameStates(p, sn)
+        
+        p = stimuli.setupRandomSeed(p, sn);
+
+        % --- handles that depend on pldaps being totally set up
+    case p.trial.pldaps.trialStates.experimentPostOpenScreen
+        
+        stimuli.modules.fixflash.defaultParameters(p, sn);      % default fixation parameters
+        stimuli.modules.targetselection.defaultParameters(p);   % default target parameters
+        
+        
+        % -------------------------------------------------------------------------
+        % --- setup stimulus objects
+        
+        % --- Fixation
+        if ~(isfield(p.trial.(sn), 'hFix') && isa(p.trial.(sn).hFix, 'stimuli.objects.target'))
+            fixXYdeg = [p.trial.(sn).fixationX; p.trial.(sn).fixationY];
+            fixXY = pds.deg2px(fixXYdeg, p.trial.display.viewdist, p.trial.display.w2px)';
+            p.trial.(sn).hFix   = stimuli.objects.fixation('position', fixXY);
         end
         
-        ctr = p.trial.display.ctr(1:2);
-        p.trial.(sn).hTrial.x = (p.trial.eyeX - ctr(1)) / p.trial.display.ppd;
-        p.trial.(sn).hTrial.y = -(p.trial.eyeY - ctr(2)) / p.trial.display.ppd;
+        % --- Face Textures
+        p.trial.(sn).hFace      = stimuli.objects.face(p);
+        p.trial.(sn).hFace.id   = p.trial.(sn).faceIndex;
+        
+        % --- Dots
+        if ~isfield(p.trial.(sn), 'hMot')
+            p.trial.(sn).hMot = stimuli.objects.dotsUniform(); % default motion is uniform range dots
+        end
+                
+        % --- Cue (for training, is gabor)
+        if ~isfield(p.trial.(sn), 'hCue')
+            p.trial.(sn).hCue  = stimuli.objects.gaborTarget('track', false);
+        end
 
-        % --- @dotMotionTrial/afterFrame handles all task state transitions
-        p.trial.(sn).hTrial.afterFrame(p.trial.ttime);
+
+    
+	% --- Called before the main trial loop. Sets up all parameters
+    case p.trial.pldaps.trialStates.trialSetup
+        
+        stimuli.dotmotion.trialSetup(p, sn);
+        
+        % --- Prepare drawing (All behavior action happens here)
+    case p.trial.pldaps.trialStates.frameUpdate
+        p.trial.(sn).states.frameUpdate(p, sn);
 
     % --- Draw task semantics using info from hTrial
     case p.trial.pldaps.trialStates.framePrepareDrawing
@@ -79,7 +114,7 @@ switch state
             
             % reward window
             th=p.trial.(sn).direction-p.trial.(sn).rewardWindow:p.trial.(sn).direction+p.trial.(sn).rewardWindow;
-            x=cosd(th);
+            x= cosd(th);
             y=-sind(th);
             winpolyx=[p.trial.(sn).choiceWinMinRadius*x p.trial.(sn).choiceWinMaxRadius*fliplr(x) p.trial.(sn).choiceWinMinRadius*x(1)]*p.trial.display.ppd;
             winpolyy=[p.trial.(sn).choiceWinMinRadius*y p.trial.(sn).choiceWinMaxRadius*fliplr(y) p.trial.(sn).choiceWinMinRadius*y(1)]*p.trial.display.ppd;
@@ -87,20 +122,15 @@ switch state
             Screen('FramePoly', p.trial.display.overlayptr, targColor, [winpolyx(:)+ctr(1), winpolyy(:)+ctr(2)]);
         end
         
-        if p.trial.(sn).hTrial.showFix
+        if p.trial.(sn).showFix
             fixRect = p.trial.display.ctr + kron(p.trial.(sn).fixWinRadius * p.trial.display.ppd,[-1, -1, +1, +1]);
             Screen('FrameOval', p.trial.display.overlayptr, fixClr, fixRect);
         end
     
-	% --- Called before the main trial loop. Sets up all parameters
-    case p.trial.pldaps.trialStates.trialSetup
-        
-        stimuli.dotmotion.trialSetup(p, sn);
-        
 	% --- All Screen() calls go here
     case p.trial.pldaps.trialStates.frameDraw
         
-        p.trial.stimulus.hTrial.beforeFrame;
+        p.trial.(sn).states.frameUpdate(p, sn);
     
 	% --- Cleanup and save all parameters
     case p.trial.pldaps.trialStates.trialCleanUpandSave
