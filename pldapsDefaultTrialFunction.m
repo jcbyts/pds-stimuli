@@ -376,7 +376,6 @@ end           % % % ****!!!!**** Moved overall function end below all subfunctio
         pds.eyelink.startTrial(p);
         
         
-        
         %%% Spike server
         %-------------------------------------------------------------------------%
 %         [p,spikes] = pds.plexon.spikeserver.getSpikes(p); %what are we dowing with the spikes???
@@ -431,10 +430,12 @@ end           % % % ****!!!!**** Moved overall function end below all subfunctio
         %-------------------------------------------------------------------------%
         pds.keyboard.clearBuffer(p);
         
-        %%% Eyelink Toolbox Setup %%%
+        %%% Eye Tracking%%%
         %-------------------------------------------------------------------------%
         % preallocate for all eye samples and event data from the eyelink
         pds.eyelink.startTrialPrepare(p);
+        
+        pds.arrington.startTrialPrepare(p);
 
 
         %%% START OF TRIAL TIMING %%
