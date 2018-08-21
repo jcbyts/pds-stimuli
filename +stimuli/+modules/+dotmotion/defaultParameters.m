@@ -1,82 +1,83 @@
 function defaultParameters(p, sn)
 
 if nargin < 2
-    sn='targetselection';
+    sn='dotmotion';
 end
 
 
-% --- Stimulus parameters
-defaultArgs.bgColour 	   = .5; % pldaps controls this when the screen is opened
-
-% --- Dot parameters
-defaultArgs.size			     = 0.2; 	 % dot size (diameter; deg)
-defaultArgs.speed 			   = 8.0; 	 % dot speed (deg/sec) 
-defaultArgs.numDots 		   = 35;    % TODO: should this be density?
-defaultArgs.contrast 	     = -0.15;
-defaultArgs.mode 			     = 1; % motion sampled from a distribution
-defaultArgs.dist 			     = 1; % make it a gaussian distribution
-defaultArgs.bandwdth 		   = 0.0;
-defaultArgs.maxBandwidth 	 = 0.0;
-defaultArgs.minBandwidth 	 = 0.0;
-defaultArgs.numBandwidths  = 1;
-defaultArgs.lifetime 		   = 5; % frames
-defaultArgs.stimWinRadius  = 3.5;
-defaultArgs.numDirs 		   = 16;
-defaultArgs.xDeg 			     = 0.0; % Aperture x position (degrees)
-defaultArgs.yDeg 			     = 0.0; % Aperture y position (degrees)
+% --- Motion parameters
+defaultArgs.motion.dotSize          = 0.2; 	 % dot size (diameter; deg)
+defaultArgs.motion.dotSpeed 		= 8.0; 	 % dot speed (deg/sec) 
+defaultArgs.motion.numDots          = 35;     % TODO: should this be density?
+defaultArgs.motion.dotContrast 	    = -0.15;
+defaultArgs.motion.dotLifetime      = 5; % frames
+defaultArgs.motion.bandwidth 		= 0.0;
+defaultArgs.motion.maxBandwidth 	= 0.0;
+defaultArgs.motion.minBandwidth 	= 0.0;
+defaultArgs.motion.numBandwidths    = 1;
+defaultArgs.motion.numDirs          = 16;
+defaultArgs.motion.radius           = 3.5;
+defaultArgs.motion.xPos             = 0.0; % Aperture x position (degrees)
+defaultArgs.motion.yPos             = 0.0; % Aperture y position (degrees)
+defaultArgs.motion.hMot             = stimuli.objects.dotsUniform(); % default motion is uniform range dots
 
 % --- Fixation point
-defaultArgs.fixPointRadius  = 0.3;  % radius of the fixation point
-defaultArgs.fixPointDim	    = 0.1; % dimming of fixation point (0 invisible)
-defaultArgs.fixWinRadius 	  = 1.8;
-defaultArgs.fixFlashCnt 	  = round(0.250*p.trial.display.frate);
+defaultArgs.fixation.radius     = 0.3;  % radius of the fixation point
+defaultArgs.fixation.dim        = 0.1; % dimming of fixation point (0 invisible)
+defaultArgs.fixation.winRadius  = 1.8;
+defaultArgs.fixation.flashCnt 	= round(0.250*p.trial.display.frate);
+defaultArgs.fixation.hFix       = stimuli.objects.fixation('position', p.trial.display.ctr(1:2));
 
 % --- Reward
-defaultArgs.rewardWindow   = 30.0; % angular width (at half-height)
-defaultArgs.maxRewardCnt   = 4;
-defaultArgs.bonusDirection = 0;
-defaultArgs.bonusWindow    = 100.0;
-defaultArgs.bonusRewardCnt = 0;
+defaultArgs.reward.windowWidth  = 30.0; % angular width (at half-height)
+defaultArgs.reward.maxNumber    = 4;
+defaultArgs.reward.amount       = p.trial.behavior.reward.defaultAmount;
+defaultArgs.reward.function     = @(err, widthParam) ceil( exp( -err.^2/2*widthParam^2));
 
 % --- Cue / Targets / Feedback
-defaultArgs.cueApertureRadius        = 1;
-defaultArgs.cueApertureContrast      = -0.25;
+defaultArgs.cue.show            = true;
+defaultArgs.cue.radius          = 1;
+defaultArgs.cue.contrast        = -0.25;
+defaultArgs.cue.hCue            = stimuli.objects.gaborTarget('track', false);
 
-defaultArgs.feedbackApertureRadius   = 1.8; % radius of the feedback aperture shown on incorrect trials (deg.)
-defaultArgs.feedbackApertureContrast = -0.5;  
+% --- trial feedback
+defaultArgs.feedback.show       = true; % show feedback
+defaultArgs.feedback.radius     = 1.8;  % radius of the feedback aperture shown on incorrect trials (deg.)
+defaultArgs.feedback.contrast   = -0.5;
+defaultArgs.feedback.faceIndex  = 1;
+defaultArgs.feedback.hFace      = stimuli.objects.face(p);
+defaultArgs.feedback.hErr       = stimuli.objects.circles();
 
-defaultArgs.choiceTargetRadius       = 0.3; % deg
-defaultArgs.choiceTargetContrast     = 0.075;
-defaultArgs.choiceCueWidth           = 6;    % deprecated 
-defaultArgs.choiceErrWidth           = 12;   % width of circle that shows where correct choice was
-defaultArgs.choiceWinMinRadius       = 3.5;
-defaultArgs.choiceWinMaxRadius       = 7;
-
-defaultArgs.faceIndex                = 1;
+% --- Choice targets
+defaultArgs.targets.radius       = 0.3;    % radius of the choice targets (if individual circles, 1/2 width if a ring)
+defaultArgs.targets.contrast     = 0.25;   % contrast of the targets
+defaultArgs.targets.windowMinEcc = 3.5;    % minimum saccade length for acceptence
+defaultArgs.targets.windowMaxEcc = 7;      % maximum saccade length for acceptence
+defaultArgs.targets.hTargs       = stimuli.objects.circles('position', p.trial.display.ctr(1:2));
 
 % --- Timing
-defaultArgs.fixGracePeriod     = 0.050;
-defaultArgs.minFixDuration     = 0.200;
-defaultArgs.maxFixDuration     = 0.400;
-defaultArgs.stimDuration       = 0.600; % Dots max duration
-defaultArgs.holdDuration       = 0.1;   % seconds (wrt dot motion onset)
-defaultArgs.minCueDelay 			 = 0.30;  % wrt to dot motion onset (seconds)
-defaultArgs.maxCueDelay 			 = 0.70;  % wrt to dot motion onset (seconds)
-defaultArgs.choiceTargetDelay  = 0;     % wrt to XX
-defaultArgs.choiceGracePeriod  = 1.4;   % grace period (aka flight time; sec)
-defaultArgs.choiceDuration 		 = 0.025; % seconds (minimum choice hold duration)
-defaultArgs.choiceTimeout 		 = 1.0;  % seconds
-defaultArgs.trialTimeout 		   = 4.0;  % seconds
+defaultArgs.timing.fixGracePeriod     = 0.050;
+defaultArgs.timing.minFixDuration     = 0.200;
+defaultArgs.timing.maxFixDuration     = 0.400;
+defaultArgs.timing.stimDuration       = 0.600; % Dots max duration
+defaultArgs.timing.holdDuration       = 0.1;   % seconds (wrt dot motion onset)
+defaultArgs.timing.minCueOnset        = 0.30;  % wrt to dot motion onset (seconds)
+defaultArgs.timing.maxCueOnset        = 0.70;  % wrt to dot motion onset (seconds)
+defaultArgs.timing.choiceTargetOnset  = 0;     % wrt to XX
+defaultArgs.timing.choiceGracePeriod  = 1.4;   % grace period (aka flight time; sec)
+defaultArgs.timing.choiceHold 		  = 0.025; % seconds (minimum choice hold duration)
+defaultArgs.timing.choiceWaitTimeout  = 1.0;  % seconds
+defaultArgs.timing.trialTimeout       = 4.0;  % seconds
 
-% NEEDS  dots, fix , face, cue
-argfields = fieldnames(defaultArgs);
+requiredFields = {'motion', 'fixation', 'reward', 'cue', 'feedback', 'targets', 'timing'};
 
-for iArg = 1:numel(argfields)
-    
-    field = argfields{iArg};
-    val   = defaultArgs.(argfields);
-    
-    if ~isfield(p.trial.(sn), field)
-        p.trial.(sn).(field) = val;
+for iReq = 1:numel(requiredFields)    
+    reqField = requiredFields{iReq};
+    if ~isfield(p.trial.(sn), reqField)
+        p.trial.(sn).(reqField) = defaultArgs.(reqField);
+    else
+        p.trial.(sn).(reqField) = dvmergefield(p.trial.(sn).(reqField), defaultArgs.(reqField), true);
     end
 end
+        
+

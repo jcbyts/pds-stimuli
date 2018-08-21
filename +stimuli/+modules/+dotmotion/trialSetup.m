@@ -11,51 +11,85 @@ fps   = p.trial.display.frate;      % frames per second
 ctr   = p.trial.display.ctr(1:2);   % center of the screen
 
 % --- Set Fixation Point Properties    
-sz = p.trial.(sn).fixPointRadius * ppd;
-p.trial.(sn).hFix(1).cSize      = sz;
-p.trial.(sn).hFix(1).sSize      = 2*sz;
-p.trial.(sn).hFix(1).cColour    = zeros(1,3);
-p.trial.(sn).hFix(1).sColour    = ones(1,3);
-p.trial.(sn).hFix(1).position   = [0,0] * ppd + p.trial.display.ctr(1:2);
-
-p.trial.(sn).hFix(2).cSize      = sz;
-p.trial.(sn).hFix(2).sSize      = 2*sz;
-p.trial.(sn).hFix(2).cColour    = p.trial.display.bgColor + p.trial.(sn).fixPointDim;
-p.trial.(sn).hFix(2).sColour    = p.trial.display.bgColor + p.trial.(sn).fixPointDim;
-p.trial.(sn).hFix(2).position   = [0,0] * ppd + ctr;
+sz = p.trial.(sn).fixation.radius * ppd;
+p.trial.(sn).fixation.hFix.radius      = sz;
+p.trial.(sn).fixation.hFix.ctrColor    = p.trial.display.clut.black;
+p.trial.(sn).fixation.hFix.color       = p.trial.display.clut.white;
+p.trial.(sn).fixation.hFix.position   = [0,0] * ppd + p.trial.display.ctr(1:2);
 
 % --- Random seed
 p.trial.(sn).rngs.conditionerRNG=RandStream(p.trial.(sn).rngs.randomNumberGenerater, 'seed', p.trial.(sn).rngs.trialSeeds(p.trial.pldaps.iTrial));
+
 setupRNG=p.trial.(sn).rngs.conditionerRNG;
 
 % fixation duration
 rnd=rand(setupRNG);
-p.trial.(sn).fixDuration = (1 - rnd) * p.trial.(sn).minFixDuration + rnd * p.trial.(sn).maxFixDuration;
-% cue delay
+p.trial.(sn).timing.fixDuration = (1 - rnd) * p.trial.(sn).timing.minFixDuration + rnd * p.trial.(sn).timing.maxFixDuration;
+
+% cue delay (uniform distribution)
 rnd=rand(setupRNG);
-p.trial.(sn).cueDelay = (1-rnd) * p.trial.(sn).minCueDelay + rnd * p.trial.(sn).maxCueDelay;
+p.trial.(sn).timing.cueOnset = (1-rnd) * p.trial.(sn).timing.minCueOnset + rnd * p.trial.(sn).timing.maxCueOnset;
 
 % --- setup trial difficulty (FIX ME: move these to a proper condition struct)
-if p.trial.(sn).numBandwidths > 1
-    rnd=randi(p.trial.(sn).numBandwidths, 1) / p.trial.(sn).numBandwidths;
-    p.trial.(sn).bandwdth = (1-rnd) * p.trial.(sn).minBandwidth + rnd * p.trial.(sn).maxBandwidth; 
+if ~isfield(p.trial.(sn).motion, 'bandwidth') % need to set difficulty parameter
+    switch class(p.trial.(sn).motion.hMot)
+        case {'stimuli.objects.dotsbase', 'stimuli.objects.dotsUniform'}
+            
+            rnd=randi(setupRNG, p.trial.(sn).motion.numBandwidths, 1) / p.trial.(sn).motion.numBandwidths;
+            p.trial.(sn).motion.bandwidth = (1-rnd) * p.trial.(sn).minBandwidth + rnd * p.trial.(sn).maxBandwidth;
+            
+        otherwise
+            error('trialSetup: I don''t recognize this type of motion stimulus')
+    end
+    
 end
 
-% --- setup dots
+
+% --- Draw Direction
+trialDirection = 0;
+warning('trialSetup: trialDirection needs to be set with a condition or a directionprior object!!')
+% --- setup motion
+switch class(p.trial.(sn).motion.hMot)
+    case 'stimuli.objects.dotsUniform'
+        % setup dot color in CLUT
+        
+        p.trial.(sn).motion.hMot.dotSize    = p.trial.(sn).motion.dotSize  * ppd; % pixels
+        p.trial.(sn).motion.hMot.dotSpeed
+        
+        % set the dot color using the color lookup table (for overlay)
+        clutIx = pds.pldaps.draw.getOpenClutEntries(p, 1);
+        p.trial.display.humanCLUT(clutIx+1,:)  = p.trial.(sn).motion.dotContrast * [1 1 1] + .5;
+        p.trial.display.monkeyCLUT(clutIx+1,:) = p.trial.(sn).motion.dotContrast * [1 1 1] + .5;
+        p.trial.display.clut.dotColor = clutIx*ones(size(p.trial.display.clut.bg));
+        
+        p.trial.(sn).motion.hMot.dotColor     = p.trial.display.clut.dotColor;
+        
+        p.trial.(sn).motion.hMot.dotDirection = trialDirection;
+        
+        % do not treat as a target (e.g., check for fixations)
+        p.trial.(sn).motion.hMot.tracked = false;
+        
+        xy = [p.trial.(sn).motion.xPos; p.trial.(sn).motion.yPos];
+        p.trial.(sn).motion.hMot.position = pds.deg2px(xy, p.trial.display.viewdist, p.trial.display.w2px)' + p.trial.display.ctr(1:2);
+        
+        
+    otherwise
+        error('trialSetup: I don''t recognize this type of motion stimulus')
+end
+        t
 fnames = {'numDots', 'bandwdth', 'mode', 'dist', 'lifetime'};
 for f = fnames
     p.trial.(sn).hDots.(f{1}) = p.trial.(sn).(f{1});
 end
 
-p.trial.(sn).hDots.size         = p.trial.(sn).size * ppd; % pixels
-p.trial.(sn).hDots.speed        = p.trial.(sn).speed * ppd / fps; % pixels/frame
-p.trial.(sn).hDots.maxRadius    = p.trial.(sn).stimWinRadius * ppd;
+
 
 p.trial.(sn).hDots.position     = [p.trial.(sn).xDeg, -1*p.trial.(sn).yDeg] * ppd + ctr;
 p.trial.(sn).hDots.colour       = p.trial.display.bgColor + p.trial.(sn).contrast;
 
 % --- setup conditions
 n = p.trial.(sn).numDirs; % number of directions/choice targets
+
 p.trial.(sn).direction = ceil(rand(setupRNG)*n)/n*360;
 p.trial.(sn).hDots.direction = p.trial.(sn).direction;
 

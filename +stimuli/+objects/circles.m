@@ -23,23 +23,21 @@ classdef circles < stimuli.objects.stimulus
 
     end
 
-    function setup(p)
-
-    end
-
-    function frameUpdate()
-
+    function frameUpdate(~, varargin)
+        % do nothing
     end
 
     function frameDraw(o, p)
-
-      r = o.radius; % radius in pixels
+      if o.stimValue
+        r = o.radius; % radius in pixels
       
-      rect = kron([1,1],o.position) + kron(r(:),[-1, -1, +1, +1]);
-      if o.weight > 0,
-        Screen('FrameOval', p.trial.display.overlayptr, o.color, rect', o.weight);
-      else,
-        Screen('FillOval', p.trial.display.overlayptr, o.color, rect');
+        rect = kron([1,1],o.position) + kron(r(:),[-1, -1, +1, +1]);
+        if o.weight > 0,
+            Screen('FrameOval', p.trial.display.overlayptr, o.color, rect', o.weight);
+        else
+            Screen('FillOval', p.trial.display.overlayptr, o.color, rect');
+        end
+        
       end
       
       if 0, % for debugging...

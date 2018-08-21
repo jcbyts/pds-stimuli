@@ -23,7 +23,7 @@ function p=runTrial(p,state, sn)
 % 01.06.2016 Jacob L. Yates <jacoby8s@gmail.com> - uses Shaun's class to run states
 
 if nargin<3
-    sn='motionestimation';
+    sn='dotmotion';
 end
 
 % --- switch PLDAPS trial states
@@ -43,43 +43,17 @@ switch state
         % --- handles that depend on pldaps being totally set up
     case p.trial.pldaps.trialStates.experimentPostOpenScreen
         
-        stimuli.modules.fixflash.defaultParameters(p, sn);      % default fixation parameters
-        stimuli.modules.targetselection.defaultParameters(p);   % default target parameters
+        stimuli.modules.dotmotion.defaultParameters(p);   % default target parameters
         
-        
-        % -------------------------------------------------------------------------
-        % --- setup stimulus objects
-        
-        % --- Fixation
-        if ~(isfield(p.trial.(sn), 'hFix') && isa(p.trial.(sn).hFix, 'stimuli.objects.target'))
-            fixXYdeg = [p.trial.(sn).fixationX; p.trial.(sn).fixationY];
-            fixXY = pds.deg2px(fixXYdeg, p.trial.display.viewdist, p.trial.display.w2px)';
-            p.trial.(sn).hFix   = stimuli.objects.fixation('position', fixXY);
-        end
-        
-        % --- Face Textures
-        p.trial.(sn).hFace      = stimuli.objects.face(p);
-        p.trial.(sn).hFace.id   = p.trial.(sn).faceIndex;
-        
-        % --- Dots
-        if ~isfield(p.trial.(sn), 'hMot')
-            p.trial.(sn).hMot = stimuli.objects.dotsUniform(); % default motion is uniform range dots
-        end
-                
-        % --- Cue (for training, is gabor)
-        if ~isfield(p.trial.(sn), 'hCue')
-            p.trial.(sn).hCue  = stimuli.objects.gaborTarget('track', false);
-        end
-
-
     
 	% --- Called before the main trial loop. Sets up all parameters
     case p.trial.pldaps.trialStates.trialSetup
         
-        stimuli.dotmotion.trialSetup(p, sn);
+        stimuli.modules.dotmotion.trialSetup(p, sn);
         
         % --- Prepare drawing (All behavior action happens here)
     case p.trial.pldaps.trialStates.frameUpdate
+        
         p.trial.(sn).states.frameUpdate(p, sn);
 
     % --- Draw task semantics using info from hTrial
