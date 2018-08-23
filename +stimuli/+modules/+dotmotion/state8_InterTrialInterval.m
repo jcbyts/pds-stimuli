@@ -1,85 +1,35 @@
-classdef state8_InterTrialInterval < stimuli.state
-  % state 8 - inter-trial interval
-  
-  % 07-07-2016 - Shaun L. Cloherty <s.cloherty@ieee.org>
-  
+classdef state8_InterTrialInterval < stimuli.objects.state
+  % state 8 - inter trial interval
+ 
+  % TODO: maybe just use sc.getTxTime instead of s.tStart??
   properties
-    tStart = NaN; % 'start' time
-    
-    rewardCnt = 0; % the number of reward(s) delivered...
-    
-    showFace = false; % show face, for additional reward?
-    
-    plotFlag = false; % urgh! true after we've updated the gui
   end
   
   methods (Access = public)
-    function s = state8_InterTrialInterval(hTrial,varargin)
+    function s = state8_InterTrialInterval(varargin)
       fprintf(1,'%s\n',mfilename);
       
-      s = s@stimuli.state(8,hTrial); % call the parent constructor
+      s = s@stimuli.objects.state(8); % call the parent constructor
     end
     
-    function beforeFrame(s)
-%       fprintf(1,'dotMotionState8.beforeFrame()\n');
-      
-      hTrial = s.hTrial;
-
-      if hTrial.rewardCnt > 0
-        s.showFace = true;
-      end
-
-      if hTrial.showChoice
-        hTrial.hChoice.beforeFrame();
-      end
-      
-      if s.showFace
-        hTrial.hFace.beforeFrame(); % show face...
-      else
-        hTrial.hCue.beforeFrame(); % draw the *correct* choice cue
-      end
+    function frameDraw(~,~,~)
+        % do nothing
     end
     
-    function afterFrame(s,t)
-%       fprintf(1,'dotMotionState8.afterFrame()\n');
-      
-      hTrial = s.hTrial;
-          
-      if isnan(s.tStart) % <-- first frame
-        s.tStart = t;
-        hTrial.setTxTime(t);
-      end
-
-      if (hTrial.rewardCnt > 0)
-        if t > (s.tStart + 0.2*s.rewardCnt)
-%           hTrial.hReward.deliver();
-          pds.behavior.reward.give(hTrial.hPldaps)
-
-          s.rewardCnt = s.rewardCnt + 1;
-          
-          fprintf(1,'dotMotionTrial.rewardCnt = %i\n',hTrial.rewardCnt);
-          hTrial.rewardCnt = hTrial.rewardCnt - 1;
+    function frameUpdate(s, p, sn)
+        
+        % get the state controller ready
+        sc = s.sc;
+            
+        % --- Save start of state
+        tStart = sc.getTxTime(s.id) - p.trial.trstart;
+        
+        if (p.trial.ttime > (tStart + p.trial.(sn).iti))
+            p.trial.flagNextTrial = true;
+            return
         end
-      end
-      
-      if (hTrial.rewardCnt <= 0)
-        if (t > (s.tStart + hTrial.iti))
-          % done...
-          hTrial.done = true;
-          return;
-        end
-      end
-
-%       % FIXME: Urgh!
-%       if ~s.plotFlag,
-% %         eval(hTrial.A.plotCmd);
-%         s.plotFlag = true;
-%         
-%         if hTrial.viewpoint,
-%           vpx_SendCommandString(sprintf('dataFile_InsertString "TRIALEND:TRIALNO:%i"',hTrial.trialNum));
-%         end
-%       end
-    end
+        
+    end % after frame
     
   end % methods
   

@@ -1,56 +1,71 @@
-classdef state2_FixPreStim < stimuli.state
-  % state 2 - hold fixation before showing dots
-  
-  % 07-07-2016 - Shaun L. Cloherty <s.cloherty@ieee.org>
-  
-  properties
-    tStart = NaN;
-  end
-  
-  methods (Access = public)
-    function s = state2_FixPreStim(hTrial,varargin)
-      fprintf(1,'%s\n',mfilename);
-      
-      s = s@stimuli.state(2,hTrial); % call the parent constructor      
+classdef state2_FixPreStim < stimuli.objects.state
+    % state 2 - hold fixation for reward
+    
+    properties
+        eyeXY=nan(1,2) % variable for tracking the eye position during detected fixation
     end
     
-    function beforeFrame(s)
-%       fprintf(1,'dotMotionState2.beforeFrame()\n');
-      
-      hTrial = s.hTrial;
-      
-      if hTrial.showFix
-        hTrial.hFix(1).beforeFrame(); % draw fixation target
-      end
-    end
-    
-    function afterFrame(s,t)
+    methods (Access = public)
+        function s = state2_FixPreStim(varargin)
+            fprintf(1,'%s\n',mfilename);
             
-      hTrial = s.hTrial;
-      
-      if isnan(s.tStart) % <-- first frame
-        s.tStart = t;
-        hTrial.setTxTime(t); % save transition time
-      end
-      
-      if t > (s.tStart + hTrial.fixDuration)
-        pds.behavior.reward.give(hTrial.hPldaps) % reward for fixation! (TODO: amount)
+            s = s@stimuli.objects.state(2); % call the parent constructor
+        end
+        
+        % --- Drawing commands
+        function frameDraw(s,p,sn)
+            
+            % call draw functions for objects that should be shown
+            p.trial.(sn).fixation.hFix.frameDraw(p);
+            
+        end % frameDraw
+        
+        % -- Evaluate state logic (prepare before drawing)
+        function frameUpdate(s,p,sn)
+            
+            % get the state controller ready
+            sc = s.sc;
 
-        % move to state 3 - show stimulus
-        hTrial.setState(3);
-        return;
-      end
-      
-      r = norm([hTrial.x,hTrial.y]);
-      
-      if (r > hTrial.fixWinRadius)
-        % broke fixation... move to state 7 - timeout
-        hTrial.error = 2;
-        hTrial.setState(7)
-        return;
-      end
-    end
+            % detect break fixations
+            if ~p.trial.(sn).fixation.hFix.isFixated
+                sc.setState(7);
+                return
+            end
+            
+            % check if fixation has been obtained
+            if isnan(p.trial.(sn).frameFixationObtained) && p.trial.(sn).fixation.hFix.isFixated
+                p.trial.(sn).frameFixationObtained = p.trial.iFrame;
+            end
+            
+            % check if time to show the targets
+            timeToShowTargs = p.trial.(sn).frameFixationObtained + ceil(p.trial.(sn).timing.t_targetOnset / p.trial.display.ifi);
+            if p.trial.iFrame >= timeToShowTargs
+                p.trial.(sn).targets.hTarg.stimValue = 1; % targets on
+            end
+
+            timeToShowMotion = p.trial.(sn).frameFixationObtained + ceil(p.trial.(sn).timing.t_fixPreStimDuration / p.trial.display.ifi);;
+            
+            
+            % time to move to next state?
+            if p.trial.iFrame >= timeToShowMotion
+                
+                if p.trial.(sn).fixation.rewardForFixation
+                    pds.behavior.reward.give(p)
+                end
+                
+                % fixPos = p.trial.(sn).fixation.hFix.position; % in pixels
+                
+                % turn on the motion stimulus
+                p.trial.(sn).motion.hMot.stimValue = true;
+                p.trial.(sn).frameMotionTurnedOn = p.trial.iFrame;
+                                
+                % transition states
+                sc.setState(3);
+                return
+            end
+        end
+        
+        
+    end % methods
     
-  end % methods
-
 end % classdef

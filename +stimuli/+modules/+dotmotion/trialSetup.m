@@ -10,11 +10,43 @@ ppd   = p.trial.display.ppd;        % pixels per degree (linear approximation)
 fps   = p.trial.display.frate;      % frames per second
 ctr   = p.trial.display.ctr(1:2);   % center of the screen
 
-% --- Set Fixation Point Properties    
+% --- Set Fixation Point Properties
+
+% set color
+ctrColor = p.trial.(sn).fixation.ctrColor;
+if isfield(p.trial.(sn).fixation, 'surColor')
+    surColor = p.trial.(sn).fixation.surColor;
+else
+    surColor = 1 - ctrColor;
+end
+
+% dim color
+ctrColorDim = p.trial.(sn).fixation.dim * (ctrColor - p.trial.display.bgColor) + p.trial.display.bgColor;
+surColorDim = p.trial.(sn).fixation.dim * (surColor - p.trial.display.bgColor) + p.trial.display.bgColor;
+
+% get four free entries in the color lookup table
+clutIx = pds.pldaps.draw.getOpenClutEntries(p, 4);
+% center color
+p.trial.display.humanCLUT(clutIx(1)+1,:)  = ctrColor;
+p.trial.display.monkeyCLUT(clutIx(1)+1,:) = ctrColor;
+p.trial.display.clut.fixCtrColor = clutIx(1)*ones(size(p.trial.display.clut.bg));
+% surround color (fixation point is a bullseye)
+p.trial.display.humanCLUT(clutIx(2)+1,:)  = surColor;
+p.trial.display.monkeyCLUT(clutIx(2)+1,:) = surColor;
+p.trial.display.clut.fixSurColor = clutIx(2)*ones(size(p.trial.display.clut.bg));
+% center color (Dimmed)
+p.trial.display.humanCLUT(clutIx(3)+1,:)  = ctrColorDim;
+p.trial.display.monkeyCLUT(clutIx(3)+1,:) = ctrColorDim;
+p.trial.display.clut.fixCtrColorDim = clutIx(3)*ones(size(p.trial.display.clut.bg));
+% surround color (Dimmed)
+p.trial.display.humanCLUT(clutIx(4)+1,:)  = surColorDim;
+p.trial.display.monkeyCLUT(clutIx(4)+1,:) = surColorDim;
+p.trial.display.clut.fixSurColorDim = clutIx(4)*ones(size(p.trial.display.clut.bg));
+
 sz = p.trial.(sn).fixation.radius * ppd;
 p.trial.(sn).fixation.hFix.radius      = sz;
-p.trial.(sn).fixation.hFix.ctrColor    = p.trial.display.clut.black;
-p.trial.(sn).fixation.hFix.color       = p.trial.display.clut.white;
+p.trial.(sn).fixation.hFix.ctrColor    = p.trial.display.clut.fixCtrColor;
+p.trial.(sn).fixation.hFix.color       = p.trial.display.clut.fixSurColor;
 p.trial.(sn).fixation.hFix.position   = [0,0] * ppd + p.trial.display.ctr(1:2);
 
 % --- Random seed
@@ -22,13 +54,38 @@ p.trial.(sn).rngs.conditionerRNG=RandStream(p.trial.(sn).rngs.randomNumberGenera
 
 setupRNG=p.trial.(sn).rngs.conditionerRNG;
 
-% fixation duration
-rnd=rand(setupRNG);
-p.trial.(sn).timing.fixDuration = (1 - rnd) * p.trial.(sn).timing.minFixDuration + rnd * p.trial.(sn).timing.maxFixDuration;
+% --- Setup Timing
 
+% post fix obtained wait for stimulus
+tau  = p.trial.(sn).timing.fixPreStimTau;
+tmax = p.trial.(sn).timing.maxFixPreStim;
+p.trial.(sn).timing.t_fixPreStimDuration = generate_truncated_exponential(setupRNG, tau, 0, tmax);
+
+% post stimulus onset fixation duration
+tau  = p.trial.(sn).timing.fixPostStimTau;
+tmax = p.trial.(sn).timing.maxFixPostStim;
+p.trial.(sn).timing.t_fixPostStimDuration = generate_truncated_exponential(setupRNG, tau, 0, tmax);
+
+% stimulus duration
+tau  = p.trial.(sn).timing.stimDurationTau;
+tmax = p.trial.(sn).timing.maxStimDuration;
+p.trial.(sn).timing.t_stimDuration = generate_truncated_exponential(setupRNG, tau, 0, tmax);
+
+% set the fix hold duration to the fix on post-stim duration
+if ~isfield(p.trial.(sn).timing, 'fixHoldDuration')
+    p.trial.(sn).timing.fixHoldDuration = p.trial.(sn).timing.t_fixPostStimDuration;
+end
+
+% cue onset (wrt motion)
 % cue delay (uniform distribution)
 rnd=rand(setupRNG);
-p.trial.(sn).timing.cueOnset = (1-rnd) * p.trial.(sn).timing.minCueOnset + rnd * p.trial.(sn).timing.maxCueOnset;
+p.trial.(sn).timing.t_cueOnset = (1-rnd) * p.trial.(sn).timing.minCueOnset + rnd * (p.trial.(sn).timing.maxCueOnset - p.trial.(sn).timing.minCueOnset);
+
+% choice target onset (wrt fixation obtained)
+tau  = p.trial.(sn).timing.choiceTargetOnsetTau;
+tmax = p.trial.(sn).timing.maxChoiceTargetOnset;
+p.trial.(sn).timing.t_targetOnset = generate_truncated_exponential(setupRNG, tau, 0, tmax);
+
 
 % --- setup trial difficulty (FIX ME: move these to a proper condition struct)
 if ~isfield(p.trial.(sn).motion, 'bandwidth') % need to set difficulty parameter
@@ -46,15 +103,36 @@ end
 
 
 % --- Draw Direction
-trialDirection = 0;
-warning('trialSetup: trialDirection needs to be set with a condition or a directionprior object!!')
+if ~isfield(p.trial.(sn).motion, 'direction')
+    if isfield(p.trial.(sn).motion, 'directionprior')
+        p.trial.(sn).motion.direction = p.trial.(sn).motion.directionprior.drawfromprior();
+    else
+        % draw direction with uniform probability from discrete number of
+        % directions
+        n = p.trial.(sn).motion.numDirs; % number of directions/choice targets
+        p.trial.(sn).motion.direction = ceil(rand(setupRNG)*n)/n*360;
+        warning('trialSetup: trialDirection needs to be set with a condition or a directionprior object!!')
+    end
+end
+
 % --- setup motion
 switch class(p.trial.(sn).motion.hMot)
     case 'stimuli.objects.dotsUniform'
-        % setup dot color in CLUT
         
-        p.trial.(sn).motion.hMot.dotSize    = p.trial.(sn).motion.dotSize  * ppd; % pixels
-        p.trial.(sn).motion.hMot.dotSpeed
+        
+        % set number of dots based on density
+        apertureArea = p.trial.(sn).motion.radius^2 * pi;
+        numDots = ceil(p.trial.(sn).motion.dotDensity * apertureArea  / fps);
+        p.trial.(sn).motion.hMot.numDots     = numDots; 
+        
+        % setup object with parameters in pixels and frames (instead of
+        % degrees and seconds)
+        p.trial.(sn).motion.hMot.radius      = p.trial.(sn).motion.radius * ppd;
+        p.trial.(sn).motion.hMot.dotSize     = p.trial.(sn).motion.dotSize  * ppd; % pixels
+        p.trial.(sn).motion.hMot.dotSpeed    = p.trial.(sn).motion.dotSpeed * ppd / fps;
+        p.trial.(sn).motion.hMot.dotLifetime = p.trial.(sn).motion.dotLifetime;
+        p.trial.(sn).motion.hMot.range       = p.trial.(sn).motion.bandwidth;
+        
         
         % set the dot color using the color lookup table (for overlay)
         clutIx = pds.pldaps.draw.getOpenClutEntries(p, 1);
@@ -64,7 +142,7 @@ switch class(p.trial.(sn).motion.hMot)
         
         p.trial.(sn).motion.hMot.dotColor     = p.trial.display.clut.dotColor;
         
-        p.trial.(sn).motion.hMot.dotDirection = trialDirection;
+        p.trial.(sn).motion.hMot.dotDirection = p.trial.(sn).motion.direction;
         
         % do not treat as a target (e.g., check for fixations)
         p.trial.(sn).motion.hMot.tracked = false;
@@ -76,130 +154,116 @@ switch class(p.trial.(sn).motion.hMot)
     otherwise
         error('trialSetup: I don''t recognize this type of motion stimulus')
 end
-        t
-fnames = {'numDots', 'bandwdth', 'mode', 'dist', 'lifetime'};
-for f = fnames
-    p.trial.(sn).hDots.(f{1}) = p.trial.(sn).(f{1});
-end
-
-
-
-p.trial.(sn).hDots.position     = [p.trial.(sn).xDeg, -1*p.trial.(sn).yDeg] * ppd + ctr;
-p.trial.(sn).hDots.colour       = p.trial.display.bgColor + p.trial.(sn).contrast;
-
-% --- setup conditions
-n = p.trial.(sn).numDirs; % number of directions/choice targets
-
-p.trial.(sn).direction = ceil(rand(setupRNG)*n)/n*360;
-p.trial.(sn).hDots.direction = p.trial.(sn).direction;
-
-% (re-)initialize dots
-p.trial.(sn).dotRNG = rng();
-p.trial.(sn).hDots.beforeTrial();
+   
+% initialize object
+p.trial.(sn).motion.hMot.setRandomSeed(p.trial.(sn).rngs.trialSeeds(p.trial.pldaps.iTrial));
+p.trial.(sn).motion.hMot.trialSetup(p);
 
 % --- Choice targets
-r  = (p.trial.(sn).stimWinRadius + p.trial.(sn).cueApertureRadius) * ppd;
-th = (0:n-1) * (2*pi/n);
+assert(isa(p.trial.(sn).targets.hTargs, 'stimuli.objects.circles'), 'trialSetup: target object is unrecognized type. Must be stimuli.objects.circles')
+n  = p.trial.(sn).motion.numDirs;
+r  = p.trial.(sn).targets.eccentricity * ppd;
 
-[x,y] = pol2cart(th, r);
+warning('trialSetup: should color be an overlay ptr CLUT index?')
+targetColor = p.trial.display.bgColor + p.trial.(sn).targets.contrast;
 
-sz = p.trial.(sn).choiceTargetRadius * ppd;
-p.trial.(sn).hChoice.size       = repmat(2*sz,1,n);
-p.trial.(sn).hChoice.position   = [x; -1*y]' + repmat(ctr,n,1);
-p.trial.(sn).hChoice.colour     = p.trial.display.bgColor + p.trial.(sn).choiceTargetContrast;
-p.trial.(sn).hChoice.weight     = -1;
+if n > 22 % draw a ring
+    
+    % the ring is centered at fixation
+    p.trial.(sn).targets.hTargs.position = p.trial.(sn).fixation.hFix.position;
+    p.trial.(sn).targets.hTargs.color = targetColor;
+    % radius of the ring is eccentricity of targets
+    p.trial.(sn).targets.hTargs.radius = r;
+    % thickness of the ring is the radius of targets
+    p.trial.(sn).targets.hTargs.weight = p.trial.(sn).targets.radius * ppd;
+    
+else % draw discrete targets
+    warning('trialSetup: should this use a direction prior object to get the conditions?')
+    th = (0:n-1) * (2*pi/n); % discretization of the thetas
 
-assert(p.trial.display.colorclamp | p.trial.display.normalizeColor, 'color range not [0-1]')
+    [x,y] = pol2cart(th, r);
+
+    sz = p.trial.(sn).targets.radius * ppd;
+    p.trial.(sn).targets.hTargs.radius = repmat(sz,1,n);
+    p.trial.(sn).targets.hTargs.position   = [x; -1*y]' + repmat(ctr,n,1);    
+    p.trial.(sn).targets.hTargs.color      = targetColor;
+    p.trial.(sn).targets.hTargs.weight     = []; % fill 
+
+end
 
 % --- Choice cue (Gabor) -- per acuity task... why!?
-r  = (p.trial.(sn).stimWinRadius + p.trial.(sn).cueApertureRadius) * ppd;
-th = p.trial.(sn).direction * pi / 180;
+th = p.trial.(sn).motion.direction * pi / 180;
 
-[x,y] = pol2cart(th, r);
+[x,y] = pol2cart(th, r); % same r as for the targets
 
-rPix    = round(p.trial.(sn).cueApertureRadius * ppd);
-cycles  = 2 * 4 * p.trial.(sn).cueApertureRadius;
-phase   = 0;
+switch class(p.trial.(sn).cue.hCue)
+    case 'stimuli.objects.gaborTarget'
+        p.trial.(sn).cue.hCue
+        p.trial.(sn).cue.hCue.setup(p); % setup with pldaps
+        p.trial.(sn).cue.hCue.position = p.trial.display.ctr(1:2) + [x y];
+        p.trial.(sn).cue.hCue.theta = p.trial.(sn).motion.direction;
+        p.trial.(sn).cue.hCue.sf = 1;
+        p.trial.(sn).cue.hCue.sigma = .25;
+        p.trial.(sn).cue.hCue.contrast = .5;
+        p.trial.(sn).cue.hCue.tf = p.trial.(sn).motion.dotSpeed;
+        p.trial.(sn).cue.hCue.phase = randi(360);
+    otherwise
+        error('trialSetup: unrecognized cue object format')
+end
+        
+% --- Feedback for correct / incorrect choices...
+p.trial.(sn).feedback.hErr.position  = p.trial.(sn).cue.hCue.position;
+p.trial.(sn).feedback.hErr.radius    = p.trial.(sn).feedback.radius * ppd;
+p.trial.(sn).feedback.hFace.position = p.trial.(sn).cue.hCue.position;
+p.trial.(sn).feedback.hFace.radius   = p.trial.(sn).feedback.radius * ppd;
+p.trial.(sn).feedback.hFace.setRandomSeed;
+idx = randi(p.trial.(sn).feedback.hFace.rng, p.trial.(sn).feedback.hFace.numTex);
+p.trial.(sn).feedback.hFace.id = p.trial.(sn).feedback.hFace.texIds{idx};
 
-img = MakeGabor(rPix,127, cycles, phase, p.trial.(sn).cueApertureContrast*127);
+% --- Setup State machine (This runs all the state transitions)
+p.trial.(sn).states = stimuli.objects.stateControl();
+p.trial.(sn).states.addState(stimuli.modules.dotmotion.state0_FixWait)
+p.trial.(sn).states.addState(stimuli.modules.dotmotion.state1_FixGracePeriod)
+p.trial.(sn).states.addState(stimuli.modules.dotmotion.state2_FixPreStim)
+p.trial.(sn).states.addState(stimuli.modules.dotmotion.state3_ShowMotion)
+p.trial.(sn).states.addState(stimuli.modules.dotmotion.state4_Choice)
+p.trial.(sn).states.addState(stimuli.modules.dotmotion.state5_HoldChoice)
+p.trial.(sn).states.addState(stimuli.modules.dotmotion.state6_Feedback)
+p.trial.(sn).states.addState(stimuli.modules.dotmotion.state7_BreakFixTimeout)
+p.trial.(sn).states.addState(stimuli.modules.dotmotion.state8_InterTrialInterval)
 
-p.trial.(sn).hCue.addTexture(1,img); % we better clear this at the end of trial
-p.trial.(sn).hCue.texSize   = p.trial.(sn).cueApertureRadius * ppd;
-p.trial.(sn).hCue.position  = [x; -1*y]' + ctr;
-p.trial.(sn).hCue.id        = 1;
+p.trial.(sn).states.setState(0);
 
-% --- Feedback for incorrect choices...
-p.trial.(sn).hFbk.size      = 2 * p.trial.(sn).feedbackApertureRadius * ppd;
-p.trial.(sn).hFbk.position  = [x; -1*y]' + ctr;
-p.trial.(sn).hFbk.colour    = p.trial.display.bgColor + p.trial.(sn).feedbackApertureContrast;
-p.trial.(sn).hFbk.weight    = 4;
+% --- Preallocate logging variables
+p.trial.(sn).frameFixationObtained = nan;
+p.trial.(sn).choice = nan;
 
-% --- Face for aditional reward
-p.trial.(sn).hFace.texSize  = 2.5 * p.trial.(sn).cueApertureRadius * ppd;
-p.trial.(sn).hFace.position = [x; -1*y]' + ctr;
-p.trial.(sn).hFace.id       = p.trial.(sn).faceIndex;
+function texp = generate_truncated_exponential(setupRNG, tau, tmin, tmax)
 
-% --- Setup dot motion trial
-% the @trial object (initially in state 0)
-% hFix,hDots,hChoice,hCue,hFace,hReward,
-p.trial.(sn).hTrial = stimuli.dotmotion.dotMotionTrial( ...
-  p.trial.(sn).hFix,p.trial.(sn).hDots,p.trial.(sn).hChoice,p.trial.(sn).hCue,p.trial.(sn).hFbk,p.trial.(sn).hFace, p, ...
-  'fixWinRadius',p.trial.(sn).fixWinRadius, ...
-  'fixGracePeriod',p.trial.(sn).fixGracePeriod, ...
-  'fixDuration',p.trial.(sn).fixDuration, ...
-  'fixFlashCnt',p.trial.(sn).fixFlashCnt, ...
-  'stimDuration',p.trial.(sn).stimDuration, ...
-  'holdDuration',p.trial.(sn).holdDuration, ...
-  'cueDelay',p.trial.(sn).cueDelay, ...
-  'choiceTargetDelay',p.trial.(sn).choiceTargetDelay, ...
-  'choiceWinMinRadius',p.trial.(sn).choiceWinMinRadius,...
-  'choiceWinMaxRadius',p.trial.(sn).choiceWinMaxRadius,...
-  'choiceDuration',p.trial.(sn).choiceDuration, ...
-  'rewardWindow',p.trial.(sn).rewardWindow, ... % think about this parameter name
-  'choiceTimeout',p.trial.(sn).choiceTimeout, ...
-  'trialTimeout',p.trial.(sn).trialTimeout, ...
-  'iti',0, ...
-  'maxRewardCnt',p.trial.(sn).maxRewardCnt, ...
-  'bonusDirection',p.trial.(sn).bonusDirection, ...
-  'bonusWindow',p.trial.(sn).bonusWindow, ...
-  'bonusRewardCnt',p.trial.(sn).bonusRewardCnt, ... 
-  'viewpoint',false);
+if nargin < 4
+    tmax = inf;
 end
 
-
-function img = MakeGabor(rPix,bkgd,cycles,phase,range)
-  % as much as it pains me, this code is cut and pasted from
-  % SupportFunctions/MakeGabor.m...
-  %
-  % we don't use MakeGabor.m directly because it wants to create the
-  % ptb texture but we just want an image that we can pass to the
-  % @textures class
-
-  % Find diameter
-  dPix = 2*rPix+1;
-  % Create a meshgrid
-  [X,Y] = meshgrid(-rPix:rPix);
-
-  % Standard deviation of gaussian (e1)
-  sigma = dPix/8;
-  % Create the gaussian (e1)
-  e1 = exp(-.5*(X.^2 + Y.^2)/sigma^2);
-
-  % Convert cycles to max radians (s1)
-  maxRadians = pi*cycles;
-  % Convert phase from degrees to radians (s1)
-  phase = pi*phase/180;
-  % Create the sinusoid (s1)
-  s1 = sin(maxRadians*X/rPix + phase);
-
-  % Create the gabor (g1)
-%   g1 = s1.*e1;
-  g1 = s1;
-  
-  % Convert to uint8
-  g1 = uint8(bkgd + g1*range);
-  
-  % stick the gaussian envelope on the alpha channel...
-  img = repmat(g1,1,1,3);
-  img(:,:,4) = uint8(255.*e1);
+if nargin < 3
+    tmin = 0;
 end
+
+tdur = tmax - tmin; % truncation point
+% stop the while loop from running for ever
+infLoopStopper = 100; itr = 1; 
+r = inf;
+
+% re-generate exponential random numbers that are less than the truncation
+while r > tdur
+
+    r = exprnd(setupRNG, tau, [1 1]); % call to the pep exprnd function
+    
+    if itr > infLoopStopper
+        r = tdur;
+        break
+    end
+        
+    itr = itr + 1;
+end
+
+texp = tmin + r;

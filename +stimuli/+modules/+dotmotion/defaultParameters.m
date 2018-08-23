@@ -8,7 +8,7 @@ end
 % --- Motion parameters
 defaultArgs.motion.dotSize          = 0.2; 	 % dot size (diameter; deg)
 defaultArgs.motion.dotSpeed 		= 8.0; 	 % dot speed (deg/sec) 
-defaultArgs.motion.numDots          = 35;     % TODO: should this be density?
+defaultArgs.motion.dotDensity       = 35;    % dots / deg^2 / sec
 defaultArgs.motion.dotContrast 	    = -0.15;
 defaultArgs.motion.dotLifetime      = 5; % frames
 defaultArgs.motion.bandwidth 		= 0.0;
@@ -24,10 +24,11 @@ defaultArgs.motion.hMot             = stimuli.objects.dotsUniform(); % default m
 % --- Fixation point
 defaultArgs.fixation.radius     = 0.3;  % radius of the fixation point
 defaultArgs.fixation.dim        = 0.1; % dimming of fixation point (0 invisible)
+defaultArgs.fixation.ctrColor   = [0 0 0]; % ctr color
 defaultArgs.fixation.winRadius  = 1.8;
 defaultArgs.fixation.flashCnt 	= round(0.250*p.trial.display.frate);
 defaultArgs.fixation.hFix       = stimuli.objects.fixation('position', p.trial.display.ctr(1:2));
-
+defaultArgs.fixation.rewardForFixation = false;
 % --- Reward
 defaultArgs.reward.windowWidth  = 30.0; % angular width (at half-height)
 defaultArgs.reward.maxNumber    = 4;
@@ -57,17 +58,22 @@ defaultArgs.targets.hTargs       = stimuli.objects.circles('position', p.trial.d
 
 % --- Timing
 defaultArgs.timing.fixGracePeriod     = 0.050;
-defaultArgs.timing.minFixDuration     = 0.200;
-defaultArgs.timing.maxFixDuration     = 0.400;
-defaultArgs.timing.stimDuration       = 0.600; % Dots max duration
+defaultArgs.timing.fixPreStimTau      = 0.05; % wrt fixation obtained
+defaultArgs.timing.fixPostStimTau     = 0.1;  % wrt fixation obtained
+defaultArgs.timing.maxFixPreStim      = 0.2;  % wrt fixation obtained
+defaultArgs.timing.maxFixPostStim     = 0.4;  % wrt fixation obtained
+defaultArgs.timing.stimDurationTau    = inf;  % wrt motion onset (seconds)
+defaultArgs.timing.maxStimDuration    = 0.600; % Dots max duration
 defaultArgs.timing.holdDuration       = 0.1;   % seconds (wrt dot motion onset)
-defaultArgs.timing.minCueOnset        = 0.30;  % wrt to dot motion onset (seconds)
-defaultArgs.timing.maxCueOnset        = 0.70;  % wrt to dot motion onset (seconds)
-defaultArgs.timing.choiceTargetOnset  = 0;     % wrt to XX
+defaultArgs.timing.minCueOnset        = 0.30;  % wrt motion onset (seconds)
+defaultArgs.timing.maxCueOnset        = 0.70;  % wrt motion onset (seconds)
+defaultArgs.timing.choiceTargetOnsetTau = 0;   % wrt fixation obtained
+defaultArgs.timing.maxChoiceTargetOnset = .2;  % wrt fixation obtained
 defaultArgs.timing.choiceGracePeriod  = 1.4;   % grace period (aka flight time; sec)
 defaultArgs.timing.choiceHold 		  = 0.025; % seconds (minimum choice hold duration)
 defaultArgs.timing.choiceWaitTimeout  = 1.0;  % seconds
 defaultArgs.timing.trialTimeout       = 4.0;  % seconds
+defaultArgs.timing.iti                = 1.0;
 
 requiredFields = {'motion', 'fixation', 'reward', 'cue', 'feedback', 'targets', 'timing'};
 
@@ -78,6 +84,13 @@ for iReq = 1:numel(requiredFields)
     else
         p.trial.(sn).(reqField) = dvmergefield(p.trial.(sn).(reqField), defaultArgs.(reqField), true);
     end
+end
+
+% --- Parameters that are contingent on other parameters
+
+% eccentricity of the targets
+if ~isfield(p.trial.(sn).targets, 'eccentricity')
+    p.trial.(sn).targets.eccentricity = p.trial.(sn).motion.radius + (0.25 * p.trial.(sn).motion.radius);
 end
         
 
