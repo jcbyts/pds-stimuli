@@ -70,6 +70,11 @@ classdef face < stimuli.objects.textures
             o.position = p.trial.display.ctr(1:2);
         end
         
+        function set.radius(o, val)
+            o.radius = val;
+            o.texSize = [val val] * 2;
+        end
+        
     end % methods
     
 end % classdef

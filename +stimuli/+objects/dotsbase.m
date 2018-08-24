@@ -32,6 +32,7 @@ classdef dotsbase < stimuli.objects.target % (Abstract) % should this be abstrac
         numDots@double      = 50;
         
         dotType@double      = 1;    % anti-aliased dots
+        useOverlay          = true;
         % dotType:
         %
         %   0 - square dots (default)
@@ -111,7 +112,7 @@ classdef dotsbase < stimuli.objects.target % (Abstract) % should this be abstrac
                 return
             end
             
-            if numel(o.dotColor)==1 % it's a clut index
+            if o.useOverlay
                 % Draw Dots
                 Screen('DrawDots',p.trial.display.overlayptr,[o.x(:), -1*o.y(:)]', o.dotSize, o.dotColor, o.position, o.dotType);
             else

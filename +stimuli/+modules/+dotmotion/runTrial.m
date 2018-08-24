@@ -60,6 +60,7 @@ switch state
     case p.trial.pldaps.trialStates.framePrepareDrawing
         
         p.trial.(sn).states.frameUpdate(p, sn);
+        disp(['state ' num2str(p.trial.(sn).states.stateId)])
 %         ctr=p.trial.display.ctr(1:2);
 %         switch p.trial.(sn).states.stateId
 %             case 0 % FixWait

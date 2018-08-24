@@ -22,7 +22,7 @@ settingsStruct.(sn).fixation.radius = 1;
 settingsStruct.display.normalizeColor = 1;
 settingsStruct.pldaps.pause.preExperiment = 0;
 
-p = pldaps(@stimuli.pldapsDefaultTrial, settingsStruct);
+p = pldaps(@stimuli.pldapsDefaultTrial, 'test', settingsStruct);
 
 p.run
 

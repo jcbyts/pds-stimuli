@@ -33,7 +33,7 @@ classdef state0_FixWait < stimuli.objects.state
             
             % iterate frame counter (counts when to show fixation point and when to show faces)
             s.frameCnt = mod(s.frameCnt+1,p.trial.(sn).fixation.flashCnt);
-            s.frameCnt
+
             % --- flash fixation until it is obtained
             if s.frameCnt == 0
                 s.showFix = ~s.showFix; % flash fixation

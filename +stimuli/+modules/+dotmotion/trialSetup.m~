@@ -36,18 +36,16 @@ p.trial.display.humanCLUT(clutIx(2)+offset,:)  = surColor;
 p.trial.display.monkeyCLUT(clutIx(2)+offset,:) = surColor;
 p.trial.display.clut.fixSurColor = clutIx(2)*ones(size(p.trial.display.clut.bg));
 % center color (Dimmed)
-p.trial.display.humanCLUT(clutIx(3)+offset,:)  = ctrColorDim;
-p.trial.display.monkeyCLUT(clutIx(3)+offset,:) = ctrColorDim;
+p.trial.display.humanCLUT(clutIx(3),:)  = ctrColorDim;
+p.trial.display.monkeyCLUT(clutIx(3),:) = ctrColorDim;
 p.trial.display.clut.fixCtrColorDim = clutIx(3)*ones(size(p.trial.display.clut.bg));
 % surround color (Dimmed)
-p.trial.display.humanCLUT(clutIx(4)+offset,:)  = surColorDim;
-p.trial.display.monkeyCLUT(clutIx(4)+offset,:) = surColorDim;
+p.trial.display.humanCLUT(clutIx(4),:)  = surColorDim;
+p.trial.display.monkeyCLUT(clutIx(4),:) = surColorDim;
 p.trial.display.clut.fixSurColorDim = clutIx(4)*ones(size(p.trial.display.clut.bg));
 
 sz = p.trial.(sn).fixation.radius * ppd;
 p.trial.(sn).fixation.hFix.radius      = sz;
-p.trial.(sn).fixation.hFix.winRadius   = p.trial.(sn).fixation.winRadius * ppd;
-p.trial.(sn).fixation.hFix.wincolor    = p.trial.display.clut.window;
 p.trial.(sn).fixation.hFix.ctrColor    = p.trial.display.clut.fixCtrColor;
 p.trial.(sn).fixation.hFix.color       = p.trial.display.clut.fixSurColor;
 p.trial.(sn).fixation.hFix.position   = [0,0] * ppd + p.trial.display.ctr(1:2);
@@ -168,8 +166,8 @@ n  = p.trial.(sn).motion.numDirs;
 r  = p.trial.(sn).targets.eccentricity * ppd;
 
 clutIx = pds.pldaps.draw.getOpenClutEntries(p, 1);
-p.trial.display.humanCLUT(clutIx+offset,:)  = p.trial.display.bgColor + p.trial.(sn).targets.contrast;
-p.trial.display.monkeyCLUT(clutIx+offset,:) = p.trial.display.bgColor + p.trial.(sn).targets.contrast;
+p.trial.display.humanCLUT(clutIx+1,:)  = p.trial.display.bgColor + p.trial.(sn).targets.contrast;
+p.trial.display.monkeyCLUT(clutIx+1,:) = p.trial.display.bgColor + p.trial.(sn).targets.contrast;
 p.trial.display.clut.targetColor = clutIx(1)*ones(size(p.trial.display.clut.bg));
 
 targetColor = p.trial.display.clut.targetColor;
@@ -222,7 +220,7 @@ end
 p.trial.(sn).feedback.hErr.position  = p.trial.(sn).cue.hCue.position;
 p.trial.(sn).feedback.hErr.radius    = p.trial.(sn).feedback.radius * ppd;
 p.trial.(sn).feedback.hFace.position = p.trial.(sn).cue.hCue.position;
-p.trial.(sn).feedback.hFace.radius   = p.trial.(sn).feedback.radius * ppd;
+p.trial.(sn).feedback.hFace.radius   = p.trial.(sn).feedback.radius;
 p.trial.(sn).feedback.hFace.setRandomSeed;
 idx = randi(p.trial.(sn).feedback.hFace.rng, p.trial.(sn).feedback.hFace.numTex);
 p.trial.(sn).feedback.hFace.id = p.trial.(sn).feedback.hFace.texIds{idx};

@@ -12,7 +12,8 @@ classdef state8_InterTrialInterval < stimuli.objects.state
       s = s@stimuli.objects.state(8); % call the parent constructor
     end
     
-    function frameDraw(~,~,~)
+    function frameDraw(~,p,~)
+        Screen('FillRect', p.trial.display.ptr, p.trial.display.bgColor)
         % do nothing
     end
     
@@ -24,7 +25,7 @@ classdef state8_InterTrialInterval < stimuli.objects.state
         % --- Save start of state
         tStart = sc.getTxTime(s.id) - p.trial.trstart;
         
-        if (p.trial.ttime > (tStart + p.trial.(sn).iti))
+        if (p.trial.ttime > (tStart + p.trial.(sn).timing.iti))
             p.trial.flagNextTrial = true;
             return
         end

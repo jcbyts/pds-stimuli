@@ -15,8 +15,8 @@ settingsStruct.(sn).stateFunction.order = 1;
 settingsStruct.(sn).use = true;
 
 % optional arguments
-settingsStruct.(sn).motion.dotSpeed = 222;
-settingsStruct.(sn).motion.radius   = 2;
+settingsStruct.(sn).motion.dotSpeed = 10;
+settingsStruct.(sn).motion.radius   = 3.5;
 settingsStruct.(sn).fixation.radius = 1;
 
 p = pldaps(@stimuli.pldapsDefaultTrial, settingsStruct);
@@ -42,5 +42,25 @@ p = feval(p.defaultParameters.dotmotion.stateFunction.name, p, state);
 
 
 disp(p.trial.dotmotion.motion)
+
+%% draw objects
+p.trial.(sn).targets.hTargs.stimValue = 1;
+p.trial.(sn).motion.hMot.stimValue = 1;
+p.trial.(sn).cue.hCue.stimValue = 1;
+p.trial.(sn).feedback.hFace.stimValue = 1;
+p.trial.(sn).fixation.hFix.stimValue = 1;
+
+
+p.trial.(sn).targets.hTargs.frameDraw(p);
+p.trial.(sn).motion.hMot.frameDraw(p);
+p.trial.(sn).cue.hCue.frameDraw(p);
+p.trial.(sn).feedback.hFace.frameDraw(p);
+p.trial.(sn).fixation.hFix.frameDraw(p);
+
+Screen('Flip', p.trial.display.ptr, 0);
+
+
+
+
 
 

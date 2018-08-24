@@ -12,7 +12,7 @@ classdef state7_BreakFixTimeout < stimuli.objects.state
       s = s@stimuli.objects.state(7); % call the parent constructor
     end
     
-    function frameDraw(~,~,~)
+    function frameDraw(~,p,~)
         % draw big red screen for bad!
         Screen('FillRect', p.trial.display.ptr, [1 0 0])
     end
@@ -27,7 +27,8 @@ classdef state7_BreakFixTimeout < stimuli.objects.state
 %         tStart = sc.getTxTime(s.id) - p.trial.trstart;
         
         if (p.trial.ttime > p.trial.(sn).timing.iti)
-            p.trial.flagNextTrial = true;
+%             p.trial.flagNextTrial = true;
+            sc.setState(8)
             return
         end
         

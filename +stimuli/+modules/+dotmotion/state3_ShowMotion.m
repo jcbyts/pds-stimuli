@@ -46,6 +46,12 @@ classdef state3_ShowMotion < stimuli.objects.state
                 return
             end
             
+            % check if time to show the targets
+            timeToShowTargs = p.trial.(sn).frameFixationObtained + ceil(p.trial.(sn).timing.t_targetOnset / p.trial.display.ifi);
+            if p.trial.iFrame >= timeToShowTargs
+                p.trial.(sn).targets.hTarg.stimValue = 1; % targets on
+            end
+            
             % time to move to next state?
             if p.trial.iFrame >= frameTurnOffMotion
                 p.trial.(sn).motion.hMot.stimValue = 0;

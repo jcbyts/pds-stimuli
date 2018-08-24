@@ -33,7 +33,7 @@ defaultArgs.fixation.rewardForFixation = false;
 defaultArgs.reward.windowWidth  = 30.0; % angular width (at half-height)
 defaultArgs.reward.maxNumber    = 4;
 defaultArgs.reward.amount       = p.trial.behavior.reward.defaultAmount;
-defaultArgs.reward.function     = @(err, widthParam) ceil( exp( -err.^2/2*widthParam^2));
+defaultArgs.reward.function     = @(err, widthParam, maxNumber) ceil( maxNumber * exp( -err.^2/2*widthParam^2));
 
 % --- Cue / Targets / Feedback
 defaultArgs.cue.show            = true;

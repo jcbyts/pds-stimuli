@@ -43,7 +43,7 @@ classdef state2_FixPreStim < stimuli.objects.state
                 p.trial.(sn).targets.hTarg.stimValue = 1; % targets on
             end
 
-            timeToShowMotion = p.trial.(sn).frameFixationObtained + ceil(p.trial.(sn).timing.t_fixPreStimDuration / p.trial.display.ifi);;
+            timeToShowMotion = p.trial.(sn).frameFixationObtained + ceil(p.trial.(sn).timing.t_fixPreStimDuration / p.trial.display.ifi);
             
             
             % time to move to next state?
