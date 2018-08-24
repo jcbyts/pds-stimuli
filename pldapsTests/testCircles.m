@@ -11,11 +11,11 @@ settingsStruct.pldaps.nosave = true; % don't save any files
 settingsStruct.display.destinationFactorNew = GL_ONE_MINUS_SRC_ALPHA;
 settingsStruct.display.sourceFactorNew = GL_SRC_ALPHA;
 
-% settingsStruct.display.normalizeColor = 1;
-% settingsStruct.display.colorclamp = 1;
+settingsStruct.display.normalizeColor = 1;
+settingsStruct.display.colorclamp = 1;
 % 
-% settingsStruct.display.destinationFactorNew = GL_ONE;
-% settingsStruct.display.sourceFactorNew = GL_ONE;
+settingsStruct.display.destinationFactorNew = GL_ONE;
+settingsStruct.display.sourceFactorNew = GL_ONE;
 
 settingsStruct.display.useOverlay = 0;
 
@@ -38,8 +38,29 @@ settingsStruct.(sn).use                 = true; % use this module
 % (e.g., eye position)
 p = pldaps(@stimuli.pldapsDefaultTrial, settingsStruct);
 
-p = p.run;
+%%
 
+p.openScreen
 
-p.defaultParameters.pldaps.trialFunction='stimuli.dotmotion.dotTrial';
+%%
 
+h = stimuli.objects.circles('position', p.trial.display.ctr(1:2), 'radius', 100);
+
+h.weight = 10;
+
+h.frameDraw(p)
+
+Screen('Flip', p.trial.display.ptr, 0);
+
+%%
+n = 10;
+th = 0:(360/n):(360-(360/n));
+x = cosd(th)*100;
+y = sind(th)*100;
+h.weight = [];
+h.position = bsxfun(@plus, p.trial.display.ctr(1:2),[x(:) y(:)]);
+h.radius   = repmat(20, n , 1);
+
+h.frameDraw(p)
+
+Screen('Flip', p.trial.display.ptr, 0);

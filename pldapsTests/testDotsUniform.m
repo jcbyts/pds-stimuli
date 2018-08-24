@@ -1,6 +1,3 @@
-% This protocol tests the fixationImg class that is found in
-% +stimuli/fixationImg
-
 % Additionally, it can be used as a model for testing other stimulus
 % protocols
 

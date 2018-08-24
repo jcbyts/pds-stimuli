@@ -69,15 +69,10 @@ if (stimVis(3) == 0)   % for two target mode presentation
        else
           myVis = 2; 
        end
-       %******* transition immediately to full contrast
-       if (1)
-          stimVis = [1 1 stimVis(3:5)];
-       else   % or fade it in gradually
-          stimVis(myVis) = stimVis(myVis) * 2;  % increase contrast
-          if (stimVis(myVis) > 1)
-             stimVis = [1 1 stimVis(3:5)];   % at this point is 
-                                             % [1 1 0 leftcount rightcount], dual trials
-          end
+       stimVis(myVis) = stimVis(myVis) * 2;  % increase contrast
+       if (stimVis(myVis) > 1)
+           stimVis = [1 1 stimVis(3:5)];   % at this point is 
+                                           % [1 1 0 leftcount rightcount], dual trials
        end
    end
    %********************
