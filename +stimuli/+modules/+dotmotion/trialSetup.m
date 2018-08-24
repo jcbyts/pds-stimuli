@@ -215,10 +215,16 @@ end
 p.trial.(sn).feedback.hErr.position  = p.trial.(sn).cue.hCue.position;
 p.trial.(sn).feedback.hErr.radius    = p.trial.(sn).feedback.radius * ppd;
 p.trial.(sn).feedback.hFace.position = p.trial.(sn).cue.hCue.position;
-p.trial.(sn).feedback.hFace.radius   = p.trial.(sn).feedback.radius * ppd;
+p.trial.(sn).feedback.hFace.radius   = p.trial.(sn).feedback.radius;
 p.trial.(sn).feedback.hFace.setRandomSeed;
 idx = randi(p.trial.(sn).feedback.hFace.rng, p.trial.(sn).feedback.hFace.numTex);
 p.trial.(sn).feedback.hFace.id = p.trial.(sn).feedback.hFace.texIds{idx};
+
+% make sure all stimuli are off
+p.trial.(sn).feedback.hErr.stimValue = 0;
+p.trial.(sn).feedback.hFace.stimValue = 0;
+p.trial.(sn).cue.hCue.stimValue = 0;
+p.trial.(sn).targets.hTargs.stimValue = 0;
 
 % --- Setup State machine (This runs all the state transitions)
 p.trial.(sn).states = stimuli.objects.stateControl();
@@ -237,6 +243,7 @@ p.trial.(sn).states.setState(0);
 % --- Preallocate logging variables
 p.trial.(sn).frameFixationObtained = nan;
 p.trial.(sn).choice = nan;
+p.trial.(sn).error = nan;
 
 function texp = generate_truncated_exponential(setupRNG, tau, tmin, tmax)
 

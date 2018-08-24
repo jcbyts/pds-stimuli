@@ -32,7 +32,7 @@ classdef state5_HoldChoice < stimuli.objects.state
             
             % track eye position wrt fixation
             s.eyeXY = [p.trial.eyeX p.trial.eyeY] - p.trial.(sn).fixation.hFix.position;
-            s.eyeXY = s.eyeXY * [1 -1]; % flip y axis (because pixels run down)
+            s.eyeXY = s.eyeXY .* [1 -1]; % flip y axis (because pixels run down)
             
             
             % start counting
