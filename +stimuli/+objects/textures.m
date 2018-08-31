@@ -78,20 +78,20 @@ classdef textures < stimuli.objects.target
             
             % initialise input parser
             args = varargin;
-            p = inputParser;
-            p.StructExpand = true;
-            p.addParameter('size',NaN,@isfloat); % pixels
-            p.addParameter('position',o.position,@isfloat); % [x,y] (pixels)
-            p.addParameter('alpha',o.alpha,@isfloat); % opacity, 0..1
+            ip = inputParser;
+            ip.StructExpand = true;
+            ip.addParameter('size',NaN,@isfloat); % pixels
+            ip.addParameter('position',o.position,@isfloat); % [x,y] (pixels)
+            ip.addParameter('alpha',o.alpha,@isfloat); % opacity, 0..1
             
             try
-                p.parse(args{:});
+                ip.parse(args{:});
             catch
                 warning('Failed to parse name-value arguments.');
                 return;
             end
             
-            args = p.Results;
+            args = ip.Results;
             
             o.texSize = args.size;
             o.position = args.position;
@@ -105,7 +105,7 @@ classdef textures < stimuli.objects.target
         end
 
         
-        function frameDraw(o,p)
+        function frameDraw(o)
             if ~o.stimValue
                 return
             end
@@ -124,9 +124,9 @@ classdef textures < stimuli.objects.target
             
             filterMode = 1; % bilinear interpolation
             if ~isnan(o.winPtr)
-                Screen('BlendFunction', p.trial.display.ptr, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-                Screen('DrawTextures',p.trial.display.ptr,texPtr,[],rect',[],filterMode,o.alpha);
-                Screen('BlendFunction', p.trial.display.ptr, p.trial.display.sourceFactorNew, p.trial.display.destinationFactorNew);
+                Screen('BlendFunction', o.ptr, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+                Screen('DrawTextures',o.ptr,texPtr,[],rect',[],filterMode,o.alpha);
+%                 Screen('BlendFunction', p.trial.display.ptr, p.trial.display.sourceFactorNew, p.trial.display.destinationFactorNew);
             end
             
         end

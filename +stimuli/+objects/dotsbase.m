@@ -95,7 +95,7 @@ classdef dotsbase < stimuli.objects.target % (Abstract) % should this be abstrac
             
         end
         
-        function trialSetup(o, p, sn)
+        function trialSetup(o, ~, ~)
             o.initDots(1:o.numDots); % <-- provided by the derived class
             
             % initialise frame counts for limited dotLifetime dots
@@ -106,22 +106,13 @@ classdef dotsbase < stimuli.objects.target % (Abstract) % should this be abstrac
             end
         end
         
-        function frameDraw(o,p,sn)
+        function frameDraw(o, ~, ~)
             
             if ~o.stimValue
                 return
             end
             
-            if o.useOverlay
-                % Draw Dots
-                Screen('DrawDots',p.trial.display.overlayptr,[o.x(:), -1*o.y(:)]', o.dotSize, o.dotColor, o.position, o.dotType);
-            else
-                Screen('BlendFunction', p.trial.display.ptr, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-                Screen('DrawDots',p.trial.display.ptr,[o.x(:), -1*o.y(:)]', o.dotSize, o.dotColor, o.position, o.dotType);
-                Screen('BlendFunction', p.trial.display.ptr, p.trial.display.sourceFactorNew, p.trial.display.destinationFactorNew);
-            end
-          
-            
+            Screen('DrawDots',o.ptr,[o.x(:), -1*o.y(:)]', o.dotSize, o.dotColor, o.position, o.dotType);            
         end
         
         function frameUpdate(o, ~,~)

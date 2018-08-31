@@ -18,10 +18,11 @@ classdef state0_FixWait < stimuli.objects.state
         end
         
         % --- Drawing commands
-        function frameDraw(~,p,sn)
+        function frameDraw(s,p,sn)
             
             % call draw functions for objects that should be shown
             p.trial.(sn).fixation.hFix.frameDraw(p);
+            s.sc.hFix.frameDraw(p);
             
         end % frameDraw
         
@@ -30,9 +31,10 @@ classdef state0_FixWait < stimuli.objects.state
               
             % get the state controller ready
             sc = s.sc;
+            iFrame = p.trial.iFrame;
             
             % iterate frame counter (counts when to show fixation point and when to show faces)
-            s.frameCnt = mod(s.frameCnt+1,p.trial.(sn).fixation.flashCnt);
+            s.frameCnt = mod(s.frameCnt+1,sc.fixFlashCnt);
 
             % --- flash fixation until it is obtained
             if s.frameCnt == 0
@@ -40,27 +42,27 @@ classdef state0_FixWait < stimuli.objects.state
             end
             
             if s.showFix % fixation on
-                p.trial.(sn).fixation.hFix.stimValue  = true;
+                sc.hFix.stimValue  = true;
             else
-                p.trial.(sn).fixation.hFix.stimValue  = false;
+                sc.hFix.stimValue  = false;
             end
             
             
             % --- Never obtained fixation
-            if p.trial.ttime > p.trial.(sn).timing.trialTimeout
+            if iFrame > sc.timeTrialTimeout
                 % failed to initiate the trial... move to state 7 - breakfix imeout interval
-                p.trial.(sn).fixation.hFix.stimValue = false; % make sure fixation point is on                p.trial.(sn).hFace.stimValue = false; % make sure face is off
+                sc.hFix.stimValue = false; % make sure fixation point is on                p.trial.(sn).hFace.stimValue = false; % make sure face is off
                 sc.setState(7);
                 return
             end
             
-            p.trial.(sn).fixation.hFix.frameUpdate(p);
+            sc.hFix.frameUpdate(p);
             
             % --- check if fixating
-            if p.trial.(sn).fixation.hFix.isFixated
+            if sc.hFix.isFixated
                 
-                p.trial.(sn).frameFixationObtained   = p.trial.iFrame;
-                p.trial.(sn).fixation.hFix.stimValue = true; % make sure fixation point is on
+                sc.timeFixationObtained   = iFrame;
+                sc.hFix.stimValue = true; % make sure fixation point is on
                 
                 % move to state 1 - fixation grace period
                 sc.setState(1);

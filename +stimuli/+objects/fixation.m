@@ -94,13 +94,8 @@ classdef fixation < stimuli.objects.target
       end
       
       
-      function frameDraw(o,p)
+      function frameDraw(o)
           % draw the fixation point and fixation windows
-          
-          if nargin < 2
-              warning('needs a pldaps to run')
-              return
-          end
           
           if ~o.stimValue % check if the stimulus should be shown
               return
@@ -110,42 +105,39 @@ classdef fixation < stimuli.objects.target
           r = o.sz; % radius in pixels
           
           rect = kron([1,1],o.position) + kron(r(:),[-1, -1, +1, +1]);
-          Screen('FillOval',p.trial.display.overlayptr, o.color,rect');
+          Screen('FillOval',o.ptr, o.color,rect');
           
           r = o.sz/2; % radius in pixels
           
           rect = kron([1,1],o.position) + kron(r(:),[-1, -1, +1, +1]);
-          Screen('FillOval',p.trial.display.overlayptr, o.ctrColor,rect');
+          Screen('FillOval',o.ptr, o.ctrColor,rect');
           
           % draw the fixation window
           if ~isempty(o.wincolor)
               r = o.winRadius;
               rect = kron([1,1],o.position) + kron(r(:),[-1, -1, +1, +1]);
-              Screen('FrameOval', p.trial.display.overlayptr, o.wincolor, rect');
+              Screen('FrameOval', o.ptr, o.wincolor, rect');
 %               Screen('FillOval',p.trial.display.overlayptr, o.wincolor,rect');
           end
           
       end
       
-      function frameUpdate(o,p)
+      function frameUpdate(o,xy)
           % every frame update call, check the fixation status
-          
-          if nargin < 2
-              warning('needs a pldaps to run')
-              return
-          end
           
           % shrinking window
           if ~isnan(o.shrinkTimeConstant)
               % exponential decay since last time on
-              tt = p.trial.trstart + p.trial.ttime - o.log(2,end);
+              tt = GetSecs - o.log(2,end);
               
               o.sz = max(exp(-tt/o.shrinkTimeConstant)*o.maxRadius, o.radius);
           else
               o.sz = o.radius;
           end
           
-          o.isHeld([p.trial.eyeX p.trial.eyeY])
+          if nargin > 1
+              o.isHeld(xy)
+          end
       end
       
       function trialSetup(o,p)

@@ -29,10 +29,6 @@ classdef face < stimuli.objects.textures
                 MFL{iFace} = imread(fullfile(facelib, facelist(iFace).name));
             end
             
-%             MFL=load(fullfile(marmoview.supportDataDir,'MarmosetFaceLibrary.mat'));
-%             MFL = struct2cell(MFL);
-%             MFL = MFL([7,10,13,17:20,24,25,27]); % these faces seem most centered
-            
             for id = 1:nFaces
                 img = MFL{id};
                 
@@ -46,20 +42,6 @@ classdef face < stimuli.objects.textures
                 
                 % assuming we can switch blend functions on the fly
                 img(:,:,4) = uint8(255.*g); % alpha channel: 0 = transparent, 255 = opaque
-%                 if strcmp(p.trial.display.sourceFactorNew, GL_SRC_ALPHA) && strcmp(p.trial.display.destinationFactorNew, GL_ONE_MINUS_SRC_ALPHA)
-%                     img(:,:,4) = uint8(255.*g); % alpha channel: 0 = transparent, 255 = opaque
-%                 else
-%                     img = double(img);
-% %                     img(:,:,4) = 255*g;
-%                     img = (img - 127)/127;
-%                     for i = 1:3
-%                         img(:,:,i) = img(:,:,i).*g;
-%                     end
-%                     
-%                     if strcmp(p.trial.display.sourceFactorNew, GL_ONE)
-%                         img = img .* o.maxContrast;
-%                     end
-%                 end
                 
                 o.addTexture(id, img);
             end

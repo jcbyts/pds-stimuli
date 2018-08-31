@@ -33,7 +33,8 @@ defaultArgs.fixation.rewardForFixation = false;
 defaultArgs.reward.windowWidth  = 30.0; % angular width (at half-height)
 defaultArgs.reward.maxNumber    = 4;
 defaultArgs.reward.amount       = p.trial.behavior.reward.defaultAmount;
-defaultArgs.reward.function     = @(err, widthParam, maxNumber) ceil( maxNumber * exp( -err.^2/2*widthParam^2));
+
+
 
 % --- Cue / Targets / Feedback
 defaultArgs.cue.show            = true;
@@ -92,5 +93,9 @@ end
 if ~isfield(p.trial.(sn).targets, 'eccentricity')
     p.trial.(sn).targets.eccentricity = p.trial.(sn).motion.radius + (0.25 * p.trial.(sn).motion.radius);
 end
-        
 
+% function needs to be a function handle of one input with all variables
+% evaluated (hard coded from this point on)
+if ~isfield(p.trial.(sn).reward, 'function')
+    p.trial.(sn).reward.function     = str2func(sprintf('@(err) ceil( %d * exp( -err.^2/2*%d^2))', p.trial.(sn).reward.maxNumber, p.trial.(sn).reward.windowWidth));
+end

@@ -38,11 +38,11 @@ classdef stimulus < handle %#ok<*MCSUP>
     %               itself
     %               
     %  Example Calls:
-    %               s = stimuli.stimulus(); % create stimulus object
-    %                                       % automatically sets up rng
-    %               >> s.rng.Seed           % calling Seed returns the
-    %                                       % current seed
-    %               s.setRandomSeed();      % randomly assign seed
+    %               s = stimuli.stimulus(ptr);  % create stimulus object
+    %                                           % automatically sets up rng
+    %               >> s.rng.Seed               % calling Seed returns the
+    %                                           % current seed
+    %               s.setRandomSeed();          % randomly assign seed
     %               
     %               or
     %               
@@ -58,6 +58,7 @@ classdef stimulus < handle %#ok<*MCSUP>
 
     
     properties (Access = public)
+        ptr % the PTB window pointer
         stimValue
         rng@RandStream=RandStream('mt19937ar')
         tracked@logical=true
@@ -70,8 +71,9 @@ classdef stimulus < handle %#ok<*MCSUP>
     
     methods
         % --- class constructor
-        function obj = stimulus(varargin)
+        function obj = stimulus(ptr, varargin)
 %             obj.stimValue = true; % the stimulus defaults to a value of true
+            obj.ptr = ptr;
             
             rngArg  = find(cellfun(@(x) strcmp(x, 'rng'), varargin));
             seedArg = find(cellfun(@(x) strcmp(x, 'seed'), varargin));
