@@ -71,10 +71,10 @@ classdef hartleybase < stimuli.objects.stimulus
         end
         
         function trialCleanup(obj, ~)
-            if ~isempty(obj.tex)
-                Screen('Close', obj.tex);
-                obj.tex = [];
-            end
+%             if ~isempty(obj.tex)
+%                 Screen('Close', obj.tex);
+%                 obj.tex = [];
+%             end
         end
         
         
