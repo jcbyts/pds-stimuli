@@ -1,4 +1,4 @@
-classdef circles < stimuli.objects.stimulus
+classdef circles  < stimuli.objects.stimulus
     % CIRCLES draws circles
 
   properties
@@ -10,32 +10,35 @@ classdef circles < stimuli.objects.stimulus
 
 
   methods
-    function o = circles(varargin)
-      ip = inputParser();
-      ip.addOptional('radius', 300)
-      ip.addOptional('position', [960 540])
-      ip.addOptional('weight', 10)
-      ip.addOptional('color', [1 1 1])
-      ip.parse(varargin{:})
+      function o = circles(winPtr, varargin)
+          
+          o = o@stimuli.objects.stimulus(winPtr, varargin{:});
+          
+          ip = inputParser();
+          ip.addOptional('radius', 300)
+          ip.addOptional('position', [960 540])
+          ip.addOptional('weight', 10)
+          ip.addOptional('color', [1 1 1])
+          ip.parse(varargin{:})
+          
+          o.radius   = ip.Results.radius;
+          o.position = ip.Results.position;
+          
+      end
 
-      o.radius = ip.Results.radius;
-      o.position = ip.Results.position;
-
-    end
-
-    function frameUpdate(~, varargin)
+    function frameUpdate(~)
         % do nothing
     end
 
-    function frameDraw(o, p)
+    function frameDraw(o)
       if o.stimValue
         r = o.radius; % radius in pixels
       
         rect = kron([1,1],o.position) + kron(r(:),[-1, -1, +1, +1]);
         if o.weight > 0,
-            Screen('FrameOval', p.trial.display.overlayptr, o.color, rect', o.weight);
+            Screen('FrameOval', o.ptr, o.color, rect', o.weight);
         else
-            Screen('FillOval', p.trial.display.overlayptr, o.color, rect');
+            Screen('FillOval', o.ptr, o.color, rect');
         end
         
       end

@@ -51,11 +51,11 @@ p.trial.(sn).feedback.hFace.stimValue = 1;
 p.trial.(sn).fixation.hFix.stimValue = 1;
 
 
-p.trial.(sn).targets.hTargs.frameDraw(p);
-p.trial.(sn).motion.hMot.frameDraw(p);
-p.trial.(sn).cue.hCue.frameDraw(p);
-p.trial.(sn).feedback.hFace.frameDraw(p);
-p.trial.(sn).fixation.hFix.frameDraw(p);
+p.trial.(sn).targets.hTargs.frameDraw();
+p.trial.(sn).motion.hMot.frameDraw();
+p.trial.(sn).cue.hCue.frameDraw();
+p.trial.(sn).feedback.hFace.frameDraw();
+p.trial.(sn).fixation.hFix.frameDraw();
 
 Screen('Flip', p.trial.display.ptr, 0);
 

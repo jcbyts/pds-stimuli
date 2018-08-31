@@ -14,6 +14,7 @@ classdef stimulus < handle %#ok<*MCSUP>
     % manage a RandStream number generator.
     % 
     % PROPERTIES
+    %   ptr         window pointer for PTB
     %   stimValue   a scalar (double, logical) that has some meaning for 
     %               the stimulus. For example 0 (false) means the stimulus
     %               isn't shown. 1 (true) means the stimulus is shown. 2

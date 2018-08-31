@@ -2,7 +2,6 @@ classdef state2_FixPreStim < stimuli.objects.state
     % state 2 - hold fixation for reward
     
     properties
-        eyeXY=nan(1,2) % variable for tracking the eye position during detected fixation
     end
     
     methods (Access = public)
@@ -13,51 +12,42 @@ classdef state2_FixPreStim < stimuli.objects.state
         end
         
         % --- Drawing commands
-        function frameDraw(s,p,sn)
+        function frameDraw(s)
             
             % call draw functions for objects that should be shown
-            p.trial.(sn).fixation.hFix.frameDraw(p);
+            s.sc.hFix.frameDraw();
             
         end % frameDraw
         
         % -- Evaluate state logic (prepare before drawing)
-        function frameUpdate(s,p,sn)
+        function frameUpdate(s)
             
             % get the state controller ready
             sc = s.sc;
+            
+            sc.hFix.frameUpdate(sc.eyeXY);
 
             % detect break fixations
-            if ~p.trial.(sn).fixation.hFix.isFixated
+            if ~sc.hFix.isFixated
                 sc.setState(7);
                 return
             end
             
-            % check if fixation has been obtained
-            if isnan(p.trial.(sn).frameFixationObtained) && p.trial.(sn).fixation.hFix.isFixated
-                p.trial.(sn).frameFixationObtained = p.trial.iFrame;
-            end
-            
             % check if time to show the targets
-            timeToShowTargs = p.trial.(sn).frameFixationObtained + ceil(p.trial.(sn).timing.t_targetOnset / p.trial.display.ifi);
-            if p.trial.iFrame >= timeToShowTargs
-                p.trial.(sn).targets.hTarg.stimValue = 1; % targets on
-            end
-
-            timeToShowMotion = p.trial.(sn).frameFixationObtained + ceil(p.trial.(sn).timing.t_fixPreStimDuration / p.trial.display.ifi);
-            
+            if sc.iFrame >= (sc.timeFixationObtained + sc.timeTargOnset)
+                sc.hTargs.stimValue = 1; % targets on
+            end            
             
             % time to move to next state?
-            if p.trial.iFrame >= timeToShowMotion
+            if sc.iFrame >= (sc.timeFixationObtained + sc.timeMotionOnset)
                 
-                if p.trial.(sn).fixation.rewardForFixation
-                    pds.behavior.reward.give(p)
-                end
-                
-                % fixPos = p.trial.(sn).fixation.hFix.position; % in pixels
+%                 if p.trial.(sn).fixation.rewardForFixation
+%                     warning('need to make this an object')
+%                 end
                 
                 % turn on the motion stimulus
-                p.trial.(sn).motion.hMot.stimValue = true;
-                p.trial.(sn).frameMotionTurnedOn = p.trial.iFrame;
+                sc.hMot.stimValue = true;
+                sc.timeMotionTurnedOn = sc.iFrame;
                                 
                 % transition states
                 sc.setState(3);

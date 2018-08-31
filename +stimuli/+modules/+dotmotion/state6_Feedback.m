@@ -15,44 +15,43 @@ classdef state6_Feedback < stimuli.objects.state
         end
         
         % --- Drawing commands
-        function frameDraw(~,p,sn)
+        function frameDraw(s)
             
-            p.trial.(sn).targets.hTargs.frameDraw(p);
-            p.trial.(sn).feedback.hFace.frameDraw(p);
-            p.trial.(sn).feedback.hErr.frameDraw(p);
+            s.sc.hTargs.frameDraw();
+            s.sc.hFace.frameDraw();
+            s.sc.hErr.frameDraw();
 
-            if ~isnan(p.trial.(sn).choice)
-                xy = [p.trial.(sn).choiceX p.trial.(sn).choiceY*-1];
-                Screen('DrawDots', p.trial.display.overlayptr, xy, 10, p.trial.display.clut.targetnull, p.trial.display.ctr(1:2), 2);
-            end
+%             if ~isnan(sc.choice)
+%                 xy = [sc.choiceX sc.choiceY*-1];
+%                 Screen('DrawDots', s.sc.hTargs.ptr, xy, 10, p.trial.display.clut.targetnull, p.trial.display.ctr(1:2), 2);
+%             end
             
         end % frameDraw
         
         % -- Evaluate state logic (prepare before drawing)
-        function frameUpdate(s,p,sn)
+        function frameUpdate(s)
             
             % get the state controller ready
             sc = s.sc;
             
             % --- Time to transition to next state if fixation is held
-            startTime = sc.getTxTime(s.id) - p.trial.trstart;
 
             if isnan(s.rewardToGive)
-                s.rewardToGive = p.trial.(sn).reward.function(p.trial.(sn).error, p.trial.(sn).reward.windowWidth, p.trial.(sn).reward.maxNumber);
+                s.rewardToGive = sc.rewardFun(sc.error);
                 if isnan(s.rewardToGive)
                     s.rewardToGive = 0;
                 end
             end
 
             if s.rewardToGive == 0
-                p.trial.(sn).feedback.hErr.stimValue = 1;
+                sc.hErr.stimValue = 1;
             else
-                p.trial.(sn).feedback.hFace.stimValue = 1;
+                sc.hFace.stimValue = 1;
             end
 
 
-            if s.rewardCnt < s.rewardToGive && (mod(p.trial.iFrame, s.rewardInterval)==0)
-                pds.behavior.reward.give(p, p.trial.(sn).reward.amount)
+            if s.rewardCnt < s.rewardToGive && (mod(sc.iFrame, s.rewardInterval)==0)
+%                 pds.behavior.reward.give(p, p.trial.(sn).reward.amount)
                 s.rewardCnt = s.rewardCnt + 1;
             else
                sc.setState(8);    

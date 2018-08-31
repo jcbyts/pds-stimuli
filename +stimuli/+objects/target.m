@@ -15,9 +15,9 @@ classdef target < stimuli.objects.stimulus %#ok<*MCSUP>
     
     methods
         % class constructor
-        function obj = target(varargin)
+        function obj = target(winPtr, varargin)
             
-            obj = obj@stimuli.objects.stimulus(varargin{:});
+            obj = obj@stimuli.objects.stimulus(winPtr, varargin{:});
             
             ip = inputParser;
             ip.StructExpand  = true;

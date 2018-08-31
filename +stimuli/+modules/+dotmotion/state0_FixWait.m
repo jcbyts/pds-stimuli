@@ -18,20 +18,20 @@ classdef state0_FixWait < stimuli.objects.state
         end
         
         % --- Drawing commands
-        function frameDraw(s,p,sn)
+        function frameDraw(s)
             
             % call draw functions for objects that should be shown
-            p.trial.(sn).fixation.hFix.frameDraw(p);
-            s.sc.hFix.frameDraw(p);
+%             p.trial.(sn).fixation.hFix.frameDraw(p);
+            s.sc.hFix.frameDraw();
             
         end % frameDraw
         
         % -- Evaluate state logic (prepare before drawing)
-        function frameUpdate(s,p,sn)
+        function frameUpdate(s)
               
             % get the state controller ready
             sc = s.sc;
-            iFrame = p.trial.iFrame;
+            iFrame = sc.iFrame;
             
             % iterate frame counter (counts when to show fixation point and when to show faces)
             s.frameCnt = mod(s.frameCnt+1,sc.fixFlashCnt);
@@ -56,7 +56,7 @@ classdef state0_FixWait < stimuli.objects.state
                 return
             end
             
-            sc.hFix.frameUpdate(p);
+            sc.hFix.frameUpdate(sc.eyeXY);
             
             % --- check if fixating
             if sc.hFix.isFixated

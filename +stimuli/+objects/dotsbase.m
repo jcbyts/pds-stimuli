@@ -7,7 +7,7 @@ classdef dotsbase < stimuli.objects.target % (Abstract) % should this be abstrac
     %   speed      - dot speed (pixels/frame),
     %   direction  - degrees
     %   numDots    - number of dots
-    %   dotLifetime   - limit of dot dotLifetime (frames)
+    %   lifetime   - limit of dot lifetime (frames)
     %   minRadius  - minimum radius of aperture (pixels; not implemented yet)
     %   radius  - maximum radius of aperture (pixels)
     %   position   - aperture position (x,y; pixels)
@@ -23,12 +23,12 @@ classdef dotsbase < stimuli.objects.target % (Abstract) % should this be abstrac
     
     properties (Access = public),
         radius@double       = 150;  % pixels TODO: should this be deg
-        dotSpeed@double     = 2;    % pixels/s
-        dotDirection@double = 0;    % deg.
+        speed@double     = 2;    % pixels/s
+        direction@double = 0;    % deg.
         dotSize@double      = 2;    % pixels (radius?)
         
         dotColor@double     = zeros(1,3); % [r,g,b] or clut index
-        dotLifetime@double  = inf; % dot dotLifetime (frames)
+        lifetime@double  = inf; % dot lifetime (frames)
         numDots@double      = 50;
         
         dotType@double      = 1;    % anti-aliased dots
@@ -59,9 +59,9 @@ classdef dotsbase < stimuli.objects.target % (Abstract) % should this be abstrac
     
     
     methods (Access = public)
-        function o = dotsbase(varargin)
+        function o = dotsbase(winPtr, varargin)
             
-            o = o@stimuli.objects.target(varargin{:});
+            o = o@stimuli.objects.target(winPtr, varargin{:});
             
             if nargin < 2
                 return
@@ -72,9 +72,9 @@ classdef dotsbase < stimuli.objects.target % (Abstract) % should this be abstrac
             ip = inputParser;
             ip.StructExpand = true;
             ip.addParameter('dotSize',     o.dotSize,      @double);
-            ip.addParameter('dotSpeed',    o.dotSpeed,     @double);
-            ip.addParameter('dotDirection',o.dotDirection, @(x) isscalar(x) && isreal(x)); % deg.
-            ip.addParameter('dotLifetime', o.dotLifetime,  @double);
+            ip.addParameter('speed',    o.speed,     @double);
+            ip.addParameter('direction',o.direction, @(x) isscalar(x) && isreal(x)); % deg.
+            ip.addParameter('lifetime', o.lifetime,  @double);
             ip.addParameter('dotColor',    o.dotColor,     @double);
             ip.addParameter('numDots',     o.numDots,      @(x) ceil(x));
             ip.addParameter('radius',      o.radius,       @double); % deg.
@@ -98,15 +98,15 @@ classdef dotsbase < stimuli.objects.target % (Abstract) % should this be abstrac
         function trialSetup(o, ~, ~)
             o.initDots(1:o.numDots); % <-- provided by the derived class
             
-            % initialise frame counts for limited dotLifetime dots
-            if o.dotLifetime ~= Inf
-                o.frameCnt = randi(o.rng, o.dotLifetime,o.numDots,1); % 1:numDots
+            % initialise frame counts for limited lifetime dots
+            if o.lifetime ~= Inf
+                o.frameCnt = randi(o.rng, o.lifetime,o.numDots,1); % 1:numDots
             else
                 o.frameCnt = inf(o.numDots,1);
             end
         end
         
-        function frameDraw(o, ~, ~)
+        function frameDraw(o)
             
             if ~o.stimValue
                 return
@@ -115,7 +115,7 @@ classdef dotsbase < stimuli.objects.target % (Abstract) % should this be abstrac
             Screen('DrawDots',o.ptr,[o.x(:), -1*o.y(:)]', o.dotSize, o.dotColor, o.position, o.dotType);            
         end
         
-        function frameUpdate(o, ~,~)
+        function frameUpdate(o)
             
             % decrement frame counters
             o.frameCnt = o.frameCnt - 1;
@@ -123,7 +123,7 @@ classdef dotsbase < stimuli.objects.target % (Abstract) % should this be abstrac
             o.moveDots(); % provided by the derived class? maybe not...
         end
         
-        function moveDots(o,~)
+        function moveDots(o)
             % calculate future position
             o.x = o.x + o.dx;
             o.y = o.y + o.dy;
@@ -140,7 +140,7 @@ classdef dotsbase < stimuli.objects.target % (Abstract) % should this be abstrac
                 [o.x(idx), o.y(idx)] = o.rotate(xx,yy,th);
             end
             
-            idx = find(o.frameCnt == 0); % dots that have exceeded their dotLifetime
+            idx = find(o.frameCnt == 0); % dots that have exceeded their lifetime
             
             if ~isempty(idx)
                 % (re-)place dots randomly within the aperture

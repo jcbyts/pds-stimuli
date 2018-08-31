@@ -19,7 +19,7 @@ defaultArgs.motion.numDirs          = 16;
 defaultArgs.motion.radius           = 3.5;
 defaultArgs.motion.xPos             = 0.0; % Aperture x position (degrees)
 defaultArgs.motion.yPos             = 0.0; % Aperture y position (degrees)
-defaultArgs.motion.hMot             = stimuli.objects.dotsUniform(); % default motion is uniform range dots
+defaultArgs.motion.hMot             = stimuli.objects.dotsUniform(p.trial.display.ptr); % default motion is uniform range dots
 
 % --- Fixation point
 defaultArgs.fixation.radius     = 0.3;  % radius of the fixation point
@@ -27,7 +27,7 @@ defaultArgs.fixation.dim        = 0.1; % dimming of fixation point (0 invisible)
 defaultArgs.fixation.ctrColor   = [0 0 0]; % ctr color
 defaultArgs.fixation.winRadius  = 1.8;
 defaultArgs.fixation.flashCnt 	= round(0.250*p.trial.display.frate);
-defaultArgs.fixation.hFix       = stimuli.objects.fixation('position', p.trial.display.ctr(1:2));
+defaultArgs.fixation.hFix       = stimuli.objects.fixation(p.trial.display.overlayptr, 'position', p.trial.display.ctr(1:2));
 defaultArgs.fixation.rewardForFixation = false;
 % --- Reward
 defaultArgs.reward.windowWidth  = 30.0; % angular width (at half-height)
@@ -40,7 +40,7 @@ defaultArgs.reward.amount       = p.trial.behavior.reward.defaultAmount;
 defaultArgs.cue.show            = true;
 defaultArgs.cue.radius          = 1;
 defaultArgs.cue.contrast        = -0.25;
-defaultArgs.cue.hCue            = stimuli.objects.gaborTarget('track', false);
+defaultArgs.cue.hCue            = stimuli.objects.gaborTarget(p.trial.display.ptr, 'track', false);
 
 % --- trial feedback
 defaultArgs.feedback.show       = true; % show feedback
@@ -48,14 +48,14 @@ defaultArgs.feedback.radius     = 1.8;  % radius of the feedback aperture shown 
 defaultArgs.feedback.contrast   = -0.5;
 defaultArgs.feedback.faceIndex  = 1;
 defaultArgs.feedback.hFace      = stimuli.objects.face(p);
-defaultArgs.feedback.hErr       = stimuli.objects.circles();
+defaultArgs.feedback.hErr       = stimuli.objects.circles(p.trial.display.overlayptr);
 
 % --- Choice targets
 defaultArgs.targets.radius       = 0.3;    % radius of the choice targets (if individual circles, 1/2 width if a ring)
 defaultArgs.targets.contrast     = 0.25;   % contrast of the targets
 defaultArgs.targets.windowMinEcc = 3.5;    % minimum saccade length for acceptence
 defaultArgs.targets.windowMaxEcc = 7;      % maximum saccade length for acceptence
-defaultArgs.targets.hTargs       = stimuli.objects.circles('position', p.trial.display.ctr(1:2));
+defaultArgs.targets.hTargs       = stimuli.objects.circles(p.trial.display.overlayptr, 'position', p.trial.display.ctr(1:2));
 
 % --- Timing
 defaultArgs.timing.fixGracePeriod     = 0.050;

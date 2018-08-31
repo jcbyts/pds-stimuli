@@ -13,69 +13,60 @@ classdef state4_Choice < stimuli.objects.state
         end
         
         % --- Drawing commands
-        function frameDraw(s,p,sn)
+        function frameDraw(s)
             
             % call draw functions for objects that should be shown
-            p.trial.(sn).fixation.hFix.frameDraw(p);
+            s.sc.hFix.frameDraw();
             % draw targets
-            p.trial.(sn).targets.hTargs.frameDraw(p);
+            s.sc.hTargs.frameDraw();
             % draw motion
-            p.trial.(sn).motion.hMot.frameDraw(p);
+            s.sc.hMot.frameDraw();
             % draw cue
-            p.trial.(sn).cue.hCue.frameDraw(p);
+            s.sc.hCue.frameDraw();
             
         end % frameDraw
         
         % -- Evaluate state logic (prepare before drawing)
-        function frameUpdate(s,p,sn)
+        function frameUpdate(s)
             
             % get the state controller ready
             sc = s.sc;
             
             % track eye position wrt fixation
-            s.eyeXY = [p.trial.eyeX p.trial.eyeY] - p.trial.(sn).fixation.hFix.position;
+            s.eyeXY = sc.eyeXY - sc.hFix.position;
             s.eyeXY = s.eyeXY .* [1 -1]; % flip y axis (because pixels run down)
 
             % update motion
-            p.trial.(sn).motion.hMot.frameUpdate(p);
+            sc.hMot.frameUpdate();
 
-            % check when stimuli need to be turned off
-            frameTurnOffMotion   = p.trial.(sn).frameMotionTurnedOn + ceil(p.trial.(sn).timing.t_stimDuration / p.trial.display.ifi);
-            frameTurnOffFixation = p.trial.(sn).frameMotionTurnedOn + ceil(p.trial.(sn).timing.t_fixPostStimDuration / p.trial.display.ifi);
-
-            
-            if p.trial.iFrame >= frameTurnOffMotion
-              p.trial.(sn).motion.hMot.stimValue = 0;
-              p.trial.(sn).frameMotionTurnedOff = p.trial.iFrame;
+            % time to turn off motion
+            if sc.iFrame >= (sc.timeMotionTurnedOn + sc.timeMotionOffset)
+                sc.hMot.stimValue = 0;
+                sc.timeMotionTurnedOff = sc.iFrame;
             end
 
-            if p.trial.iFrame >= frameTurnOffFixation
-              p.trial.(sn).fixation.hFix.stimValue = 0;
-              p.trial.(sn).frameFixationTurnedOff = p.trial.iFrame;
+            % time to turn off fixation
+            if sc.iFrame >= (sc.timeFixationObtained + sc.timeFixationOffset)
+                sc.hFix.stimValue = 0;
+                sc.timeFixationTurnedOff = sc.iFrame;
             end
 
             % this state ends when the period of required fixation is over
-            frameStopWaitForChoice = p.trial.(sn).frameFixDim + ceil(p.trial.(sn).timing.choiceWaitTimeout / p.trial.display.ifi);
-
-            if p.trial.iFrame > frameStopWaitForChoice
-
-              % transition states
-              sc.setState(6); % transition to feedback
-              return
+            if sc.iFrame > (sc.timeFixDim + sc.timeWaitForChoice)
+                
+                % transition states
+                sc.setState(6); % transition to feedback
+                return
             end
 
             % check if choice was made
             r = sqrt(sum(s.eyeXY.^2)); % euclidean distance
-            if r > (p.trial.(sn).targets.windowMinEcc * p.trial.display.ppd) && ...
-              r < (p.trial.(sn).targets.windowMaxEcc * p.trial.display.ppd)
+            if r > sc.windowMinEcc && r < sc.windowMaxEcc
               
-              p.trial.(sn).frameChoiceMade = p.trial.iFrame;
+              sc.timeChoiceMade = sc.iFrame;
 
               sc.setState(5);
             end
-
-
-
 
 
         end

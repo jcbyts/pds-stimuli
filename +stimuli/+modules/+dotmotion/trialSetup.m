@@ -132,8 +132,8 @@ switch class(p.trial.(sn).motion.hMot)
         % degrees and seconds)
         p.trial.(sn).motion.hMot.radius      = p.trial.(sn).motion.radius * ppd;
         p.trial.(sn).motion.hMot.dotSize     = p.trial.(sn).motion.dotSize  * ppd; % pixels
-        p.trial.(sn).motion.hMot.dotSpeed    = p.trial.(sn).motion.dotSpeed * ppd / fps;
-        p.trial.(sn).motion.hMot.dotLifetime = p.trial.(sn).motion.dotLifetime;
+        p.trial.(sn).motion.hMot.speed    = p.trial.(sn).motion.dotSpeed * ppd / fps;
+        p.trial.(sn).motion.hMot.lifetime = p.trial.(sn).motion.dotLifetime;
         p.trial.(sn).motion.hMot.range       = p.trial.(sn).motion.bandwidth;
         
         
@@ -145,7 +145,7 @@ switch class(p.trial.(sn).motion.hMot)
         
         p.trial.(sn).motion.hMot.dotColor     = p.trial.display.clut.dotColor;
         
-        p.trial.(sn).motion.hMot.dotDirection = p.trial.(sn).motion.direction;
+        p.trial.(sn).motion.hMot.direction = p.trial.(sn).motion.direction;
         
         % do not treat as a target (e.g., check for fixations)
         p.trial.(sn).motion.hMot.tracked = false;
@@ -259,6 +259,8 @@ p.trial.(sn).states = stimuli.modules.dotmotion.trialstates(...
     'timeChoiceHold', ceil(p.trial.(sn).timing.choiceHold / ifi), ...
     'timeFeedback', ceil(p.trial.(sn).timing.t_targetOnset / ifi), ...
     'timeITI', ceil(p.trial.(sn).timing.iti / ifi), ...
+    'windowMinEcc', (p.trial.(sn).targets.windowMinEcc * p.trial.display.ppd), ...
+    'windowMaxEcc', (p.trial.(sn).targets.windowMaxEcc * p.trial.display.ppd), ...
     'rewardCnt', 0, ...
     'rewardFun', p.trial.(sn).reward.function);
 

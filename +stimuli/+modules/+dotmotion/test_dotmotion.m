@@ -1,4 +1,5 @@
 % Script for testing the default arguments / trialSetup
+sca
 
 % --- setup pldaps and testing modules
 settingsStruct = struct(); % settingsStruct is a structure that modifies pldaps default parameters

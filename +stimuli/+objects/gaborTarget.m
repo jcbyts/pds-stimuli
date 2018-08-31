@@ -21,9 +21,9 @@ classdef gaborTarget < stimuli.objects.target
     methods (Access = public)
       
       % --- Class constructor
-      function obj = gaborTarget(varargin)
+      function obj = gaborTarget(winPtr, varargin)
           
-          obj = obj@stimuli.objects.target(varargin{:}); % use parent constructor (inherits the properties and methods of TARGET)
+          obj = obj@stimuli.objects.target(winPtr, varargin{:}); % use parent constructor (inherits the properties and methods of TARGET)
           
           if nargin == 1
               return
@@ -71,13 +71,7 @@ classdef gaborTarget < stimuli.objects.target
       end
       
       
-      function frameDraw(o,p)
-          % draw the fixation point and fixation windows
-          
-          if nargin < 2
-              warning('needs a pldaps to run')
-              return
-          end
+      function frameDraw(o)
           
           if ~o.stimValue % check if the stimulus should be shown
               return
@@ -91,17 +85,17 @@ classdef gaborTarget < stimuli.objects.target
           gaborParams = [180-o.phase, o.sf/o.ppd, o.sigma*o.ppd, o.contrast, 1, 0, 0, 0];
 
 %           Screen('BlendFunction', p.trial.display.ptr, GL_ONE, GL_ONE);
-          Screen('BlendFunction', p.trial.display.ptr, GL_ONE, GL_ONE);
-          Screen('DrawTexture', p.trial.display.ptr, o.gabortex, [], rect', o.theta, [], [], [], [], kPsychDontDoRotation, gaborParams);
-          Screen('BlendFunction', p.trial.display.ptr, p.trial.display.sourceFactorNew, p.trial.display.destinationFactorNew);
+          Screen('BlendFunction', o.ptr, GL_ONE, GL_ONE);
+          Screen('DrawTexture', o.ptr, o.gabortex, [], rect', o.theta, [], [], [], [], kPsychDontDoRotation, gaborParams);
+%           Screen('BlendFunction', o.ptr, p.trial.display.sourceFactorNew, p.trial.display.destinationFactorNew);
             
-          % draw the fixation window
-          if ~isempty(o.wincolor)
-              r = o.winRadius;
-              rect = kron([1,1],o.position) + kron(r(:),[-1, -1, +1, +1]);
-              Screen('FrameOval', p.trial.display.overlayptr, o.wincolor, rect');
-%               Screen('FillOval',p.trial.display.overlayptr, o.wincolor,rect');
-          end
+%           % draw the fixation window
+%           if ~isempty(o.wincolor)
+%               r = o.winRadius;
+%               rect = kron([1,1],o.position) + kron(r(:),[-1, -1, +1, +1]);
+%               Screen('FrameOval', p.trial.display.overlayptr, o.wincolor, rect');
+% %               Screen('FillOval',p.trial.display.overlayptr, o.wincolor,rect');
+%           end
           
       end
       

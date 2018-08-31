@@ -4,7 +4,7 @@ classdef trialstates < stimuli.objects.stateControl
     properties
         hFix@stimuli.objects.fixation
         hMot
-        hTarg
+        hTargs
         hCue
         hErr
         hFace
@@ -15,9 +15,14 @@ classdef trialstates < stimuli.objects.stateControl
         timeFixationObtained
         timeTargOnset
         timeMotionOnset
+        timeMotionTurnedOn
+        timeMotionTurnedOff
         timeMotionOffset
         timeCueOnset
+        timeCueTurnedOn
         timeFixationOffset
+        timeFixationTurnedOff
+        timeFixDim
         timeStopFixationHold
         timeWaitForChoice
         timeChoiceGracePeriod
@@ -25,16 +30,24 @@ classdef trialstates < stimuli.objects.stateControl
         timeFeedback
         timeITI
         timeChoiceMade
+        windowMinEcc
+        windowMaxEcc
         rewardCnt
         rewardToGive
         rewardFun
+        iFrame=0
+        choiceX=nan
+        choiceY=nan
+        choice=nan
+        error=nan
+        flagNextTrial=false
     end
     
     methods
-        function o = trialstates(hFix,hMot,hTarg,hCue,hErr,hFace,varargin)
+        function o = trialstates(hFix,hMot,hTargs,hCue,hErr,hFace,varargin)
             o.hFix = hFix;
             o.hMot = hMot;
-            o.hTarg = hTarg;
+            o.hTargs = hTargs;
             o.hCue  = hCue;
             o.hErr  = hErr;
             o.hFace = hFace;
@@ -57,6 +70,9 @@ classdef trialstates < stimuli.objects.stateControl
             ip.addOptional('timeChoiceMade',        4);
             ip.addOptional('rewardCnt',             4);
             ip.addOptional('rewardFun',             4);
+            ip.addOptional('windowMinEcc',             4);
+            ip.addOptional('windowMaxEcc',             4);
+            
             
             ip.parse(varargin{:});
             

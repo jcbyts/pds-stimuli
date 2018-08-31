@@ -63,9 +63,9 @@ classdef fixation < stimuli.objects.target
   methods (Access = public)
       
       % --- Class constructor
-      function o = fixation(varargin)
+      function o = fixation(winPtr, varargin)
           
-          o = o@stimuli.objects.target(varargin{:}); % use parent constructor (inherits the properties and methods of TARGET)
+          o = o@stimuli.objects.target(winPtr, varargin{:}); % use parent constructor (inherits the properties and methods of TARGET)
           
           if nargin == 1
               return

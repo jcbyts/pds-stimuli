@@ -59,8 +59,13 @@ switch state
     % --- Draw task semantics using info from hTrial
     case p.trial.pldaps.trialStates.framePrepareDrawing
         
-        p.trial.(sn).states.frameUpdate(p, sn);
-        disp(['state ' num2str(p.trial.(sn).states.stateId)])
+        p.trial.(sn).states.iFrame = p.trial.iFrame;
+        p.trial.(sn).states.eyeXY  = [p.trial.eyeX p.trial.eyeY];
+        
+        p.trial.(sn).states.frameUpdate();
+        
+        p.trial.flagNextTrial = p.trial.(sn).states.flagNextTrial;
+%         disp(['state ' num2str(p.trial.(sn).states.stateId)])
 %         ctr=p.trial.display.ctr(1:2);
 %         switch p.trial.(sn).states.stateId
 %             case 0 % FixWait
@@ -107,7 +112,7 @@ switch state
 	% --- All Screen() calls go here
     case p.trial.pldaps.trialStates.frameDraw
         
-        p.trial.(sn).states.frameDraw(p, sn);
+        p.trial.(sn).states.frameDraw();
     
 	% --- Cleanup and save all parameters
     case p.trial.pldaps.trialStates.trialCleanUpandSave

@@ -18,34 +18,34 @@ classdef state5_HoldChoice < stimuli.objects.state
         end
         
         % --- Drawing commands
-        function frameDraw(s,p,sn)
+        function frameDraw(s)
             % draw targets
-            p.trial.(sn).targets.hTargs.frameDraw(p);
+            s.sc.hTargs.frameDraw();
             % draw cue
-            p.trial.(sn).cue.hCue.frameDraw(p);
+            s.sc.hCue.frameDraw();
         end
         
-        function frameUpdate(s,p,sn)
+        function frameUpdate(s)
             
             % get the state controller ready
             sc = s.sc;
             
             % track eye position wrt fixation
-            s.eyeXY = [p.trial.eyeX p.trial.eyeY] - p.trial.(sn).fixation.hFix.position;
+            s.eyeXY = sc.eyeXY - sc.hFix.position;
             s.eyeXY = s.eyeXY .* [1 -1]; % flip y axis (because pixels run down)
             
             
             % start counting
-            if p.trial.iFrame > (p.trial.(sn).frameChoiceMade + ceil(p.trial.(sn).timing.choiceGracePeriod / p.trial.display.ifi))
+            if sc.iFrame > (sc.timeChoiceMade + sc.timeChoiceGracePeriod)
                 s.choiceX = s.choiceX + s.eyeXY(1);
                 s.choiceY = s.choiceY + s.eyeXY(2);
                 s.frameCnt = s.frameCnt + 1;
                 
-                if p.trial.iFrame > (p.trial.(sn).frameChoiceMade + ceil(p.trial.(sn).timing.choiceHold / p.trial.display.ifi))
-                    p.trial.(sn).choiceX = s.choiceX / s.frameCnt;
-                    p.trial.(sn).choiceY = s.choiceY / s.frameCnt;
-                    p.trial.(sn).choice = cart2pol(p.trial.(sn).choiceX, p.trial.(sn).choiceY)/pi*180;
-                    p.trial.(sn).error  = angle(exp(1i * (p.trial.(sn).choice - p.trial.(sn).motion.direction)/180*pi))/pi*180;
+                if sc.iFrame > (sc.timeChoiceMade + sc.timeChoiceHold)
+                    sc.choiceX = s.choiceX / s.frameCnt;
+                    sc.choiceY = s.choiceY / s.frameCnt;
+                    sc.choice = cart2pol(sc.choiceX, sc.choiceY)/pi*180;
+                    sc.error  = angle(exp(1i * (sc.choice - sc.hMot.direction)/180*pi))/pi*180;
                     sc.setState(6); % transition to feedback
                     return
                 end
@@ -53,8 +53,7 @@ classdef state5_HoldChoice < stimuli.objects.state
             
             % check if choice was made
             r = sqrt(sum(s.eyeXY.^2)); % euclidean distance
-            if r < (p.trial.(sn).targets.windowMinEcc * p.trial.display.ppd) || ...
-                    r > (p.trial.(sn).targets.windowMaxEcc * p.trial.display.ppd)
+            if r < sc.windowMinEcc || r > sc.windowMaxEcc
                 % break fixation
                 sc.setState(7);
             end

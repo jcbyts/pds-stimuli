@@ -11,38 +11,35 @@ classdef state1_FixGracePeriod < stimuli.objects.state
         end
         
         % --- Drawing commands
-        function frameDraw(~,p,sn)
+        function frameDraw(s)
             
             % call draw functions for objects that should be shown
-            p.trial.(sn).fixation.hFix.frameDraw(p);
+            s.sc.hFix.frameDraw();
             
         end % frameDraw
         
         % -- Evaluate state logic (prepare before drawing)
-        function frameUpdate(s,p,sn)
+        function frameUpdate(s)
               
             % get the state controller ready
             sc = s.sc;
             
             % calculate the timegracePeriod time to transition if fixation
             % hold is maintained
-            transitionTime = (sc.getTxTime(s.id) + p.trial.(sn).timing.fixGracePeriod - p.trial.trstart);
+            transitionTime = sc.timeFixationObtained + sc.timeFixGracePeriod;
             
             % if during grace period, do nothing
-            if p.trial.ttime < transitionTime
+            if sc.iFrame < transitionTime
                 return;
             end
             
-            if ~p.trial.(sn).fixation.hFix.isFixated
+            sc.hFix.frameUpdate(sc.eyeXY);
+            
+            if ~sc.hFix.isFixated
                 % broke fixation... move to state 7 - timeout
                 sc.setState(7);   % break fixation timeout
                 return;
             end
-            
-            %if p.trial.(sn).rewardForObtainFixation
-                % move to state 2 - hold fixation
-            %    pds.behavior.reward.give(p);
-            %end
             
             sc.setState(2); % ---> to show stim
             

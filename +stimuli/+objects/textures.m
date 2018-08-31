@@ -25,7 +25,6 @@ classdef textures < stimuli.objects.target
     end
     
     properties (Access = private)
-        winPtr@double % ptb window (pass nan to operate without PTB)
         glsl
         texMode=2;
     end
@@ -56,22 +55,8 @@ classdef textures < stimuli.objects.target
     methods (Access = public)
         function o = textures(winPtr,varargin) % marmoview's initCmd?
             
-            o = o@stimuli.objects.target(varargin{:});
+            o = o@stimuli.objects.target(winPtr, varargin{:});
             
-            o.winPtr = winPtr;
-%             o.texMode = [];
-%             if ~isnan(o.winPtr)
-%                 try
-%                 [sourceFactorOld, destinationFactorOld]=Screen('BlendFunction', o.winPtr);
-%                 
-%                 if strcmp(sourceFactorOld, GL_SRC_ALPHA) && strcmp(destinationFactorOld, GL_ONE_MINUS_SRC_ALPHA)
-%                     o.texMode = [];
-%                 else
-%                     o.texMode=2;
-%                 end
-%                 end
-%             end
-%             
             if nargin == 1
                 return
             end
@@ -97,8 +82,8 @@ classdef textures < stimuli.objects.target
             o.position = args.position;
             o.alpha = args.alpha;
             
-            if ~isnan(o.winPtr)
-                o.glsl = []; %MakeTextureDrawShader(o.winPtr, 'SeparateAlphaChannel');
+            if ~isnan(o.ptr)
+                o.glsl = []; %MakeTextureDrawShader(o.ptr, 'SeparateAlphaChannel');
             else
                 o.glsl = [];
             end
@@ -123,7 +108,7 @@ classdef textures < stimuli.objects.target
             rect = bsxfun(@plus, kron([1,1],o.position),kron([-1,1],r));
             
             filterMode = 1; % bilinear interpolation
-            if ~isnan(o.winPtr)
+            if ~isnan(o.ptr)
                 Screen('BlendFunction', o.ptr, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
                 Screen('DrawTextures',o.ptr,texPtr,[],rect',[],filterMode,o.alpha);
 %                 Screen('BlendFunction', p.trial.display.ptr, p.trial.display.sourceFactorNew, p.trial.display.destinationFactorNew);
@@ -150,8 +135,8 @@ classdef textures < stimuli.objects.target
                 img = double(img)/255;
             end
             
-            if ~isnan(o.winPtr)
-                texPtr = Screen('MakeTexture',o.winPtr,img, [], [], o.texMode, [], o.glsl);
+            if ~isnan(o.ptr)
+                texPtr = Screen('MakeTexture',o.ptr,img, [], [], o.texMode, [], o.glsl);
             else
                 texPtr = img;
             end
@@ -171,7 +156,7 @@ classdef textures < stimuli.objects.target
         
         function closeAll(o)
             
-            if ~isnan(o.winPtr)
+            if ~isnan(o.ptr)
                 for i = 1:o.numTex
                     try
                     Screen('Close', o.texture{i}.ptr)
