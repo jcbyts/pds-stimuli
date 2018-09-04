@@ -16,7 +16,7 @@ classdef state2_FixHold < stimuli.objects.state
         function frameDraw(~,p,sn)
             
             % call draw functions for objects that should be shown
-            p.trial.(sn).hFix.frameDraw(p);
+            p.trial.(sn).hFix.frameDraw();
             
         end % frameDraw
         

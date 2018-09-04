@@ -105,7 +105,7 @@ classdef butterfly < stimuli.objects.stimulus
             % convert the unmatched arguments to a cell array of arg. pairs
             nextargs = [fieldnames(ip.Unmatched) struct2cell(ip.Unmatched)]';
             % call the parent constructor to create the object
-            obj = obj@stimuli.objects.stimulus(nextargs{:}); 
+            obj = obj@stimuli.objects.stimulus(p.trial.display.ptr, nextargs{:}); 
             
             % size of the display
             obj.boundaries  = ip.Results.boundaries; % boundaries for bouncing objects off the "walls"
@@ -384,7 +384,7 @@ classdef butterfly < stimuli.objects.stimulus
         % Calls screen calls
         function frameDraw(obj, p)
 
-              obj.objects.frameDraw(p);
+              obj.objects.frameDraw();
               
               obj.ctrOn  = obj.ctrOn + 1;
               obj.ctrOff = obj.ctrOff + 1;

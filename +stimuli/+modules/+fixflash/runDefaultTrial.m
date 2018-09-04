@@ -18,7 +18,7 @@ switch state
     % --- Draw task semantics using info from hTrial
     case p.trial.pldaps.trialStates.framePrepareDrawing
         
-        p.trial.(sn).hFix.frameUpdate(p); % update fixation object
+        p.trial.(sn).hFix.frameUpdate([p.trial.eyeX p.trial.eyeY]); % update fixation object
         
         % call the state machine to update
         p.trial.(sn).states.frameUpdate(p,sn)
@@ -114,7 +114,7 @@ switch state
         
         % --- Fixation
         if ~(isfield(p.trial.(sn), 'hFix') && isa(p.trial.(sn).hFix, 'stimuli.objects.target'))
-            p.trial.(sn).hFix   = stimuli.objects.fixation('position', p.trial.display.ctr(1:2));
+            p.trial.(sn).hFix   = stimuli.objects.fixation(p.trial.display.overlayptr, 'position', p.trial.display.ctr(1:2));
         end
         
         % --- Reward Face

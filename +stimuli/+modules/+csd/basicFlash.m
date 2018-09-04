@@ -58,7 +58,7 @@ switch state
         
     case p.trial.pldaps.trialStates.frameDraw
         
-        p.trial.(sn).hFlash.frameDraw(p); % draw the flash
+        p.trial.(sn).hFlash.frameDraw(); % draw the flash
         
     case p.trial.pldaps.trialStates.trialSetup
         
@@ -92,7 +92,7 @@ switch state
         
         % --- create object
         if ~isfield(p.trial.(sn), 'hFlash')
-            p.trial.(sn).hFlash = stimuli.objects.ffflash('color', p.trial.(sn).onColor);
+            p.trial.(sn).hFlash = stimuli.objects.ffflash(p.trial.display.ptr, 'color', p.trial.(sn).onColor, 'bgColor', p.trial.display.bgColor);
         end
         
         

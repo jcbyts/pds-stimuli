@@ -14,9 +14,9 @@ classdef state1_FixGracePeriod < stimuli.objects.state
         function frameDraw(~,p,sn)
             
             % call draw functions for objects that should be shown
-            p.trial.(sn).hFix.frameDraw(p);
+            p.trial.(sn).hFix.frameDraw();
             % draw face on top of fixation point?
-            p.trial.(sn).hFace.frameDraw(p);
+            p.trial.(sn).hFace.frameDraw();
             
         end % frameDraw
         

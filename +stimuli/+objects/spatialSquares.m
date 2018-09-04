@@ -63,7 +63,7 @@ classdef spatialSquares < stimuli.objects.stimulus %#ok<*MCSUP>
             
             nextargs = [fieldnames(ip.Unmatched) struct2cell(ip.Unmatched)]';
             
-            obj = obj@stimuli.objects.stimulus(nextargs{:}); % call parent constructer (hartley is a target)
+            obj = obj@stimuli.objects.stimulus(p.trial.display.ptr, nextargs{:}); % call parent constructer (hartley is a target)
 
             % save arguments
             obj.N           = ip.Results.N;
