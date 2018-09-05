@@ -205,7 +205,6 @@ th = p.trial.(sn).motion.direction * pi / 180;
 
 switch class(p.trial.(sn).cue.hCue)
     case 'stimuli.objects.gaborTarget'
-        p.trial.(sn).cue.hCue
         p.trial.(sn).cue.hCue.setup(p); % setup with pldaps
         p.trial.(sn).cue.hCue.position = p.trial.display.ctr(1:2) + [x y];
         p.trial.(sn).cue.hCue.theta = p.trial.(sn).motion.direction;

@@ -12,7 +12,7 @@ classdef state0_FixWait < stimuli.objects.state
     methods (Access = public)
         
         function s = state0_FixWait(varargin) % constructor
-            fprintf(1,'%s\n',mfilename);
+%             fprintf(1,'%s\n',mfilename);
             
             s = s@stimuli.objects.state(0); % call the parent constructor
         end
