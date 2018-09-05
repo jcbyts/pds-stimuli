@@ -16,7 +16,7 @@ classdef state1_showStim < stimuli.objects.state
         function frameDraw(~,p,sn)
             
             for k = 1:numel(p.trial.(sn).hTargs)
-                p.trial.(sn).hTargs(k).frameDraw(p);
+                p.trial.(sn).hTargs(k).frameDraw();
             end
             
         end % frameDraw

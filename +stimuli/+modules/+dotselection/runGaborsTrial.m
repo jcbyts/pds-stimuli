@@ -92,8 +92,8 @@ switch state
         
         % --- Targs
         if ~isfield(p.trial.(sn), 'hTargs')
-            p.trial.(sn).hTargs(1)   = stimuli.objects.gaborTarget();
-            p.trial.(sn).hTargs(2)   = stimuli.objects.gaborTarget();
+            p.trial.(sn).hTargs(1)   = stimuli.objects.gaborTarget(p.trial.display.ptr);
+            p.trial.(sn).hTargs(2)   = stimuli.objects.gaborTarget(p.trial.display.ptr);
         end
              
 

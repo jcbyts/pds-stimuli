@@ -9,6 +9,14 @@ settingsStruct.pldaps.useModularStateFunctions = true;
 % settingsStruct.(sn).stateFunction.name = 'stimuli.modules.ddpi.ddpi';
 % settingsStruct.(sn).stateFunction.order = -3;
 % settingsStruct.(sn).use = true;
+%% 
+close all
+p = runFaceForageHDmovie('subject', subject, ...
+    'pauseBefore', pauseBeforeExperiment, ...
+    'settingsStruct', settingsStruct);
+
+pds.plotTiming(p, true);
+
 
 %% Natural Image Free View: warm up
 close all

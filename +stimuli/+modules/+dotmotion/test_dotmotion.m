@@ -7,7 +7,7 @@ settingsStruct = struct(); % settingsStruct is a structure that modifies pldaps 
 settingsStruct.pldaps.nosave = true; % don't save any files
 
 settingsStruct.pldaps.useModularStateFunctions = true;
-settingsStruct.pldaps.trialMasterFunction='runModularTrial';
+% settingsStruct.pldaps.trialMasterFunction='runModularTrial';
 
 % dot selection requires a fixation behavior
 sn = 'dotmotion';
@@ -21,7 +21,7 @@ settingsStruct.(sn).motion.radius   = 4;
 settingsStruct.(sn).fixation.radius = 1;
 
 settingsStruct.display.normalizeColor = 1;
-settingsStruct.pldaps.pause.preExperiment = 0;
+settingsStruct.pldaps.pause.preExperiment = 1;
 
 p = pldaps(@stimuli.pldapsDefaultTrial, 'test', settingsStruct);
 
