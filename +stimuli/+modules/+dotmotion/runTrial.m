@@ -35,8 +35,14 @@ switch state
         % This code should be copied from protocol to protocol (I know.
         % There should be a way to make this automatic, but can't think of
         % an easy way)
-        
-        stimuli.setupDefaultFrameStates(p, sn)
+        requestedStates = {...
+        'experimentPostOpenScreen',...
+        'trialSetup',...
+        'framePrepareDrawing',...
+        'frameUpdate',...
+        'trialCleanUpandSave',...
+        };
+        stimuli.setupDefaultFrameStates(p, sn, requestedStates)
         
         p = stimuli.setupRandomSeed(p, sn);
 
@@ -54,13 +60,13 @@ switch state
         % --- Prepare drawing (All behavior action happens here)
     case p.trial.pldaps.trialStates.frameUpdate
         
-%         p.trial.(sn).states.frameUpdate(p, sn);
+        p.trial.(sn).states.frameUpdate(p, sn);
 
     % --- Draw task semantics using info from hTrial
     case p.trial.pldaps.trialStates.framePrepareDrawing
         
-        p.trial.(sn).states.frameUpdate(p, sn);
-        disp(['state ' num2str(p.trial.(sn).states.stateId)])
+%         p.trial.(sn).states.frameUpdate(p, sn);
+%         disp(['state ' num2str(p.trial.(sn).states.stateId)])
 %         ctr=p.trial.display.ctr(1:2);
 %         switch p.trial.(sn).states.stateId
 %             case 0 % FixWait

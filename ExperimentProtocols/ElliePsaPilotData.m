@@ -1,4 +1,4 @@
-subject = 'Ellie';% 'Ellie'; %'test'
+subject = 'test';% 'Ellie'; %'test'
 pauseBeforeExperiment = false;
 
 settingsStruct = struct();
@@ -33,6 +33,8 @@ p = runFaceForageCSD('subject', subject, ...
 pds.plotTiming(p, true);
 
 %% Face Forage with Hartley
+close all
+
 p = runFaceForageHartley('subject', subject, ...
     'pauseBefore', pauseBeforeExperiment, ...
     'imageEveryNTrials', 15, ...
@@ -42,6 +44,8 @@ p = runFaceForageHartley('subject', subject, ...
 pds.plotTiming(p, true);
 
 %% Fixation with spatial mappingp
+close all
+
 spatialSquaresOpts = struct();
 spatialSquaresOpts.N        = 2; % number of squares on each frame
 spatialSquaresOpts.lifetime = 8; % lifetime of squares frames
@@ -66,6 +70,7 @@ pds.plotTiming(p, true);
 
 
 %% Face Forage with spatial mapping
+close all
 
 spatialSquaresOpts = struct();
 spatialSquaresOpts.N        = 10; % number of squares on each frame
@@ -82,12 +87,16 @@ p = runFaceForageSpatialMapping('subject', subject,...
     'imageEveryNTrials', 10, ...
     'settingsStruct', settingsStruct);
 
+pds.plotTiming(p, true)
 %% Presaccadic selection with gabors
+
+close all
+
 SingleTarget = 0;
-runGaborTargetSelection('subject', subject,...
-    'pauseBefore', pauseBeforeExperiment,'SingleTarget', SingleTarget)
+p = runGaborTargetSelection('subject', subject,...
+    'pauseBefore', pauseBeforeExperiment,'SingleTarget', SingleTarget);
 
-
+pds.plotTiming(p, true);
 %% Full field direction mapping
 p = runFaceForageDirectionMapping('subject', subject, ...
     'pauseBefore', pauseBeforeExperiment, ...
