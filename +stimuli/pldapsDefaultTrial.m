@@ -1,74 +1,109 @@
-function p=pldapsDefaultTrial(p,state)
+function p=pldapsDefaultTrial(p,state,sn)
 
-sn = 'stimulus';
-% Default trial function just measures input
-if nargin==1 %initial call to setup conditions
+if nargin < 3
+    sn = 'stimulus';
+end
+% % Default trial function just measures input
+% if nargin==1 %initial call to setup conditions
+%     
+%     % ---------------------------------------------------------------------
+%     % --- Colors
+%     % PLDAPS uses a color lookup table (CLUT) to draw separate colors to
+%     % the two screens: subject screen and experimenter screen
+%     % These colors are set here in defaultColors and stimuli.clutColors.
+%     % You can create more colors by following the formula within.
+%     %
+%     % When drawing to the overlay (for two seperate colors), the draw call
+%     % will use a color that is an index value into the CLUT that is setup
+%     % here.
+%     p = defaultColors(p);
+%     stimuli.clutColors(p);
+%     
+%     % dot sizes for drawing
+%     p.defaultParameters.stimulus.eyeW      = 8;    % eye indicator width in pixels
+%     p.defaultParameters.stimulus.cursorW   = 8;    % cursor width in pixels
+%     
+%     % setup default trial (measures / draws)
+%     p.defaultParameters.(sn).stateFunction.use  = true;
+%     p.defaultParameters.(sn).stateFunction.name = 'stimuli.pldapsDefaultTrial';
+%     p.defaultParameters.(sn).stateFunction.order = 0;
+%     requestedStates = {...
+%         'experimentPostOpenScreen',...
+%         'frameUpdate', ...
+%         'frameDraw', ...
+%         'frameFlip', ...
+%         'trialSetup', ...
+%         'trialPrepare', ...
+%         'trialItiDraw', ...
+%         'trialCleanUpandSave',...
+%         };
+%     stimuli.setupDefaultFrameStates(p, sn, requestedStates);
+%     
+%      
+% else
     
-    % ---------------------------------------------------------------------
-    % --- Colors
-    % PLDAPS uses a color lookup table (CLUT) to draw separate colors to
-    % the two screens: subject screen and experimenter screen
-    % These colors are set here in defaultColors and stimuli.clutColors.
-    % You can create more colors by following the formula within.
-    %
-    % When drawing to the overlay (for two seperate colors), the draw call
-    % will use a color that is an index value into the CLUT that is setup
-    % here.
-    p = defaultColors(p);
-    stimuli.clutColors(p);
+switch state
     
-    % dot sizes for drawing
-    p.defaultParameters.stimulus.eyeW      = 8;    % eye indicator width in pixels
-    p.defaultParameters.stimulus.cursorW   = 8;    % cursor width in pixels
-    
-    p.defaultParameters.pldaps.trialMasterFunction = 'runModularTrial';
-    p.defaultParameters.pldaps.trialFunction = 'stimuli.pldapsDefaultTrial';
-    
-    % track this git repo
-    p = pds.git.track(p, 'calibrationGUI', 'pep');
-    
-    % seconds per trial
-    p.trial.pldaps.maxTrialLength = 20;
-    p.trial.pldaps.maxFrames = p.trial.pldaps.maxTrialLength*p.trial.display.frate;
-    
-else
-    
-    switch state
+    case p.trial.pldaps.trialStates.experimentPreOpenScreen
         
-        case p.trial.pldaps.trialStates.frameUpdate
-            frameUpdate(p);
-            
-        case p.trial.pldaps.trialStates.frameFlip
-            frameFlip(p)
-            
-            if p.trial.iFrame == p.trial.pldaps.maxFrames
-                p.trial.flagNextTrial=true;
-            end
-        case p.trial.pldaps.trialStates.frameDraw
-            frameDraw(p,sn);
-            
-        case p.trial.pldaps.trialStates.frameDrawingFinished
-            frameDrawingFinished(p);
-            
-        case p.trial.pldaps.trialStates.trialItiDraw
-            trialItiDraw(p)
-            
-            % Flip a blank screen
-            Screen('FillRect', p.trial.display.overlayptr, p.trial.display.bgColor);
-            Screen('Flip', p.trial.display.ptr);
-            
-        case p.trial.pldaps.trialStates.trialSetup
-            trialSetup(p);
-            
-        case p.trial.pldaps.trialStates.trialPrepare
-            trialPrepare(p);
-            
-        case p.trial.pldaps.trialStates.trialCleanUpandSave
-            cleanUpandSave(p);
-            
-    end
+        if ~isfield(p.defaultParameters.pldaps, 'trialMasterFunction')
+            p.defaultParameters.pldaps.trialMasterFunction = 'runModularTrial';
+        end
+        
+        % track this git repo
+        p = pds.git.track(p, 'calibrationGUI', 'pep');
+        
+        % seconds per trial
+        if ~isfield(p.trial.pldaps, 'maxTrialLength')
+            p.trial.pldaps.maxTrialLength = 20;
+        end
+        
+        
+    case p.trial.pldaps.trialStates.frameUpdate
+        frameUpdate(p);
+        
+    case p.trial.pldaps.trialStates.frameFlip
+        frameFlip(p)
+        
+        if p.trial.iFrame == p.trial.pldaps.maxFrames
+            p.trial.flagNextTrial=true;
+        end
+    case p.trial.pldaps.trialStates.frameDraw
+        frameDraw(p,sn);
+        
+        %         case p.trial.pldaps.trialStates.frameDrawingFinished
+        %             frameDrawingFinished(p);
+        
+    case p.trial.pldaps.trialStates.trialItiDraw
+        trialItiDraw(p)
+        
+        % Flip a blank screen
+        Screen('FillRect', p.trial.display.overlayptr, p.trial.display.bgColor);
+        Screen('Flip', p.trial.display.ptr);
+        
+    case p.trial.pldaps.trialStates.trialSetup
+        trialSetup(p);
+        
+    case p.trial.pldaps.trialStates.trialPrepare
+        trialPrepare(p);
+        
+    case p.trial.pldaps.trialStates.trialCleanUpandSave
+        cleanUpandSave(p);
+        
+        
+    case p.trial.pldaps.trialStates.experimentPostOpenScreen
+        if ~isfield(p.trial.(sn), 'eyeW')
+            p.trial.(sn).eyeW = 8;
+        end
+        if ~isField(p.trial,'event')
+            defaultBitNames(p);
+        end
+        
+        p.trial.pldaps.maxFrames = p.trial.pldaps.maxTrialLength*p.trial.display.frate;
+        
 end
 end
+
 
 % % % % % % % % % % % % % % %
 % % % Sub-functions

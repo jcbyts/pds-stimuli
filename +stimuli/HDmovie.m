@@ -11,7 +11,7 @@ classdef HDmovie < handle
         tex
     end
     
-    properties (Access = private)
+    properties (Access = public)
         movietexture
         lastpts
         pts
@@ -55,12 +55,13 @@ classdef HDmovie < handle
             h.texids = zeros(1,nLoadFrames);
             h.texpts = zeros(1,nLoadFrames);
             
+        end
+        function start(h)
             % Start playback of movie. This will start
             % the realtime playback clock and playback of audio tracks, if any.
             % Play 'movie', at a playbackrate = rate, with 1.0 == 100% audio volume.
             Screen('PlayMovie', h.movie, 1, 0, 1.0);
             [h.movietexture, h.pts] = Screen('GetMovieImage', h.ptr, h.movie);
-            
         end
         
         function loadFrames(h)
