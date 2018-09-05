@@ -1,5 +1,5 @@
 
-p=pldaps(@plain);
+p=pldaps(@stimuli.pldapsDefaultTrial);
 p=openScreen(p);
 p=pds.datapixx.init(p);
 
@@ -15,19 +15,31 @@ h.frameIndex=[9000 12000];
 h.open
 
 %%
+dt = zeros((h.frameIndex(2)-h.frameIndex(1)), 1);
+fr = zeros((h.frameIndex(2)-h.frameIndex(1)), 1);
 for i=1:(h.frameIndex(2)-h.frameIndex(1))
 %     h.update
+    t0 = GetSecs;
     h.update
     h.draw
+    t1 = GetSecs - t0; 
+    dt(i) = t1;
 %     h.draw
     %     h.drawNext
-    Screen('Flip', p.trial.display.ptr);
+    fr(i) = Screen('Flip', p.trial.display.ptr);
 end
 
 %%
 h.closeMovie
 %%
 sca
+figure(1); clf
+subplot(2,1,1)
+plot(dt*1e3, '.')
+subplot(2,2,3)
+histogram(dt*1e3)
+subplot(2,2,4)
+plot(diff(fr)*1e3, '.')
 %%
 h.loadFrames
 %%
