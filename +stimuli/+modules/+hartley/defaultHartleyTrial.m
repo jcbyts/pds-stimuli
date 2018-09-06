@@ -74,13 +74,18 @@ switch state
         p.trial.(sn).count = 1;
         [p.trial.(sn).kxgrid, p.trial.(sn).kygrid]=meshgrid(p.trial.(sn).kxs, p.trial.(sn).kys);
         
+        % --- instantiate Hartley object
+        p.trial.(sn).hHart = stimuli.objects.hartleybase(p, 'position', p.trial.display.ctr(1:2));
+        
     %--------------------------------------------------------------------------
     % --- Trial Setup: pre-allocate important variables for storage and
     % update the object
     case p.trial.pldaps.trialStates.trialSetup
         
         % --- instantiate Hartley object
-        p.trial.(sn).hHart = stimuli.objects.hartleybase(p, 'position', p.trial.display.ctr(1:2));
+        if ~isfield(p.trial.(sn), 'hHart')
+            p.trial.(sn).hHart = stimuli.objects.hartleybase(p, 'position', p.trial.display.ctr(1:2));
+        end
         
         % necessary variable
         p.trial.(sn).maxFrames = p.trial.pldaps.maxTrialLength * p.trial.display.frate;
