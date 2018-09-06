@@ -65,7 +65,7 @@ classdef dotsUniform < stimuli.objects.dotsbase
             
             n = length(idx); % the number of dots to (re-)place
             
-            o.frameCnt(idx) = o.dotLifetime; % default: Inf, see @dotsbase
+            o.frameCnt(idx) = o.lifetime; % default: Inf, see @dotsbase
             
             % dot positions (polar coordinates, r and th)
             r  = sqrt(rand(o.rng,n,1) * o.radius * o.radius); % pixels
@@ -79,8 +79,8 @@ classdef dotsUniform < stimuli.objects.dotsbase
             % set displacements (dx and dy) for each dot (note: rand(n,1))
             phi = o.range.*rand(o.rng, n, 1) - o.range/2;
             
-            direction = o.dotDirection + phi;
-            [dx, dy]  = pol2cart(direction * (pi/180), o.dotSpeed);
+            direction = o.direction + phi;
+            [dx, dy]  = pol2cart(direction * (pi/180), o.speed);
             o.dx(idx) = dx;
             o.dy(idx) = dy;
         end

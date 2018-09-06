@@ -23,12 +23,12 @@ classdef dotsbase < stimuli.objects.target % (Abstract) % should this be abstrac
     
     properties (Access = public),
         radius@double       = 150;  % pixels TODO: should this be deg
-        dotSpeed@double     = 2;    % pixels/s
-        dotDirection@double = 0;    % deg.
+        speed@double     = 2;    % pixels/s
+        direction@double = 0;    % deg.
         dotSize@double      = 2;    % pixels (radius?)
         
-        dotColor@double     = zeros(1,3); % [r,g,b] or clut index
-        dotLifetime@double  = inf; % dot dotLifetime (frames)
+        color@double     = zeros(1,3); % [r,g,b] or clut index
+        lifetime@double  = inf; % dot dotLifetime (frames)
         numDots@double      = 50;
         
         dotType@double      = 1;    % anti-aliased dots
@@ -72,10 +72,10 @@ classdef dotsbase < stimuli.objects.target % (Abstract) % should this be abstrac
             ip = inputParser;
             ip.StructExpand = true;
             ip.addParameter('dotSize',     o.dotSize,      @double);
-            ip.addParameter('dotSpeed',    o.dotSpeed,     @double);
-            ip.addParameter('dotDirection',o.dotDirection, @(x) isscalar(x) && isreal(x)); % deg.
-            ip.addParameter('dotLifetime', o.dotLifetime,  @double);
-            ip.addParameter('dotColor',    o.dotColor,     @double);
+            ip.addParameter('speed',    o.speed,     @double);
+            ip.addParameter('direction',o.direction, @(x) isscalar(x) && isreal(x)); % deg.
+            ip.addParameter('lifetime', o.lifetime,  @double);
+            ip.addParameter('color',    o.color,     @double);
             ip.addParameter('numDots',     o.numDots,      @(x) ceil(x));
             ip.addParameter('radius',      o.radius,       @double); % deg.
             ip.addParameter('position',    o.position,     @(x) isvector(x) && isreal(x)); % [x,y] (pixels)
@@ -95,12 +95,12 @@ classdef dotsbase < stimuli.objects.target % (Abstract) % should this be abstrac
             
         end
         
-        function trialSetup(o, p, sn)
+        function trialSetup(o, ~, ~)
             o.initDots(1:o.numDots); % <-- provided by the derived class
             
             % initialise frame counts for limited dotLifetime dots
-            if o.dotLifetime ~= Inf
-                o.frameCnt = randi(o.rng, o.dotLifetime,o.numDots,1); % 1:numDots
+            if o.lifetime ~= Inf
+                o.frameCnt = randi(o.rng, o.lifetime,o.numDots,1); % 1:numDots
             else
                 o.frameCnt = inf(o.numDots,1);
             end
@@ -114,10 +114,10 @@ classdef dotsbase < stimuli.objects.target % (Abstract) % should this be abstrac
             
             if o.useOverlay
                 % Draw Dots
-                Screen('DrawDots',p.trial.display.overlayptr,[o.x(:), -1*o.y(:)]', o.dotSize, o.dotColor, o.position, o.dotType);
+                Screen('DrawDots',p.trial.display.overlayptr,[o.x(:), -1*o.y(:)]', o.dotSize, o.color, o.position, o.dotType);
             else
                 Screen('BlendFunction', p.trial.display.ptr, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-                Screen('DrawDots',p.trial.display.ptr,[o.x(:), -1*o.y(:)]', o.dotSize, o.dotColor, o.position, o.dotType);
+                Screen('DrawDots',p.trial.display.ptr,[o.x(:), -1*o.y(:)]', o.dotSize, o.color, o.position, o.dotType);
                 Screen('BlendFunction', p.trial.display.ptr, p.trial.display.sourceFactorNew, p.trial.display.destinationFactorNew);
             end
           

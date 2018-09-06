@@ -23,6 +23,16 @@ classdef state5_HoldChoice < stimuli.objects.state
             p.trial.(sn).targets.hTargs.frameDraw(p);
             % draw cue
             p.trial.(sn).cue.hCue.frameDraw(p);
+                
+            dotsxy = p.trial.behavior.eyeAtFrame(:,p.trial.(sn).frameFixDim:p.trial.iFrame);
+            Screen('DrawDots', p.trial.display.overlayptr, dotsxy, 4, p.trial.display.clut.redbg, [], 0);
+            
+            if s.choiceX ~=0
+                gracePeriod = ceil(p.trial.(sn).timing.choiceGracePeriod / p.trial.display.ifi);
+            
+                dotsxy = p.trial.behavior.eyeAtFrame(:,(p.trial.(sn).frameChoiceMade + gracePeriod):p.trial.iFrame);
+                Screen('DrawDots', p.trial.display.overlayptr, dotsxy, 4, p.trial.display.clut.greenbg, [], 0);
+            end
         end
         
         function frameUpdate(s,p,sn)
@@ -34,14 +44,14 @@ classdef state5_HoldChoice < stimuli.objects.state
             s.eyeXY = [p.trial.eyeX p.trial.eyeY] - p.trial.(sn).fixation.hFix.position;
             s.eyeXY = s.eyeXY .* [1 -1]; % flip y axis (because pixels run down)
             
-            
+            gracePeriod = ceil(p.trial.(sn).timing.choiceGracePeriod / p.trial.display.ifi);
             % start counting
-            if p.trial.iFrame > (p.trial.(sn).frameChoiceMade + ceil(p.trial.(sn).timing.choiceGracePeriod / p.trial.display.ifi))
+            if p.trial.iFrame > (p.trial.(sn).frameChoiceMade + gracePeriod)
                 s.choiceX = s.choiceX + s.eyeXY(1);
                 s.choiceY = s.choiceY + s.eyeXY(2);
                 s.frameCnt = s.frameCnt + 1;
                 
-                if p.trial.iFrame > (p.trial.(sn).frameChoiceMade + ceil(p.trial.(sn).timing.choiceHold / p.trial.display.ifi))
+                if p.trial.iFrame > (p.trial.(sn).frameChoiceMade + gracePeriod + ceil(p.trial.(sn).timing.choiceHold / p.trial.display.ifi))
                     p.trial.(sn).choiceX = s.choiceX / s.frameCnt;
                     p.trial.(sn).choiceY = s.choiceY / s.frameCnt;
                     p.trial.(sn).choice = cart2pol(p.trial.(sn).choiceX, p.trial.(sn).choiceY)/pi*180;

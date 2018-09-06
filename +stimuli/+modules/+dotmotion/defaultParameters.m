@@ -6,11 +6,13 @@ end
 
 
 % --- Motion parameters
+defaultArgs.motion.priorType        = 'default';
+defaultArgs.motion.stimulusType     = 'default';
 defaultArgs.motion.dotSize          = 0.2; 	 % dot size (diameter; deg)
-defaultArgs.motion.dotSpeed 		= 8.0; 	 % dot speed (deg/sec) 
-defaultArgs.motion.dotDensity       = 35;    % dots / deg^2 / sec
-defaultArgs.motion.dotContrast 	    = -0.15;
-defaultArgs.motion.dotLifetime      = 5; % frames
+defaultArgs.motion.speed 		    = 8.0; 	 % speed (deg/sec) 
+defaultArgs.motion.density          = 35;    % dots / deg^2 / sec
+defaultArgs.motion.contrast 	    = -0.15;
+defaultArgs.motion.lifetime         = 5; % frames
 defaultArgs.motion.bandwidth 		= 0.0;
 defaultArgs.motion.maxBandwidth 	= 0.0;
 defaultArgs.motion.minBandwidth 	= 0.0;
@@ -24,7 +26,7 @@ defaultArgs.motion.hMot             = stimuli.objects.dotsUniform(); % default m
 % --- Fixation point
 defaultArgs.fixation.radius     = 0.3;  % radius of the fixation point
 defaultArgs.fixation.dim        = 0.1; % dimming of fixation point (0 invisible)
-defaultArgs.fixation.ctrColor   = [0 0 0]; % ctr color
+defaultArgs.fixation.ctrColor   = [1 1 1]; % ctr color
 defaultArgs.fixation.winRadius  = 1.8;
 defaultArgs.fixation.flashCnt 	= round(0.250*p.trial.display.frate);
 defaultArgs.fixation.hFix       = stimuli.objects.fixation('position', p.trial.display.ctr(1:2));
@@ -33,7 +35,7 @@ defaultArgs.fixation.rewardForFixation = false;
 defaultArgs.reward.windowWidth  = 30.0; % angular width (at half-height)
 defaultArgs.reward.maxNumber    = 4;
 defaultArgs.reward.amount       = p.trial.behavior.reward.defaultAmount;
-defaultArgs.reward.function     = @(err, widthParam, maxNumber) ceil( maxNumber * exp( -err.^2/2*widthParam^2));
+defaultArgs.reward.function     = @(err, widthParam, maxNumber) ceil( maxNumber * exp( -err.^2/2/widthParam^2));
 
 % --- Cue / Targets / Feedback
 defaultArgs.cue.show            = true;
@@ -69,7 +71,7 @@ defaultArgs.timing.minCueOnset        = 0.30;  % wrt motion onset (seconds)
 defaultArgs.timing.maxCueOnset        = 0.70;  % wrt motion onset (seconds)
 defaultArgs.timing.choiceTargetOnsetTau = 0;   % wrt fixation obtained
 defaultArgs.timing.maxChoiceTargetOnset = .2;  % wrt fixation obtained
-defaultArgs.timing.choiceGracePeriod  = 1.4;   % grace period (aka flight time; sec)
+defaultArgs.timing.choiceGracePeriod  = 0.02;   % grace period (aka flight time; sec)
 defaultArgs.timing.choiceHold 		  = 0.025; % seconds (minimum choice hold duration)
 defaultArgs.timing.choiceWaitTimeout  = 1.0;  % seconds
 defaultArgs.timing.trialTimeout       = 4.0;  % seconds
@@ -93,4 +95,7 @@ if ~isfield(p.trial.(sn).targets, 'eccentricity')
     p.trial.(sn).targets.eccentricity = p.trial.(sn).motion.radius + (0.25 * p.trial.(sn).motion.radius);
 end
         
-
+% direction prior
+if ~isfield(p.trial.(sn).motion, 'directionprior')
+    p.trial.(sn).motion.directionprior = stimuli.modules.dotmotion.directionprior(p.trial.(sn).motion.numDirs, p.trial.(sn).motion.priorType);
+end

@@ -10,6 +10,24 @@ ppd   = p.trial.display.ppd;        % pixels per degree (linear approximation)
 fps   = p.trial.display.frate;      % frames per second
 ctr   = p.trial.display.ctr(1:2);   % center of the screen
 
+% --- Random seed
+p.trial.(sn).rngs.conditionerRNG=RandStream(p.trial.(sn).rngs.randomNumberGenerater, 'seed', p.trial.(sn).rngs.trialSeeds(p.trial.pldaps.iTrial));
+setupRNG=p.trial.(sn).rngs.conditionerRNG;
+
+% --- Draw Direction
+if ~isfield(p.trial.(sn).motion, 'direction')
+    if isfield(p.trial.(sn).motion, 'directionprior')
+        p.trial.(sn).motion.direction = p.trial.(sn).motion.directionprior.drawfromprior();
+        %p.trial.(sn).fixation.ctrColor = p.trial.(sn).motion.directionprior.fixClr; % fixationColor
+    else
+        % draw direction with uniform probability from discrete number of
+        % directions
+        n = p.trial.(sn).motion.numDirs; % number of directions/choice targets
+        p.trial.(sn).motion.direction = ceil(rand(setupRNG)*n)/n*360;
+        warning('trialSetup: trialDirection needs to be set with a condition or a directionprior object!!')
+    end
+end
+
 % --- Set Fixation Point Properties
 
 % set color
@@ -51,11 +69,6 @@ p.trial.(sn).fixation.hFix.wincolor    = p.trial.display.clut.window;
 p.trial.(sn).fixation.hFix.ctrColor    = p.trial.display.clut.fixCtrColor;
 p.trial.(sn).fixation.hFix.color       = p.trial.display.clut.fixSurColor;
 p.trial.(sn).fixation.hFix.position   = [0,0] * ppd + p.trial.display.ctr(1:2);
-
-% --- Random seed
-p.trial.(sn).rngs.conditionerRNG=RandStream(p.trial.(sn).rngs.randomNumberGenerater, 'seed', p.trial.(sn).rngs.trialSeeds(p.trial.pldaps.iTrial));
-
-setupRNG=p.trial.(sn).rngs.conditionerRNG;
 
 % --- Setup Timing
 
@@ -105,18 +118,7 @@ if ~isfield(p.trial.(sn).motion, 'bandwidth') % need to set difficulty parameter
 end
 
 
-% --- Draw Direction
-if ~isfield(p.trial.(sn).motion, 'direction')
-    if isfield(p.trial.(sn).motion, 'directionprior')
-        p.trial.(sn).motion.direction = p.trial.(sn).motion.directionprior.drawfromprior();
-    else
-        % draw direction with uniform probability from discrete number of
-        % directions
-        n = p.trial.(sn).motion.numDirs; % number of directions/choice targets
-        p.trial.(sn).motion.direction = ceil(rand(setupRNG)*n)/n*360;
-        warning('trialSetup: trialDirection needs to be set with a condition or a directionprior object!!')
-    end
-end
+
 
 % --- setup motion
 switch class(p.trial.(sn).motion.hMot)
@@ -125,27 +127,27 @@ switch class(p.trial.(sn).motion.hMot)
         
         % set number of dots based on density
         apertureArea = p.trial.(sn).motion.radius^2 * pi;
-        numDots = ceil(p.trial.(sn).motion.dotDensity * apertureArea  / fps);
+        numDots = ceil(p.trial.(sn).motion.density * apertureArea  / fps);
         p.trial.(sn).motion.hMot.numDots     = numDots; 
         
         % setup object with parameters in pixels and frames (instead of
         % degrees and seconds)
         p.trial.(sn).motion.hMot.radius      = p.trial.(sn).motion.radius * ppd;
         p.trial.(sn).motion.hMot.dotSize     = p.trial.(sn).motion.dotSize  * ppd; % pixels
-        p.trial.(sn).motion.hMot.dotSpeed    = p.trial.(sn).motion.dotSpeed * ppd / fps;
-        p.trial.(sn).motion.hMot.dotLifetime = p.trial.(sn).motion.dotLifetime;
+        p.trial.(sn).motion.hMot.speed       = p.trial.(sn).motion.speed * ppd / fps;
+        p.trial.(sn).motion.hMot.lifetime    = p.trial.(sn).motion.lifetime;
         p.trial.(sn).motion.hMot.range       = p.trial.(sn).motion.bandwidth;
         
         
         % set the dot color using the color lookup table (for overlay)
         clutIx = pds.pldaps.draw.getOpenClutEntries(p, 1);
-        p.trial.display.humanCLUT(clutIx+1,:)  = p.trial.(sn).motion.dotContrast * [1 1 1] + .5;
-        p.trial.display.monkeyCLUT(clutIx+1,:) = p.trial.(sn).motion.dotContrast * [1 1 1] + .5;
+        p.trial.display.humanCLUT(clutIx+1,:)  = p.trial.(sn).motion.contrast * [1 1 1] + .5;
+        p.trial.display.monkeyCLUT(clutIx+1,:) = p.trial.(sn).motion.contrast * [1 1 1] + .5;
         p.trial.display.clut.dotColor = clutIx*ones(size(p.trial.display.clut.bg));
         
-        p.trial.(sn).motion.hMot.dotColor     = p.trial.display.clut.dotColor;
+        p.trial.(sn).motion.hMot.color     = p.trial.display.clut.dotColor;
         
-        p.trial.(sn).motion.hMot.dotDirection = p.trial.(sn).motion.direction;
+        p.trial.(sn).motion.hMot.direction = p.trial.(sn).motion.direction;
         
         % do not treat as a target (e.g., check for fixations)
         p.trial.(sn).motion.hMot.tracked = false;
@@ -185,8 +187,11 @@ if n > 22 % draw a ring
     p.trial.(sn).targets.hTargs.weight = p.trial.(sn).targets.radius * ppd;
     
 else % draw discrete targets
-    warning('trialSetup: should this use a direction prior object to get the conditions?')
-    th = (0:n-1) * (2*pi/n); % discretization of the thetas
+    if isfield(p.trial.(sn).motion, 'directionprior')
+        th = p.trial.(sn).motion.directionprior.direction/180*pi;
+    else
+        th = (0:n-1) * (2*pi/n); % discretization of the thetas
+    end
 
     [x,y] = pol2cart(th, r);
 
@@ -211,7 +216,7 @@ switch class(p.trial.(sn).cue.hCue)
         p.trial.(sn).cue.hCue.sf = 1;
         p.trial.(sn).cue.hCue.sigma = .25;
         p.trial.(sn).cue.hCue.contrast = .5;
-        p.trial.(sn).cue.hCue.tf = p.trial.(sn).motion.dotSpeed;
+        p.trial.(sn).cue.hCue.tf = p.trial.(sn).motion.speed;
         p.trial.(sn).cue.hCue.phase = randi(360);
     otherwise
         error('trialSetup: unrecognized cue object format')
@@ -234,15 +239,15 @@ p.trial.(sn).targets.hTargs.stimValue = 0;
 
 % --- Setup State machine (This runs all the state transitions)
 p.trial.(sn).states = stimuli.objects.stateControl();
-p.trial.(sn).states.addState(stimuli.modules.dotmotion.state0_FixWait)
-p.trial.(sn).states.addState(stimuli.modules.dotmotion.state1_FixGracePeriod)
-p.trial.(sn).states.addState(stimuli.modules.dotmotion.state2_FixPreStim)
-p.trial.(sn).states.addState(stimuli.modules.dotmotion.state3_ShowMotion)
-p.trial.(sn).states.addState(stimuli.modules.dotmotion.state4_Choice)
-p.trial.(sn).states.addState(stimuli.modules.dotmotion.state5_HoldChoice)
-p.trial.(sn).states.addState(stimuli.modules.dotmotion.state6_Feedback)
-p.trial.(sn).states.addState(stimuli.modules.dotmotion.state7_BreakFixTimeout)
-p.trial.(sn).states.addState(stimuli.modules.dotmotion.state8_InterTrialInterval)
+p.trial.(sn).states.addState(stimuli.modules.dotmotion.state0_FixWait);
+p.trial.(sn).states.addState(stimuli.modules.dotmotion.state1_FixGracePeriod);
+p.trial.(sn).states.addState(stimuli.modules.dotmotion.state2_FixPreStim);
+p.trial.(sn).states.addState(stimuli.modules.dotmotion.state3_ShowMotion);
+p.trial.(sn).states.addState(stimuli.modules.dotmotion.state4_Choice);
+p.trial.(sn).states.addState(stimuli.modules.dotmotion.state5_HoldChoice);
+p.trial.(sn).states.addState(stimuli.modules.dotmotion.state6_Feedback);
+p.trial.(sn).states.addState(stimuli.modules.dotmotion.state7_BreakFixTimeout);
+p.trial.(sn).states.addState(stimuli.modules.dotmotion.state8_InterTrialInterval);
 
 p.trial.(sn).states.setState(0);
 
@@ -251,7 +256,7 @@ p.trial.(sn).frameFixationObtained = nan;
 p.trial.(sn).choice = nan;
 p.trial.(sn).error = nan;
 
-pds.datapixx.init(p); % reinitialize color lookup tables
+evalc('pds.datapixx.init(p);'); % reinitialize color lookup tables
 
 
 function texp = generate_truncated_exponential(setupRNG, tau, tmin, tmax)

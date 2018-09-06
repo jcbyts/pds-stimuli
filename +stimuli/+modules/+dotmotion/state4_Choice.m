@@ -13,7 +13,7 @@ classdef state4_Choice < stimuli.objects.state
         end
         
         % --- Drawing commands
-        function frameDraw(s,p,sn)
+        function frameDraw(~,p,sn)
             
             % call draw functions for objects that should be shown
             p.trial.(sn).fixation.hFix.frameDraw(p);
@@ -23,6 +23,9 @@ classdef state4_Choice < stimuli.objects.state
             p.trial.(sn).motion.hMot.frameDraw(p);
             % draw cue
             p.trial.(sn).cue.hCue.frameDraw(p);
+            
+            dotsxy = p.trial.behavior.eyeAtFrame(:,p.trial.(sn).frameFixDim:p.trial.iFrame);
+            Screen('DrawDots', p.trial.display.overlayptr, dotsxy, 4, p.trial.display.clut.eyepos, [], 0);
             
         end % frameDraw
         

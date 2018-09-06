@@ -12,7 +12,7 @@ classdef state3_ShowMotion < stimuli.objects.state
         end
         
         % --- Drawing commands
-        function frameDraw(s,p,sn)
+        function frameDraw(~,p,sn)
             
             % call draw functions for objects that should be shown
             p.trial.(sn).fixation.hFix.frameDraw(p);

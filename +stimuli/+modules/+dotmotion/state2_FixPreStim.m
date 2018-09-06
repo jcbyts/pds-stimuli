@@ -18,6 +18,8 @@ classdef state2_FixPreStim < stimuli.objects.state
             % call draw functions for objects that should be shown
             p.trial.(sn).fixation.hFix.frameDraw(p);
             
+            p.trial.(sn).targets.hTargs.frameDraw(p);
+            
         end % frameDraw
         
         % -- Evaluate state logic (prepare before drawing)
@@ -40,7 +42,7 @@ classdef state2_FixPreStim < stimuli.objects.state
             % check if time to show the targets
             timeToShowTargs = p.trial.(sn).frameFixationObtained + ceil(p.trial.(sn).timing.t_targetOnset / p.trial.display.ifi);
             if p.trial.iFrame >= timeToShowTargs
-                p.trial.(sn).targets.hTarg.stimValue = 1; % targets on
+                p.trial.(sn).targets.hTargs.stimValue = 1; % targets on
             end
 
             timeToShowMotion = p.trial.(sn).frameFixationObtained + ceil(p.trial.(sn).timing.t_fixPreStimDuration / p.trial.display.ifi);

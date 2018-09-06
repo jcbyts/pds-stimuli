@@ -10,15 +10,25 @@ settingsStruct.pldaps.trialMasterFunction='runModularTrial';
 
 p = pldaps(@stimuli.pldapsDefaultTrial, settingsStruct);
 
-p.openScreen
+p.openScreen;
+
+pds.datapixx.init(p);
 %% build test objects
 
 % fixation
 hFix = stimuli.objects.fixation();
 hFix.position = p.trial.display.ctr(1:2);
 hFix.stimValue = 1;
+hFix.sz = 10;
+hFix.ctrColor = p.trial.display.clut.white;
+hFix.color    = p.trial.display.clut.black;
+hFix.wincolor = p.trial.display.clut.redbg;
 
-% choice targets
+hFix.frameDraw(p);
+
+Screen('Flip', p.trial.display.ptr, 0);
+Screen('FillRect', p.trial.display.overlayptr, p.trial.display.clut.bg)
+%% choice targets
 hChoice = stimuli.objects.circles('position', p.trial.display.ctr(1:2), 'radius', 100);
 n = 10;
 th = 0:(360/n):(360-(360/n));
@@ -28,25 +38,39 @@ hChoice.weight = [];
 hChoice.position = bsxfun(@plus, p.trial.display.ctr(1:2),[x(:) y(:)]);
 hChoice.radius   = repmat(20, n , 1);
 hChoice.stimValue = 1;
+hChoice.color = p.trial.display.clut.white;
 
+hChoice.frameDraw(p);
+
+Screen('Flip', p.trial.display.ptr, 0);
+Screen('FillRect', p.trial.display.overlayptr, p.trial.display.clut.bg)
+
+%%
 % dots
 hDots = stimuli.objects.dotsUniform('range', 10);
 
 hDots.position = p.trial.display.ctr(1:2);
-hDots.dotSpeed = 10;
-hDots.dotDirection = 90;
+hDots.speed = 10;
+hDots.direction = 90;
+hDots.color = p.trial.display.clut.greenbg;
 
 hDots.trialSetup(p); % initializes dot positions before a trial
 hDots.setRandomSeed();
 hDots.stimValue = 1;
 
+hDots.frameDraw(p);
 
-%% draw
+Screen('Flip', p.trial.display.ptr, 0);
+Screen('FillRect', p.trial.display.overlayptr, p.trial.display.clut.bg)
+
+%% draw all objects
 
 
 hDots.frameUpdate(p);
-hDots.frameDraw(p);
+
 hChoice.frameDraw(p);
+hDots.frameDraw(p);
 hFix.frameDraw(p);
 
 Screen('Flip', p.trial.display.ptr, 0);
+% Screen('FillRect', p.trial.display.overlayptr, p.trial.display.clut.bg)

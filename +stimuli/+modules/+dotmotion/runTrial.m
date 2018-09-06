@@ -40,6 +40,7 @@ switch state
         'trialSetup',...
         'framePrepareDrawing',...
         'frameUpdate',...
+        'frameDraw', ...
         'trialCleanUpandSave',...
         };
         stimuli.setupDefaultFrameStates(p, sn, requestedStates)
@@ -59,7 +60,7 @@ switch state
         
         % --- Prepare drawing (All behavior action happens here)
     case p.trial.pldaps.trialStates.frameUpdate
-        
+%         disp(['state ' num2str(p.trial.(sn).states.stateId)])
         p.trial.(sn).states.frameUpdate(p, sn);
 
     % --- Draw task semantics using info from hTrial
@@ -117,6 +118,10 @@ switch state
     
 	% --- Cleanup and save all parameters
     case p.trial.pldaps.trialStates.trialCleanUpandSave
+        
+        ar = p.trial.(sn).reward.function(p.trial.(sn).error, p.trial.(sn).reward.windowWidth,  p.trial.(sn).reward.maxNumber);
+        fprintf('Trial: %d, Direction: %02.2f, Choice: %02.2f, Error: %02.2f, Reward: %d', ...
+            p.trial.trialnumber, p.trial.(sn).motion.direction, p.trial.(sn).choice, p.trial.(sn).error, ar);
         
 end % switch
 
