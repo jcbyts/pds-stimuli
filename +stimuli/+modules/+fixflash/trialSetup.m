@@ -42,7 +42,7 @@ end
 % p.trial.(sn).hFix.ctrColor   = -ones(1,3);
 p.trial.(sn).hFix.position      = [xpos ypos] * ppd + ctr;
 p.trial.(sn).hFix.winRadius  = p.trial.(sn).fixWinRadius * ppd;
-p.trial.(sn).hFix.wincolor   = p.trial.display.clut.bg_white;
+p.trial.(sn).hFix.wincolor   = p.trial.display.clut.window;
 
 
 % fixation duration
