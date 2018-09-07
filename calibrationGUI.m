@@ -56,7 +56,7 @@ function calibrationGUI_OpeningFcn(hObject, ~, handles, varargin)
 handles.output = hObject;
 handles.p = varargin{1}; % pointer to pldaps object
 
-Screen('BlendFunction', handles.p.trial.display.ptr, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+Screen('BlendFunction', handles.p.defaultParameters.display.ptr, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 handles.S = struct; % Settings for the protocol, NOT changed while running
 handles.A = struct; % plot
 
@@ -86,27 +86,27 @@ end
 % EYE CALIBRATION STUFF HERE
 cm=getCalibrationPref(handles.p,1);
 % marmoview specific preferences override pldaps
-if handles.p.trial.eyelink.use && handles.p.trial.eyelink.useAsEyepos
-    if handles.p.trial.eyelink.useRawData && ~isempty(handles.p.trial.eyelink.calibration_matrix)
-        cm = handles.p.trial.eyelink.calibration_matrix(:,:,handles.p.trial.eyelink.eyeIdx)';
+if handles.p.defaultParameters.eyelink.use && handles.p.defaultParameters.eyelink.useAsEyepos
+    if handles.p.defaultParameters.eyelink.useRawData && ~isempty(handles.p.defaultParameters.eyelink.calibration_matrix)
+        cm = handles.p.defaultParameters.eyelink.calibration_matrix(:,:,handles.p.defaultParameters.eyelink.eyeIdx)';
     else
-        handles.p.trial.eyelink.useRawData=true;
-        handles.p.trial.eyelink.calibration_matrix=[];
+        handles.p.defaultParameters.eyelink.useRawData=true;
+        handles.p.defaultParameters.eyelink.calibration_matrix=[];
         for i = 1:2 % loop over eye index
             % get subject specific calibration matrix
             cm=getCalibrationPref(handles.p,1);
-            handles.p.trial.eyelink.calibration_matrix(:,:,i) = cm';
+            handles.p.defaultParameters.eyelink.calibration_matrix(:,:,i) = cm';
         end
     end
-elseif handles.p.trial.arrington.use && handles.p.trial.arrington.useAsEyepos
-    if ~isempty(handles.p.trial.arrington.calibration_matrix)
-        cm = handles.p.trial.arrington.calibration_matrix(:,:,handles.p.trial.arrington.eyeIdx)';
+elseif handles.p.defaultParameters.arrington.use && handles.p.defaultParameters.arrington.useAsEyepos
+    if ~isempty(handles.p.defaultParameters.arrington.calibration_matrix)
+        cm = handles.p.defaultParameters.arrington.calibration_matrix(:,:,handles.p.defaultParameters.arrington.eyeIdx)';
     else
-        handles.p.trial.arrington.calibration_matrix=[];
+        handles.p.defaultParameters.arrington.calibration_matrix=[];
         for i = 1:2 % loop over eye index
             % get subject specific calibration matrix
             cm=getCalibrationPref(handles.p,1);
-            handles.p.trial.arrington.calibration_matrix(:,:,i) = cm';
+            handles.p.defaultParameters.arrington.calibration_matrix(:,:,i) = cm';
         end
     end 
 end
@@ -139,7 +139,7 @@ cm=getCurrentCalibrationMatrix(handles.p);
 handles=updateGains(handles, cm);
 
 handles.A.c(1) = handles.A.c(1) + ...
-    handles.shiftSize*handles.p.trial.display.ppd;
+    handles.shiftSize*handles.p.defaultParameters.display.ppd;
 
 handles=updateCalibrationMatrix(handles);
 guidata(hObject,handles);
@@ -154,7 +154,7 @@ cm=getCurrentCalibrationMatrix(handles.p);
 handles=updateGains(handles,cm);
 
 handles.A.c(1) = handles.A.c(1) - ...
-    handles.shiftSize*handles.p.trial.display.ppd;
+    handles.shiftSize*handles.p.defaultParameters.display.ppd;
 
 handles=updateCalibrationMatrix(handles);
 guidata(hObject,handles);
@@ -168,7 +168,7 @@ cm=getCurrentCalibrationMatrix(handles.p);
 handles=updateGains(handles,cm);
 
 handles.A.c(2) = handles.A.c(2) - ...
-    handles.shiftSize*handles.p.trial.display.ppd;
+    handles.shiftSize*handles.p.defaultParameters.display.ppd;
 
 handles=updateCalibrationMatrix(handles);
 guidata(hObject,handles);
@@ -182,7 +182,7 @@ cm=getCurrentCalibrationMatrix(handles.p);
 handles=updateGains(handles,cm);
 
 handles.A.c(2) = handles.A.c(2) + ...
-    handles.shiftSize*handles.p.trial.display.ppd;
+    handles.shiftSize*handles.p.defaultParameters.display.ppd;
 
 handles=updateCalibrationMatrix(handles);
 
@@ -345,21 +345,21 @@ UpdateEyePlot(handles);
 % --- Draw specified calibration targets
 function handles=drawCalibrationTargets(handles, xy, nFrames)
 % clear frame
-Screen('FillRect', handles.p.trial.display.overlayptr,handles.p.trial.display.bgColor);
-% Screen('FillRect', handles.p.trial.display.overlayptr,0);
+Screen('FillRect', handles.p.defaultParameters.display.overlayptr,handles.p.defaultParameters.display.bgColor);
+% Screen('FillRect', handles.p.defaultParameters.display.overlayptr,0);
 
 nTargs=size(xy,1);
 texids=handles.A.Marmotex(randi(numel(handles.A.Marmotex), nTargs,1));
 
-xypx=pds.deg2px(xy', handles.p.trial.display.viewdist, handles.p.trial.display.w2px, false);
+xypx=pds.deg2px(xy', handles.p.defaultParameters.display.viewdist, handles.p.defaultParameters.display.w2px, false);
 
-ctr=handles.p.trial.display.ctr;
+ctr=handles.p.defaultParameters.display.ctr;
 xypx=bsxfun(@times, xypx, [1; -1]);
 xypx=bsxfun(@plus, xypx, ctr(1:2)')';
 
 
 sz=3;
-szpx=pds.deg2px(sz, handles.p.trial.display.viewdist, handles.p.trial.display.w2px, false);
+szpx=pds.deg2px(sz, handles.p.defaultParameters.display.viewdist, handles.p.defaultParameters.display.w2px, false);
 
 dstRects=CenterRectOnPoint([0 0 szpx(1) szpx(2)], xypx(:,1), xypx(:,2))';
 handles.A.rawXY=nan(2,nFrames);
@@ -369,14 +369,14 @@ pds.behavior.reward.give(handles.p);
 for k=1:nFrames
     [eye, raw]=getEye(handles.p);
     handles.A.rawxy(:,k)=raw;
-    Screen('DrawTextures', handles.p.trial.display.ptr, texids, [], dstRects);
-    Screen('DrawDots', handles.p.trial.display.overlayptr, eye', 4, handles.p.trial.display.clut.eyepos, [], 0);
-    Screen('Flip', handles.p.trial.display.ptr, 0);
+    Screen('DrawTextures', handles.p.defaultParameters.display.ptr, texids, [], dstRects);
+    Screen('DrawDots', handles.p.defaultParameters.display.overlayptr, eye', 4, handles.p.defaultParameters.display.clut.eyepos, [], 0);
+    Screen('Flip', handles.p.defaultParameters.display.ptr, 0);
     if rand < .0025
         pds.behavior.reward.give(handles.p);
     end
 end
-Screen('Flip', handles.p.trial.display.ptr, 0);
+Screen('Flip', handles.p.defaultParameters.display.ptr, 0);
 
 % update eye plot
 ah=handles.EyeTrace;
@@ -407,7 +407,7 @@ function closeButton_Callback(hObject, eventdata, handles)
 
 handles=cleanupMarmosetTextures(handles);
 
-Screen('BlendFunction', handles.p.trial.display.ptr, handles.p.trial.display.sourceFactorNew, handles.p.trial.display.destinationFactorNew);
+Screen('BlendFunction', handles.p.defaultParameters.display.ptr, handles.p.defaultParameters.display.sourceFactorNew, handles.p.defaultParameters.display.destinationFactorNew);
 
 close(handles.figure1, 'force');
 
@@ -421,8 +421,8 @@ handles=updateCalibrationMatrix(handles);
 guidata(hObject,handles);
 
 % clear overlay pointer
-Screen('FillRect', handles.p.trial.display.overlayptr,0);
-Screen('Flip', handles.p.trial.display.ptr, 0);
+Screen('FillRect', handles.p.defaultParameters.display.overlayptr,0);
+Screen('Flip', handles.p.defaultParameters.display.ptr, 0);
 
 
 % --- Executes on button press in marmosetFaceCheckbox.
@@ -461,7 +461,7 @@ for id = 1:length(MFL)
   g = g./max(g(:));
   img(:,:,4) = uint8(255.*g); % alpha channel: 0 = transparent, 255 = opaque
     
-  handles.A.Marmotex(id)=Screen('MakeTexture',handles.p.trial.display.ptr,img);
+  handles.A.Marmotex(id)=Screen('MakeTexture',handles.p.defaultParameters.display.ptr,img);
   handles.A.MarmotexSize(1,id)=sz(1);
   handles.A.MarmotexSize(2,id)=sz(2);
 end
@@ -500,12 +500,12 @@ axis(handles.EyeTrace,[-etr etr -etr etr]);
 function UpdateEyePlot(handles)
 % handles.A.cm
 if isfield(handles.A, 'hplot')
-% if handles.p.trial.pldaps.quit && handles.p.trial.pldaps.iTrial > 0  % At least 1 trial must be complete in order to plot the trace
+% if handles.p.defaultParameters.pldaps.quit && handles.p.defaultParameters.pldaps.iTrial > 0  % At least 1 trial must be complete in order to plot the trace
     eye=[handles.A.rawxy; ones(1,size(handles.A.rawxy,2))]'*handles.A.cm;
     eye=eye';
-    ctr=handles.p.trial.display.ctr;
+    ctr=handles.p.defaultParameters.display.ctr;
     eye=bsxfun(@minus, eye, ctr(1:2)');
-    eye=pds.px2deg(eye, handles.p.trial.display.viewdist, handles.p.trial.display.px2w);
+    eye=pds.px2deg(eye, handles.p.defaultParameters.display.viewdist, handles.p.defaultParameters.display.px2w);
     eye=bsxfun(@times, eye, [1; -1]);
     handles.A.hplot.XData=eye(1,:);
     handles.A.hplot.YData=eye(2,:);
@@ -524,38 +524,38 @@ set(h.GainText,'String',sprintf('[%.2g %.2g]',dx,dy));
 % Support functions for calibration
 % --- update calibraiton matrix using current Gains    
 function  handles=updateCalibrationMatrix(handles)
-ctr=handles.p.trial.display.ctr;
+ctr=handles.p.defaultParameters.display.ctr;
 cm=gainsToCalibrationMatrix([handles.A.dx handles.A.dy],[handles.A.rx handles.A.ry],handles.A.c,ctr(1:2));
 handles.A.cm=cm;
     
-if handles.p.trial.eyelink.use && handles.p.trial.eyelink.useAsEyepos
-    handles.p.trial.eyelink.calibration_matrix(:,:,handles.p.trial.eyelink.eyeIdx)=cm';
+if handles.p.defaultParameters.eyelink.use && handles.p.defaultParameters.eyelink.useAsEyepos
+    handles.p.defaultParameters.eyelink.calibration_matrix(:,:,handles.p.defaultParameters.eyelink.eyeIdx)=cm';
 end
 
-if handles.p.trial.arrington.use && handles.p.trial.arrington.useAsEyepos
-    handles.p.trial.arrington.calibration_matrix(:,:,handles.p.trial.arrington.eyeIdx)=cm';
+if handles.p.defaultParameters.arrington.use && handles.p.defaultParameters.arrington.useAsEyepos
+    handles.p.defaultParameters.arrington.calibration_matrix(:,:,handles.p.defaultParameters.arrington.eyeIdx)=cm';
 end
 
 
 % --- get recent eye position values
 function [eye, raw]=getEye(p)
-if p.trial.eyelink.use && p.trial.eyelink.useAsEyepos
+if p.defaultParameters.eyelink.use && p.defaultParameters.eyelink.useAsEyepos
     sample=Eyelink('NewestFloatSample');
-    eyeIdx=p.trial.eyelink.eyeIdx;
-    if p.trial.eyelink.useRawData
+    eyeIdx=p.defaultParameters.eyelink.eyeIdx;
+    if p.defaultParameters.eyelink.useRawData
         raw=[sample.px(eyeIdx); sample.py(eyeIdx)];
-        eye=p.trial.eyelink.calibration_matrix(:,:,eyeIdx)*[raw; 1];
+        eye=p.defaultParameters.eyelink.calibration_matrix(:,:,eyeIdx)*[raw; 1];
     else
-        eye=[p.trial.eyelink.gx(eyeIdx); p.trial.eyelink.gy(eyeIdx)];
+        eye=[p.defaultParameters.eyelink.gx(eyeIdx); p.defaultParameters.eyelink.gy(eyeIdx)];
         raw=eye;
     end
-elseif p.trial.arrington.use && p.trial.arrington.useAsEyepos
+elseif p.defaultParameters.arrington.use && p.defaultParameters.arrington.useAsEyepos
     [x,y] = vpx_GetGazePoint;
     raw = [x;y];
     
-    eyeIdx=p.trial.arrington.eyeIdx;
+    eyeIdx=p.defaultParameters.arrington.eyeIdx;
     
-    eye = p.trial.arrington.calibration_matrix(:,:,eyeIdx)*[raw;1];
+    eye = p.defaultParameters.arrington.calibration_matrix(:,:,eyeIdx)*[raw;1];
 else
     [x,y]=GetMouse;
     eye=[x; y];
@@ -608,14 +608,14 @@ function c=getCalibrationPref(p, eyeIdx)
 %   cm     [3 x 2] - calibration matrix
 
 % get subject name
-subj=p.trial.session.subject;
+subj=p.defaultParameters.session.subject;
 
 % if no index is passed in, query the eyelink to get the proper index
 if nargin < 2
-    useEyelink = p.trial.eyelink.use & p.trial.eyelink.useAsEyepos;
+    useEyelink = p.defaultParameters.eyelink.use & p.defaultParameters.eyelink.useAsEyepos;
     if useEyelink
-        if isfield(p.trial.eyelink, 'eyeIdx')
-            eyeIdx = p.trial.eyelink.eyeIdx;
+        if isfield(p.defaultParameters.eyelink, 'eyeIdx')
+            eyeIdx = p.defaultParameters.eyelink.eyeIdx;
         else
             eyeIdx = 1;
         end
@@ -645,7 +645,7 @@ end
 
 % --- Save the current eye calibration to rig preferences
 function saveCalibrationAsRigPref(p,c)
-subj=p.trial.session.subject;
+subj=p.defaultParameters.session.subject;
 
 % get previous calibration matrix
 cm = getpref('marmoview_calibration', subj);
@@ -654,10 +654,10 @@ cm = getpref('marmoview_calibration', subj);
 if isempty(cm)
     cm = c;
     cm(:,:,2) = c;
-elseif p.trial.eyelink.use && p.trial.eyelink.useAsEyepos
-    cm(:,:,p.trial.eyelink.eyeIdx) = c;
-elseif p.trial.arrington.use && p.trial.arrington.useAsEyepos
-    cm(:,:,p.trial.arrington.eyeIdx) = c;
+elseif p.defaultParameters.eyelink.use && p.defaultParameters.eyelink.useAsEyepos
+    cm(:,:,p.defaultParameters.eyelink.eyeIdx) = c;
+elseif p.defaultParameters.arrington.use && p.defaultParameters.arrington.useAsEyepos
+    cm(:,:,p.defaultParameters.arrington.eyeIdx) = c;
 end
 
 setpref('marmoview_calibration', subj, cm)
@@ -666,16 +666,16 @@ disp('saved new calibration matrix.')
 % --- Get the current eye calibration matrix
 function cm=getCurrentCalibrationMatrix(p)
 cm=[];
-if p.trial.eyelink.use && p.trial.eyelink.useAsEyepos
+if p.defaultParameters.eyelink.use && p.defaultParameters.eyelink.useAsEyepos
 	% marmoview only has one eye
-    cm=p.trial.eyelink.calibration_matrix(:,:,p.trial.eyelink.eyeIdx)';
-elseif p.trial.arrington.use && p.trial.arrington.useAsEyepos
-    cm=p.trial.arrington.calibration_matrix(:,:,p.trial.arrington.eyeIdx)'; 
+    cm=p.defaultParameters.eyelink.calibration_matrix(:,:,p.defaultParameters.eyelink.eyeIdx)';
+elseif p.defaultParameters.arrington.use && p.defaultParameters.arrington.useAsEyepos
+    cm=p.defaultParameters.arrington.calibration_matrix(:,:,p.defaultParameters.arrington.eyeIdx)'; 
 end
 
 % --- Update the current MarmoView Gains from a calibration matrix
 function handles=updateGains(handles, cm)
-[g,r,c]=calibrationMatrixToGains(cm, handles.p.trial.display.ctr(1:2));
+[g,r,c]=calibrationMatrixToGains(cm, handles.p.defaultParameters.display.ctr(1:2));
 handles.A.dx=g(1);
 handles.A.dy=g(2);
 handles.A.rx=r(1);
