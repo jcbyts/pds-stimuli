@@ -23,7 +23,11 @@ settingsStruct.(sn).fixation.radius = 1;
 settingsStruct.display.normalizeColor = 1;
 settingsStruct.pldaps.pause.preExperiment = 0;
 
-p = pldaps(@stimuli.pldapsDefaultTrial, 'test', settingsStruct);
+settingsStruct.session.subject = 'Mouse';
+
+settingsStruct = loadCalibration(settingsStruct);
+
+p = pldaps(@stimuli.pldapsDefaultTrial, settingsStruct);
 
 p.run
 

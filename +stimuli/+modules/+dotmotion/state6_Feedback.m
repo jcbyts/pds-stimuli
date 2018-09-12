@@ -4,7 +4,7 @@ classdef state6_Feedback < stimuli.objects.state
     properties
         rewardCnt = 0; % the number of reward(s) delivered...
         rewardToGive = nan
-        rewardInterval = 5; % frames
+        rewardInterval = 50; % frames
     end
     
     methods (Access = public)

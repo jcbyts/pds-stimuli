@@ -106,7 +106,7 @@ classdef dotsbase < stimuli.objects.target % (Abstract) % should this be abstrac
             end
         end
         
-        function frameDraw(o,p,sn)
+        function frameDraw(o,p,~)
             
             if ~o.stimValue
                 return

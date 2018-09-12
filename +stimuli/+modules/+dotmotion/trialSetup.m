@@ -149,7 +149,7 @@ switch class(p.trial.(sn).motion.hMot)
         
         p.trial.(sn).motion.hMot.direction = p.trial.(sn).motion.direction;
         
-        % do not treat as a target (e.g., check for fixations)
+%         % do not treat as a target (e.g., check for fixations)
         p.trial.(sn).motion.hMot.tracked = false;
         
         xy = [p.trial.(sn).motion.xPos; p.trial.(sn).motion.yPos];

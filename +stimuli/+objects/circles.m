@@ -30,8 +30,15 @@ classdef circles < stimuli.objects.stimulus
     function frameDraw(o, p)
       if o.stimValue
         r = o.radius; % radius in pixels
-      
-        rect = kron([1,1],o.position) + kron(r(:),[-1, -1, +1, +1]);
+%         
+%         tic
+%         rect = kron([1,1],o.position) + kron(r(:),[-1, -1, +1, +1]);
+%         toc
+        
+%         tic
+        rect = [o.position(:,1) - r(:) o.position(:,2) - r(:) o.position(:,1) + r(:) o.position(:,2) + r(:)];
+%         toc
+        
         if o.weight > 0,
             Screen('FrameOval', p.trial.display.overlayptr, o.color, rect', o.weight);
         else

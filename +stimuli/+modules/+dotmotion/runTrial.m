@@ -38,8 +38,7 @@ switch state
         requestedStates = {...
         'experimentPostOpenScreen',...
         'trialSetup',...
-        'framePrepareDrawing',...
-        'frameUpdate',...
+        'framePrepareDrawing',... %         'frameUpdate',...
         'frameDraw', ...
         'trialCleanUpandSave',...
         };
@@ -61,12 +60,12 @@ switch state
         % --- Prepare drawing (All behavior action happens here)
     case p.trial.pldaps.trialStates.frameUpdate
 %         disp(['state ' num2str(p.trial.(sn).states.stateId)])
-        p.trial.(sn).states.frameUpdate(p, sn);
+%         p.trial.(sn).states.frameUpdate(p, sn);
 
     % --- Draw task semantics using info from hTrial
     case p.trial.pldaps.trialStates.framePrepareDrawing
         
-%         p.trial.(sn).states.frameUpdate(p, sn);
+        p.trial.(sn).states.frameUpdate(p, sn);
 %         disp(['state ' num2str(p.trial.(sn).states.stateId)])
 %         ctr=p.trial.display.ctr(1:2);
 %         switch p.trial.(sn).states.stateId
@@ -120,7 +119,7 @@ switch state
     case p.trial.pldaps.trialStates.trialCleanUpandSave
         
         ar = p.trial.(sn).reward.function(p.trial.(sn).error, p.trial.(sn).reward.windowWidth,  p.trial.(sn).reward.maxNumber);
-        fprintf('Trial: %d, Direction: %02.2f, Choice: %02.2f, Error: %02.2f, Reward: %d', ...
+        fprintf('Trial: %d, Direction: %02.2f, Choice: %02.2f, Error: %02.2f, Reward: %d\n', ...
             p.trial.trialnumber, p.trial.(sn).motion.direction, p.trial.(sn).choice, p.trial.(sn).error, ar);
         
 end % switch

@@ -86,6 +86,11 @@ classdef stimulus < handle %#ok<*MCSUP>
             
         end
         
+        function initLog(obj)
+            obj.log = [];
+            obj.stimValue = false;
+        end
+        
         % --- set function logs the value when it is change
         function set.stimValue(obj, val)
             if obj.locked

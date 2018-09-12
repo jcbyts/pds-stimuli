@@ -30,6 +30,13 @@ classdef target < stimuli.objects.stimulus %#ok<*MCSUP>
             obj.isFixated = false; % initialize to non-fixated state
         end
         
+        function initLog(obj)
+            obj.log       = [];
+            obj.stimValue = false;
+            obj.fixlog    = [];
+            obj.isFixated = false;
+        end
+        
         function set.isFixated(obj, val)
             obj.isFixated = val;
             obj.fixlog(:, end+1) = [val; GetSecs];
