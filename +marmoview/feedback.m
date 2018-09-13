@@ -2,7 +2,7 @@
 
 % 19-05-2016 - Shaun L. Cloherty <s.cloherty@ieee.org>
 
-classdef (Abstract) feedback < handle
+classdef (Abstract) feedback < handle & matlab.mixin.Copyable
   % Abstract class for providing feedback (e.g., sound, reward etc.).
   %
   % To see the public properties of this class, type
@@ -15,13 +15,17 @@ classdef (Abstract) feedback < handle
   %
   % The class constructor can be called with a range of arguments:
   
-  properties (Access = private)
-    h@handle; % handle for the marmoview gui figure
+  properties (GetAccess = public, SetAccess = protected)
+  log@double=[]
+  end
+  
+  properties (Access = protected)
+%     h@handle; % handle for the marmoview gui figure
   end % properties
   
   methods (Access = public)
-    function o = feedback(h,varargin),
-      o.h = h;
+    function o = feedback(varargin)
+%       o.h = h;
     end
     
     % called to deliver the feedback...
@@ -29,5 +33,9 @@ classdef (Abstract) feedback < handle
     
     % called at the end of each trial to provide info to the gui...?
     report(o,varargin); % abstract method?
+    
+    function clearlog(o)
+        o.log = [];
+    end
   end % methods  
 end % classdef

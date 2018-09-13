@@ -23,7 +23,7 @@ classdef newera < marmoview.liquid
   %   rate     - dispensing rate (ml per minute)
   
   properties (SetAccess = private, GetAccess = public)
-    dev@serial; % the serial port object - PRIVATE?
+    dev%@serial; % the serial port object - PRIVATE?
 
     port; % port for serial communications ('COM1','COM2', etc.)
     baud;
@@ -32,93 +32,123 @@ classdef newera < marmoview.liquid
   end % properties
 
   % dependent properties, calculated on the fly...
-  properties (Dependent, SetAccess = public, GetAccess = public)
+  properties (SetAccess = public, GetAccess = public)
     diameter@double; % diameter of the syringe (mm)
     volume@double;   % dispensing volume (mL)
     rate@double;     % dispensing rate (mL per minute)
   end
 
   methods % set/get dependent properties
-    % dependent property set methods
-    function o = set.diameter(o,value),
-        o.setdia(value);
-    end
+      % dependent property set methods
+      function o = set.diameter(o,value)
+          if isa(o.dev, 'serial')
+              o.setdia(value);
+          else
+              o.diameter = value;
+          end
+      end % set.diameter
 
-    function o = set.volume(o,value),
-        % note: value is in ml, however, if diameter > 14.0mm, the pump
-        %       is expecting volume in microliters (unless the default units
-        %       have been over-riden).
-        if o.diameter <= 14.0,
-          value = value*1e3; % microliters
+    function o = set.volume(o,value)
+        
+        if isa(o.dev, 'serial') % only run conversion if active serial port
+            
+            % note: value is in ml, however, if diameter > 14.0mm, the pump
+            %       is expecting volume in microliters (unless the default units
+            %       have been over-riden).
+            if o.diameter <= 14.0,
+                value = value*1e3; % microliters
+            end
+            o.setvol(value);
+        else
+            o.volume = value;
         end
-        o.setvol(value);
-    end
+        
+    end % set.volume
 
-    function o = set.rate(o,value),
-        o.setrate(value);
-    end
+    function o = set.rate(o,value)
+        if isa(o.dev, 'serial')
+            o.setrate(value);
+        else
+            o.rate = value;
+        end
+        
+    end % set.rate
 
     % dependent property get methods
-    function value = get.diameter(o),
-        [err,status,msg] = o.sndcmd('DIA');
-        assert(err == 0);
+    function value = get.diameter(o)
+        if isa(o.dev, 'serial')
+            [err,~,msg] = o.sndcmd('DIA');
+            assert(err == 0);
 
-        value = str2double(msg);
-    end
+            value = str2double(msg);
+        else
+            value = o.diameter;
+        end
+    end % get.diameter
 
-    function value = get.volume(o),
-      [err,status,msg] = o.sndcmd('VOL');
-      assert(err == 0);
-
-      pat = '(?<value>[\d\.]{5})\s*(?<units>[A-Z]{2})';
-      tokens = regexp(msg,pat,'names');
-        
-      value = str2double(tokens.value);        
-
-      % note: value should be returned in ml, however, if diameter <= 14.0mm,
-      %       the pump returns the volume in microliters (unless the default
-      %       units have been over-riden).
-      switch upper(tokens.units),
-        case 'ML', % milliliters
-          value = value;
-        case 'UL', % microliters
-          value = value/1e3; % milliliters
-        otherwise,
-          warning('MARMOVIEW:NEWERA','Unknown volume units ''%s''.', tokens.units);
-      end
-    end
+    function value = get.volume(o)
+        if isa(o.dev, 'serial')
+            [err,~,msg] = o.sndcmd('VOL');
+            assert(err == 0);
+            
+            pat = '(?<value>[\d\.]{5})\s*(?<units>[A-Z]{2})';
+            tokens = regexp(msg,pat,'names');
+            
+            value = str2double(tokens.value);
+            
+            
+            % note: value should be returned in ml, however, if diameter <= 14.0mm,
+            %       the pump returns the volume in microliters (unless the default
+            %       units have been over-riden).
+            switch upper(tokens.units),
+                case 'ML', % milliliters
+                    % do nothing
+                case 'UL', % microliters
+                    value = value/1e3; % milliliters
+                otherwise,
+                    warning('MARMOVIEW:NEWERA','Unknown volume units ''%s''.', tokens.units);
+            end
+        else
+            value = o.volume;
+        end
+    end % get.volume
 
     function value = get.rate(o)
-      [err,~,msg] = o.sndcmd('RAT');
-      assert(err == 0);
-
-      pat = '(?<value>[\d\.]{5})\s*(?<units>[A-Z]{2})';
-      tokens = regexp(msg,pat,'names');
-        
-      value = str2double(tokens.value);
-      
-      switch upper(tokens.units),
-        case 'MM', % milliliters per minute
-          value = value;
-        case 'MH', % millimeters per hour
-          value = value/60.0; % milliliters per minute
-        case 'UM', % microliters per minute
-          value = value/1e3; % milliliters per minute
-        case 'UH', % microliters per hour
-          value = value/(60*1e3); % milliliters per minute
-        otherwise,
-          warning('MARMOVIEW:NEWERA','Unknown rate units ''%s''.', tokens.units);
-      end 
-    end
-  end
+        if isa(o.dev, 'serial')
+            [err,~,msg] = o.sndcmd('RAT');
+            assert(err == 0);
+            
+            pat = '(?<value>[\d\.]{5})\s*(?<units>[A-Z]{2})';
+            tokens = regexp(msg,pat,'names');
+            
+            value = str2double(tokens.value);
+            
+            switch upper(tokens.units),
+                case 'MM', % milliliters per minute
+                    % do nothing
+                case 'MH', % millimeters per hour
+                    value = value/60.0; % milliliters per minute
+                case 'UM', % microliters per minute
+                    value = value/1e3; % milliliters per minute
+                case 'UH', % microliters per hour
+                    value = value/(60*1e3); % milliliters per minute
+                otherwise,
+                    warning('MARMOVIEW:NEWERA','Unknown rate units ''%s''.', tokens.units);
+            end
+            
+        else
+            value = o.rate;
+        end
+    end % get.rate
+    
+  end % set/get methods
 
   methods
-    function o = newera(p,varargin) % h is the handle for the marmoview gui
-%       fprintf(1,'marmoview.newera()\n');
+    function o = newera(varargin) % constructor
+        
+      o = o@marmoview.liquid(varargin{:}); % call parent constructor
 
-      o = o@marmoview.liquid(p,varargin{:}); % call parent constructor
-
-      % initialise input parser
+      % parse optional arguments
       args = varargin;
       ip = inputParser;
       ip.KeepUnmatched = true;
@@ -140,11 +170,16 @@ classdef newera < marmoview.liquid
       o.baud = args.baud;
 
       o.address = args.address;
+      
+      if nargin < 1 % if nothing was passed in, assume base obj
+          return
+      end
 
       % now try and connect to the New Era syringe pump...
       %
       %   data frame: 8N1 (8 data bits, no parity, 1 stop bit)
       %   terminator: CR (0x0D)
+      
       o.dev = serial(o.port,'BaudRate',o.baud,'DataBits',8,'Parity','none', ...
                             'StopBits',1,'Terminator',13,'InputBufferSize',4096); % CR = 13
 
@@ -160,13 +195,13 @@ classdef newera < marmoview.liquid
       end
 
       o.diameter = args.diameter;
-      o.volume = args.volume;
-      o.rate = args.rate;
+      o.volume   = args.volume;
+      o.rate     = args.rate;
       
       o.setdir(0); % 0 = infusion, 1 = withdrawal
       o.clrvol(0); % 0 = infused volume, 1 = withdrawn volume
 %       o.clrvol(1);
-    end
+    end % constructor
 
     function [err,status] = open(o)
       fopen(o.dev);
@@ -178,7 +213,7 @@ classdef newera < marmoview.liquid
       % beep once so we know the pump is alive...
       err = o.beep(1);
       assert(err == 0);
-    end
+    end % open
 
     function close(o)
       [~,status,~] = o.sndcmd(''); % send a CR... no command
@@ -188,7 +223,7 @@ classdef newera < marmoview.liquid
       end
       
       fclose(o.dev);
-    end
+    end % close
 
     function delete(o)
       try
@@ -196,7 +231,7 @@ classdef newera < marmoview.liquid
       catch
       end
       delete(o.dev);
-    end
+    end % delete
     
     function err = deliver(o,varargin)
 %       fprintf(1,'marmoview.newera.deliver()\n');
@@ -212,12 +247,27 @@ classdef newera < marmoview.liquid
       err = 0;
 %       fprintf(o.dev,'00 RUN','async');
       fprintf(o.dev,'00 RUN');
+      
+      o.log = [o.log GetSecs]; % log all reward calls
+
     end
 
     function r = report(o)
-%       fprintf(1,'marmoview.newera.report()\n');
       r.totalVolume = o.qryvol();
     end
+    
+    % save out the object as a struct
+    function s = saveobj(obj)
+%         disp('custom save for reward object')
+        pl = properties(obj);
+        pl = setdiff(pl, 'dev');
+        for i = 1:numel(pl)
+            s.(pl{i}) = obj.(pl{i});
+        end
+        
+    end
+    
+    
   end % methods
 
   methods (Access = private)
@@ -303,6 +353,13 @@ classdef newera < marmoview.liquid
       %       buffer... here we discard the contents of the input buffer
       %       before any subsequent write/read operation
 %       flushinput(o.dev); % FIXME: requires the instrumentation toolbox
+
+      if ~(isa(o.dev, 'serial') && isvalid(o.dev))
+          err = 'not valid';
+          status ='not valid';
+          msg = 'not valid device';
+          return
+      end
       flushin(o);
       
       cmd_ = sprintf('%02i %s',o.address,cmd);
@@ -312,7 +369,7 @@ classdef newera < marmoview.liquid
         return
       end
 
-      pause(0.100); % <-- FIXME: need to figure out how to remove the need for this
+      WaitSecs(0.100); % <-- FIXME: need to figure out how to remove the need for this
       
       % the response from the pump looks like this:
       %
@@ -383,5 +440,20 @@ classdef newera < marmoview.liquid
       end
     end
   end % private emethods
+  
+  methods(Static)
+      function obj = loadobj(s)
+          if isstruct(s)
+              newObj = marmoview.newera;
+              fl = fieldnames(s);
+              for i = 1:numel(fl)
+                  newObj.(fl{i}) = s.(fl{i});
+              end
+              obj = newObj;
+          else
+              obj = s;
+          end
+      end
+  end
 
 end % classdef

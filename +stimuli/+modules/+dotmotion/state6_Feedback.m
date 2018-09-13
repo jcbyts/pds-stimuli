@@ -61,7 +61,8 @@ classdef state6_Feedback < stimuli.objects.state
 
 
             if s.rewardCnt < s.rewardToGive && (mod(p.trial.iFrame, s.rewardInterval)==0)
-                pds.behavior.reward.give(p, p.trial.(sn).reward.amount)
+                p.trial.reward.deliver();
+%                 pds.behavior.reward.give(p, p.trial.(sn).reward.amount)
                 s.rewardCnt = s.rewardCnt + 1;
             end 
             

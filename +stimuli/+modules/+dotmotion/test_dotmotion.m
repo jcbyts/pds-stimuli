@@ -4,7 +4,7 @@ sca
 % --- setup pldaps and testing modules
 settingsStruct = struct(); % settingsStruct is a structure that modifies pldaps default parameters
 
-settingsStruct.pldaps.nosave = true; % don't save any files
+settingsStruct.pldaps.nosave = false; % don't save any files
 
 settingsStruct.pldaps.useModularStateFunctions = true;
 settingsStruct.pldaps.trialMasterFunction='runModularTrial';
