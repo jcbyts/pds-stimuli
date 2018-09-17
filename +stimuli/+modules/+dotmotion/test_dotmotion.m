@@ -21,7 +21,7 @@ settingsStruct.(sn).motion.radius   = 4;
 settingsStruct.(sn).fixation.radius = 1;
 
 settingsStruct.display.normalizeColor = 1;
-settingsStruct.pldaps.pause.preExperiment = 0;
+settingsStruct.pldaps.pause.preExperiment = 1;
 
 settingsStruct.session.subject = 'Mouse';
 
