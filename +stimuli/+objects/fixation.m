@@ -107,14 +107,14 @@ classdef fixation < stimuli.objects.target
           end
           
           
-          r = o.sz; % radius in pixels
+          r = o.radius; % radius in pixels
           
 %           rect = kron([1,1],o.position) + kron(r(:),[-1, -1, +1, +1]);
           
           rect = [o.position(:,1) - r(:) o.position(:,2) - r(:) o.position(:,1) + r(:) o.position(:,2) + r(:)];
           Screen('FillOval',p.trial.display.overlayptr, o.color,rect');
           
-          r = o.sz/2; % radius in pixels
+          r = o.radius/2; % radius in pixels
           
 %           rect = kron([1,1],o.position) + kron(r(:),[-1, -1, +1, +1]);
           rect = [o.position(:,1) - r(:) o.position(:,2) - r(:) o.position(:,1) + r(:) o.position(:,2) + r(:)];

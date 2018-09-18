@@ -18,10 +18,11 @@ settingsStruct.(sn).use = true;
 % optional arguments
 settingsStruct.(sn).motion.speed = 10;
 settingsStruct.(sn).motion.radius   = 4;
-settingsStruct.(sn).fixation.radius = 1;
+settingsStruct.(sn).fixation.radius = .3;
+settingsStruct.(sn).feedback.radius = .8;
 
 settingsStruct.display.normalizeColor = 1;
-settingsStruct.pldaps.pause.preExperiment = 1;
+settingsStruct.pldaps.pause.preExperiment = 0;
 
 settingsStruct.session.subject = 'Mouse';
 

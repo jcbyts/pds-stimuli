@@ -24,11 +24,11 @@ outStruct.	display.	destinationFactorNew = 'GL_ONE_MINUS_SRC_ALPHA';
 outStruct.	display.	sourceFactorNew = 'GL_SRC_ALPHA';
 outStruct.	display.	stereoFlip = [ ];
 outStruct.	display.	stereoMode = 0;
-outStruct. display.    crosstalk = 0;
+outStruct.  display.    crosstalk = 0;
 outStruct.	display.	switchOverlayCLUTs = false;
-outStruct. display.    ipd = 3;
-outStruct. display.    useGL = false; % flag for custom 3D rendering features
-outStruct.display.switchOverlayCLUTs = false;
+outStruct.  display.    ipd = 3;
+outStruct.  display.    useGL = false; % flag for custom 3D rendering features
+outStruct.  display.    switchOverlayCLUTs = false;
 
 % eyelink settings
 outStruct.	eyelink.	buffereventlength = 30;
@@ -56,6 +56,7 @@ outStruct.pldaps.draw.grid=true;
 outStruct.pldaps.draw.photodiode=false;
 outStruct.pldaps.eyeposMovAv=1;
 outStruct.pldaps.useModularStateFunctions=true;
+outStruct.pldaps.save.v73 = true;
 
  outStruct.	pldaps.	draw.	framerate.	location = [ 10   -10 ];
  outStruct.	pldaps.	draw.	framerate.	nSeconds = 3;

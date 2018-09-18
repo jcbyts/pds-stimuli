@@ -35,18 +35,19 @@ defaultArgs.fixation.rewardForFixation = false;
 defaultArgs.reward.windowWidth  = 30.0; % angular width (at half-height)
 defaultArgs.reward.maxNumber    = 4;
 defaultArgs.reward.amount       = p.trial.behavior.reward.defaultAmount;
-defaultArgs.reward.function     = @(err, widthParam, maxNumber) ceil( maxNumber * exp( -err.^2/2/widthParam^2));
+defaultArgs.reward.function     = @(err, widthParam, maxNumber) round( maxNumber * exp( -err.^2/2/widthParam^2));
 
 % --- Cue / Targets / Feedback
 defaultArgs.cue.show            = true;
-defaultArgs.cue.radius          = 1;
-defaultArgs.cue.contrast        = -0.25;
+defaultArgs.cue.radius          = .5;
+defaultArgs.cue.contrast        = 0.25;
 defaultArgs.cue.hCue            = stimuli.objects.gaborTarget('track', false);
 
 % --- trial feedback
 defaultArgs.feedback.show       = true; % show feedback
-defaultArgs.feedback.radius     = 1.8;  % radius of the feedback aperture shown on incorrect trials (deg.)
+defaultArgs.feedback.radius     = 0.5;  % radius of the feedback aperture shown on incorrect trials (deg.)
 defaultArgs.feedback.contrast   = -0.5;
+defaultArgs.feedback.weight     = 5; % pixels
 defaultArgs.feedback.faceIndex  = 1;
 defaultArgs.feedback.hFace      = stimuli.objects.face(p);
 defaultArgs.feedback.hErr       = stimuli.objects.circles();

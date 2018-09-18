@@ -1,8 +1,8 @@
 function trialSetup(p, sn)
 
-	if nargin < 2
-		sn = 'stimulus';
-	end
+if nargin < 2
+    sn = 'dotmotion';
+end
 
 p.trial.pldaps.goodtrial = 1;
 
@@ -169,12 +169,13 @@ assert(isa(p.trial.(sn).targets.hTargs, 'stimuli.objects.circles'), 'trialSetup:
 n  = p.trial.(sn).motion.numDirs;
 r  = p.trial.(sn).targets.eccentricity * ppd;
 
-clutIx = pds.pldaps.draw.getOpenClutEntries(p, 1);
-p.trial.display.humanCLUT(clutIx+offset,:)  = p.trial.display.bgColor + p.trial.(sn).targets.contrast;
-p.trial.display.monkeyCLUT(clutIx+offset,:) = p.trial.display.bgColor + p.trial.(sn).targets.contrast;
-p.trial.display.clut.targetColor = clutIx(1)*ones(size(p.trial.display.clut.bg));
+% target is no longer on the overlay
+% clutIx = pds.pldaps.draw.getOpenClutEntries(p, 1);
+% p.trial.display.humanCLUT(clutIx+offset,:)  = p.trial.display.bgColor + p.trial.(sn).targets.contrast;
+% p.trial.display.monkeyCLUT(clutIx+offset,:) = p.trial.display.bgColor + p.trial.(sn).targets.contrast;
+% p.trial.display.clut.targetColor = clutIx(1)*ones(size(p.trial.display.clut.bg));
 
-targetColor = p.trial.display.clut.targetColor;
+targetColor = p.trial.display.bgColor + p.trial.(sn).targets.contrast; %p.trial.display.clut.targetColor;
 
 if n > 22 % draw a ring
     
@@ -211,7 +212,7 @@ th = p.trial.(sn).motion.direction * pi / 180;
 switch class(p.trial.(sn).cue.hCue)
     case 'stimuli.objects.gaborTarget'
         p.trial.(sn).cue.hCue.setup(p); % setup with pldaps
-        p.trial.(sn).cue.hCue.position = p.trial.display.ctr(1:2) + [x y];
+        p.trial.(sn).cue.hCue.position = p.trial.display.ctr(1:2) + [x -y];
         p.trial.(sn).cue.hCue.theta = p.trial.(sn).motion.direction;
         p.trial.(sn).cue.hCue.sf = 1;
         p.trial.(sn).cue.hCue.sigma = .25;
@@ -225,6 +226,9 @@ end
 % --- Feedback for correct / incorrect choices...
 p.trial.(sn).feedback.hErr.position  = p.trial.(sn).cue.hCue.position;
 p.trial.(sn).feedback.hErr.radius    = p.trial.(sn).feedback.radius * ppd;
+p.trial.(sn).feedback.hErr.weight    = 5;
+p.trial.(sn).feedback.hErr.color     = p.trial.display.bgColor + p.trial.(sn).feedback.contrast;
+
 p.trial.(sn).feedback.hFace.position = p.trial.(sn).cue.hCue.position;
 p.trial.(sn).feedback.hFace.radius   = p.trial.(sn).feedback.radius * ppd;
 p.trial.(sn).feedback.hFace.setRandomSeed;

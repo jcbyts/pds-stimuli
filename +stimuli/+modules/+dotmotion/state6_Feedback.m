@@ -18,11 +18,14 @@ classdef state6_Feedback < stimuli.objects.state
         function frameDraw(s,p,sn)
             
             p.trial.(sn).targets.hTargs.frameDraw(p);
-            p.trial.(sn).feedback.hFace.frameDraw(p);
-            p.trial.(sn).feedback.hErr.frameDraw(p);
-
+            
+            if p.trial.(sn).feedback.show
+                p.trial.(sn).feedback.hFace.frameDraw(p);
+                p.trial.(sn).feedback.hErr.frameDraw(p);
+            end
+            
             if ~isnan(p.trial.(sn).choice)
-                xy = [p.trial.(sn).choiceX p.trial.(sn).choiceY] + p.trial.(sn).fixation.hFix.position;
+                xy = [p.trial.(sn).choiceX -p.trial.(sn).choiceY] + p.trial.(sn).fixation.hFix.position;
                 
                 if s.rewardToGive == 0
                     clr = p.trial.display.clut.redbg;
@@ -30,7 +33,7 @@ classdef state6_Feedback < stimuli.objects.state
                     clr = p.trial.display.clut.greenbg;
                 end
                 
-                Screen('DrawDots', p.trial.display.overlayptr, xy, 10, clr, p.trial.display.ctr(1:2), 2);
+                Screen('DrawDots', p.trial.display.overlayptr, xy, 10, clr, [], 2);
             end
             
         end % frameDraw

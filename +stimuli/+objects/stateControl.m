@@ -56,6 +56,16 @@ classdef stateControl < handle % handle class self references in memory
     methods (Access = public)
         %     function o = trial(varargin),
         %     end
+        function value = getStateTransitions(o)
+            value = [];
+            for i = 1:numel(o.stateIds)
+                id = o.stateIds(i);
+                value = [value; o.txLog{i} id*ones(numel(o.txLog{i}), 1)]; %#ok<AGROW>
+            end
+            [~, ind] = sort(value(:,1));
+            value = value(ind,:);
+        end
+        
         
         function value = getLog(o, id)
             % get the timestamps for a particular state

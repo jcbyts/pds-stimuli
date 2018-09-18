@@ -51,7 +51,7 @@ hDots = stimuli.objects.dotsUniform('range', 10);
 
 hDots.position = p.trial.display.ctr(1:2);
 hDots.speed = 10;
-hDots.direction = 90;
+hDots.direction = 45;
 hDots.color = p.trial.display.clut.greenbg;
 
 hDots.trialSetup(p); % initializes dot positions before a trial
@@ -73,4 +73,4 @@ hDots.frameDraw(p);
 hFix.frameDraw(p);
 
 Screen('Flip', p.trial.display.ptr, 0);
-% Screen('FillRect', p.trial.display.overlayptr, p.trial.display.clut.bg)
+Screen('FillRect', p.trial.display.overlayptr, p.trial.display.clut.bg)

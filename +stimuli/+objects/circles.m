@@ -40,9 +40,9 @@ classdef circles < stimuli.objects.stimulus
 %         toc
         
         if o.weight > 0,
-            Screen('FrameOval', p.trial.display.overlayptr, o.color, rect', o.weight);
+            Screen('FrameOval', p.trial.display.ptr, o.color, rect', o.weight);
         else
-            Screen('FillOval', p.trial.display.overlayptr, o.color, rect');
+            Screen('FillOval', p.trial.display.ptr, o.color, rect');
         end
         
       end

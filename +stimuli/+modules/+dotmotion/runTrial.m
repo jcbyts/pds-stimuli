@@ -122,6 +122,50 @@ switch state
         fprintf('Trial: %d, Direction: %02.2f, Choice: %02.2f, Error: %02.2f, Reward: %d\n', ...
             p.trial.trialnumber, p.trial.(sn).motion.direction, p.trial.(sn).choice, p.trial.(sn).error, ar);
         
+        
+%         stimuli.modules.dotmotion.plotTrialOutcome(p)
+        % --- plot trial outcome
+        figure(1); clf
+        subplot(3,3,[1 2 4 5])
+        plot(p.trial.(sn).fixation.hFix.position(1), p.trial.(sn).fixation.hFix.position(2), 'ko');
+        hold on
+        stateLog = p.trial.dotmotion.states.getStateTransitions;
+        ft = p.trial.timing.flipTimes(3,:);
+        cmap = lines;
+        nTransitions = size(stateLog,1);
+        eyeXY = p.trial.behavior.eyeAtFrame';
+        for i = 1:nTransitions
+            if i < nTransitions
+                iix = ft > stateLog(i,1) & ft < stateLog(i+1,1);
+                plot(eyeXY(iix,1), eyeXY(iix,2), '.', 'Color', cmap(stateLog(i,2)+1,:))
+            else
+                iix = ft > stateLog(i,1); % last transition
+                plot(eyeXY(iix,1), eyeXY(iix,2), '. ', 'Color', cmap(stateLog(i,2)+1,:))
+            end
+        end
+        [dx,dy] = pol2cart(p.trial.(sn).motion.direction/180*pi, 1);
+        quiver(p.trial.(sn).motion.hMot.position(1), p.trial.(sn).motion.hMot.position(2), dx, -dy, p.trial.(sn).motion.hMot.radius, 'AutoScale', 'off', 'Color', 'r', 'MaxHeadSize', 5);
+        quiver(p.trial.(sn).motion.hMot.position(1), p.trial.(sn).motion.hMot.position(2), p.trial.(sn).choiceX, -p.trial.(sn).choiceY, 1, 'AutoScale', 'off', 'Color', 'b', 'MaxHeadSize', 5);
+        th = linspace(0, 2*pi, 100);
+        plot(p.trial.(sn).motion.hMot.position(1) + p.trial.(sn).motion.hMot.radius*cos(th), p.trial.(sn).motion.hMot.position(2) + p.trial.(sn).motion.hMot.radius*sin(th), 'k--')
+        
+        xlim(p.trial.display.winRect([1 3]))
+        ylim(p.trial.display.winRect([2 4]))
+        axis ij
+        
+        hasData = cellfun(@(x) isfield(x, sn), p.data);
+        errs = cellfun(@(x) x.(sn).error, p.data(hasData));
+        chos = cellfun(@(x) x.(sn).error, p.data(hasData));
+        subplot(3,3,3)
+        
+        
+        subplot(3,3,6)
+        
+        subplot(3,3,7:9)
+        
+        
+        
+        
 end % switch
 
 end % function
