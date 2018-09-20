@@ -54,15 +54,25 @@ hDots.speed = 10;
 hDots.direction = 45;
 hDots.color = p.trial.display.clut.greenbg;
 
-hDots.trialSetup(p); % initializes dot positions before a trial
 hDots.setRandomSeed();
+hDots.trialSetup(p); % initializes dot positions before a trial
+hDots.frameUpdate(p);
+% hDots.setRandomSeed();
 hDots.stimValue = 1;
 
 hDots.frameDraw(p);
 
+if p.trial.display.ptr==p.trial.display.overlayptr
+    p.trial.display.clut.bg = [.5 .5 .5];
+end
 Screen('Flip', p.trial.display.ptr, 0);
 Screen('FillRect', p.trial.display.overlayptr, p.trial.display.clut.bg)
 
+iFrame = 1;
+xd = {};
+yd = {};
+xd{iFrame} = hDots.x;
+yd{iFrame} = hDots.y;
 %% draw all objects
 
 
@@ -71,6 +81,21 @@ hDots.frameUpdate(p);
 hChoice.frameDraw(p);
 hDots.frameDraw(p);
 hFix.frameDraw(p);
+iFrame = iFrame + 1;
+xd{iFrame} = hDots.x;
+yd{iFrame} = hDots.y;
 
 Screen('Flip', p.trial.display.ptr, 0);
 Screen('FillRect', p.trial.display.overlayptr, p.trial.display.clut.bg)
+
+
+%%
+
+[x, y] = hDots.regenerateDots;
+
+for iFrame = 1:numel(x)
+    figure(1); clf
+    plot(x{iFrame}, y{iFrame}, 'o'); hold on
+    plot(xd{iFrame}, yd{iFrame}, '.');
+    pause
+end

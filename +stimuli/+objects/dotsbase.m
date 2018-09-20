@@ -57,11 +57,17 @@ classdef dotsbase < stimuli.objects.target % (Abstract) % should this be abstrac
         frameCnt
     end
     
+    properties (Access=private)
+       drawCnt
+    end
+    
     
     methods (Access = public)
         function o = dotsbase(varargin)
             
             o = o@stimuli.objects.target(varargin{:});
+            
+            o.drawCnt = 0;
             
             if nargin < 2
                 return
@@ -96,6 +102,7 @@ classdef dotsbase < stimuli.objects.target % (Abstract) % should this be abstrac
         end
         
         function trialSetup(o, ~, ~)
+            
             o.initDots(1:o.numDots); % <-- provided by the derived class
             
             % initialise frame counts for limited dotLifetime dots
@@ -104,6 +111,7 @@ classdef dotsbase < stimuli.objects.target % (Abstract) % should this be abstrac
             else
                 o.frameCnt = inf(o.numDots,1);
             end
+            o.drawCnt = 1;
         end
         
         function frameDraw(o,p,~)
@@ -120,8 +128,8 @@ classdef dotsbase < stimuli.objects.target % (Abstract) % should this be abstrac
                 Screen('DrawDots',p.trial.display.ptr,[o.x(:), -1*o.y(:)]', o.dotSize, o.color, o.position, o.dotType);
                 Screen('BlendFunction', p.trial.display.ptr, p.trial.display.sourceFactorNew, p.trial.display.destinationFactorNew);
             end
-          
-            
+%             disp(o.drawCnt)
+            o.drawCnt = o.drawCnt + 1;
         end
         
         function frameUpdate(o, ~,~)
@@ -157,6 +165,22 @@ classdef dotsbase < stimuli.objects.target % (Abstract) % should this be abstrac
             end
         end
         
+        function [x,y] = regenerateDots(o)
+            warning('dotsbase/regenerateDots: assumes that trialSetup was followed by frameUpdate before the first draw')
+            nFrames = o.drawCnt;
+            
+            % reset random number generator
+            o.rng.reset();
+            o.trialSetup();
+            x = {};
+            y = {};
+            for i = 1:nFrames
+                o.frameUpdate();
+                x{i} = o.x;
+                y{i} = o.y;
+            end
+            
+        end
         
         % initialize position (x,y) and frame displacement (dx,dy) for each dot
         initDots(o,idx); % abstract method
