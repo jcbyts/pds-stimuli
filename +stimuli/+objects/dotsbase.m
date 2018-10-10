@@ -165,9 +165,18 @@ classdef dotsbase < stimuli.objects.target % (Abstract) % should this be abstrac
             end
         end
         
-        function [x,y] = regenerateDots(o)
-            warning('dotsbase/regenerateDots: assumes that trialSetup was followed by frameUpdate before the first draw')
-            nFrames = o.drawCnt;
+        function [x,y] = regenerateDots(o, nFrames, verbose)
+            if nargin < 3
+                verbose = true;
+            end
+            
+            if nargin < 2
+                nFrames = o.drawCnt;
+            end
+            
+            if verbose
+                warning('dotsbase/regenerateDots: assumes that trialSetup was followed by frameUpdate before the first draw')
+            end
             
             % reset random number generator
             o.rng.reset();
