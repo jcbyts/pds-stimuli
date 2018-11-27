@@ -1,5 +1,15 @@
 function S = loadCalibration(S)
 
+if (strcmp(S.session.subject,'test'))
+    S.eyelink.use = false;
+    S.eyelink.useAsEyepos = false;
+    S.arrington.use = false;
+    S.arrington.useAsEyepos = false;
+    S.mouse.useAsEyepos = true;
+    
+    return
+end
+
 % try to load calibration
 try
     cm = getpref('marmoview_calibration', S.session.subject);
@@ -15,10 +25,3 @@ catch
     return
 end
 
-if (strcmp(S.session.subject,'test'))
-  S.eyelink.use = false;
-  S.eyelink.useAsEyepos = false;
-  S.arrington.use = false;
-  S.arrington.useAsEyepos = false;
-  S.mouse.useAsEyepos = true;
-end

@@ -89,7 +89,7 @@ end
 
 if isinf(radius)
     % Load standard grating shader:
-    gratingShader = LoadGLSLProgramFromFiles('BasicHartleyShader', 1);
+    gratingShader = LoadGLSLProgramFromFiles(fullfile(pepRoot, 'utils', 'BasicHartleyShader'), 1);
 else
     % Load grating shader with circular aperture support:
     gratingShader = LoadGLSLProgramFromFiles({'BasicHartleyShader.vert.txt', 'ApertureSineGratingShader.frag.txt'}, 1);

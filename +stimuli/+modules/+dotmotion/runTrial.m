@@ -122,7 +122,7 @@ switch state
         fprintf('Trial: %d, Direction: %02.2f, Choice: %02.2f, Error: %02.2f, Reward: %d\n', ...
             p.trial.trialnumber, p.trial.(sn).motion.direction, p.trial.(sn).choice, p.trial.(sn).error, ar);
         
-        
+        try
 %         stimuli.modules.dotmotion.plotTrialOutcome(p)
         % --- plot trial outcome
         figure(1); clf
@@ -162,7 +162,7 @@ switch state
         subplot(3,3,6)
         
         subplot(3,3,7:9)
-        
+        end
         
         
         

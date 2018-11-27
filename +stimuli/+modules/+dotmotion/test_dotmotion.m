@@ -9,6 +9,7 @@ settingsStruct.pldaps.nosave = false; % don't save any files
 settingsStruct.pldaps.useModularStateFunctions = true;
 settingsStruct.pldaps.trialMasterFunction='runModularTrial';
 
+settingsStruct.session.experimentName = 'testDotMotion';
 % dot selection requires a fixation behavior
 sn = 'dotmotion';
 settingsStruct.(sn).stateFunction.name = 'stimuli.modules.dotmotion.runTrial';
