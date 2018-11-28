@@ -42,22 +42,6 @@ switch state
     % --- After screen is open: Setup default parameters
     case p.trial.pldaps.trialStates.experimentPostOpenScreen
         
-        %------------------------------------------------------------------
-        % Setup IMG directory and random seeds
-        if ~isfield(p.trial.(sn), 'imgDir')
-            
-            impath = getpref('pep', 'imgDir');
-            assert(isdir(impath), 'imgDir path does not exist. You have to set that up for natImgBackgorund to run')
-            
-            p.trial.(sn).imgDir   = impath;
-        end
-        
-        if ~isfield(p.trial.(sn), 'fileList')
-            warning('If on the propixx rig, make sure the  drive is on')
-            flist = [dir(fullfile(p.trial.(sn).imgDir, '*.JPG')) dir(fullfile(p.trial.(sn).imgDir, '*.PNG')) dir(fullfile(p.trial.(sn).imgDir, '*.jpg')) dir(fullfile(p.trial.(sn).imgDir, '*.png'))];
-            p.trial.(sn).fileList = flist;
-        end
-        
         if ~isfield(p.trial.(sn), 'numToShow')
             p.trial.(sn).numToShow=10;
         end
@@ -75,6 +59,19 @@ switch state
         % Select images to draw this trial
 %         p.trial.display.sourceFactorNew = GL_SRC_ALPHA;
 %         Screen('BlendFunction', p.trial.display.ptr, p.trial.display.sourceFactorNew, p.trial.display.destinationFactorNew);
+
+        if ~isfield(p.trial.(sn), 'imgDir')
+            
+            impath = getpref('pep', 'imgDir');
+            assert(isdir(impath), 'imgDir path does not exist. You have to set that up for natImgBackgorund to run')
+            
+            p.trial.(sn).imgDir   = impath;
+        end
+        
+        if ~isfield(p.trial.(sn), 'fileList')
+            flist = [dir(fullfile(p.trial.(sn).imgDir, '*.JPG')) dir(fullfile(p.trial.(sn).imgDir, '*.PNG')) dir(fullfile(p.trial.(sn).imgDir, '*.jpg')) dir(fullfile(p.trial.(sn).imgDir, '*.png'))];
+            p.trial.(sn).fileList = flist;
+        end
         
         % setup random seed
         p.trial.(sn).rngs.conditionerRNG = RandStream(p.trial.(sn).rngs.randomNumberGenerater, 'seed', p.trial.(sn).rngs.trialSeeds(p.trial.pldaps.iTrial));

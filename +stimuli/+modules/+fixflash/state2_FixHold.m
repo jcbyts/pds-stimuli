@@ -54,10 +54,10 @@ classdef state2_FixHold < stimuli.objects.state
                      end
                   end
                 
-                  if ~p.trial.(sn).waitForSaccade
+%                   if ~p.trial.(sn).waitForSaccade
                      sc.setState(8);
                      return
-                  end
+%                   end
                   
                 end
     

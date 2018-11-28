@@ -5,7 +5,7 @@ p=pds.datapixx.init(p);
 
 %%
 % moviefilename='/home/marmorig/MyTestMovie.mov';
-moviefilename='/home/marmorig/Videos/HeadPokeTraining001.MP4';
+moviefilename='/home/propixxrig/Videos/HeadPokeTraining001.MP4';
 % moviefilename='/home/marmorig/test.avi';
 % moviefilename='C:\Users\Jake\Downloads\scene.avi';
 % if p.trial.display.useOverlay==2

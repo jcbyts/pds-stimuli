@@ -2,7 +2,7 @@ function p=forage(p, state, sn)
 % FACEFORAGE module for PLDAPS open reception
 
 if nargin<3
-    sn='faceforage';
+    sn='forage';
 end
 
 % -------------------------------------------------------------------------
@@ -120,6 +120,12 @@ switch state
         p.trial.(sn).x       = nan(p.trial.(sn).maxFrames, p.trial.(sn).MotN);
         p.trial.(sn).y       = nan(p.trial.(sn).maxFrames, p.trial.(sn).MotN);
         p.trial.(sn).ctrHold = nan(p.trial.(sn).maxFrames, p.trial.(sn).MotN);
+        
+        
+        % update parameters for this trial
+        if isfield(p.trial.(sn), 'motionType')
+            p.trial.(sn).hTargs.motionType = p.trial.(sn).motionType;
+        end
     
     % ---------------------------------------------------------------------
     % --- Update all behavior of the objects

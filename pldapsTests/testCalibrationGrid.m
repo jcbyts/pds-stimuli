@@ -15,7 +15,7 @@ settingsStruct.display.colorclamp = 1;
 settingsStruct.display.destinationFactorNew = GL_ONE;
 settingsStruct.display.sourceFactorNew = GL_ONE;
 
-settingsStruct.display.useOverlay = 0;
+settingsStruct.display.useOverlay = 1;
 
 settingsStruct.pldaps.useModularStateFunctions = true;
 settingsStruct.pldaps.trialMasterFunction='runModularTrial';
