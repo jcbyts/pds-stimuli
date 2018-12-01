@@ -33,8 +33,8 @@ hChoice.stimValue = 1;
 hDots = stimuli.objects.dotsUniform('range', 10);
 
 hDots.position = p.trial.display.ctr(1:2);
-hDots.dotSpeed = 10;
-hDots.dotDirection = 90;
+hDots.speed = 10;
+hDots.direction = 90;
 
 hDots.trialSetup(p); % initializes dot positions before a trial
 hDots.setRandomSeed();

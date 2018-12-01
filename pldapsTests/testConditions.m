@@ -5,11 +5,12 @@ settingsStruct.session.subject = 'test';
 % save PDS file as this experimental protocol
 settingsStruct.session.experimentName = 'testConditions';
 
+settingsStruct = mergeStruct(settingsStruct, forage_grating_randomwalk);
 
 c = {};
 N = nan;
 
-behavior = @forage_face_randomwalk;
+behavior = @forage_grating_randomwalk;
 % condition 1: colony pictures with face forage
 c{1} = combineConditions({@naturalimg_colonypics, behavior});
 c{1}.Nr = 1;

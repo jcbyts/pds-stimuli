@@ -123,7 +123,7 @@ classdef butterfly < stimuli.objects.stimulus
                 case {1, 'face', 'Face'}
                     obj.objects = stimuli.objects.face(p, 'maxContrast', obj.maxContrast);
                 case {2, 'grating', 'Grating'}
-                    obj.objects = stimuli.objects.gratings(p, 'maxContrast', obj.maxContrast);
+                    obj.objects = stimuli.objects.grating(p, 'maxContrast', obj.maxContrast);
                 otherwise
                     obj.objects = stimuli.objects.singledot(p, 'maxContrast', obj.maxContrast);
 

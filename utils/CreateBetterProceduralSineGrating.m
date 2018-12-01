@@ -89,10 +89,11 @@ end
 
 if isinf(radius)
     % Load standard grating shader:
-    gratingShader = LoadGLSLProgramFromFiles('BetterSineGratingShader', 1);
+    gratingShader = LoadGLSLProgramFromFiles(fullfile(pepRoot, 'utils', 'BetterSineGratingShader'), 1);
 else
     % Load grating shader with circular aperture support:
-    gratingShader = LoadGLSLProgramFromFiles({'BetterSineGratingShader.vert.txt', 'BetterApertureSineGratingShader.frag.txt'}, 1);
+%     gratingShader = LoadGLSLProgramFromFiles({'BetterSineGratingShader.vert.txt', 'BetterApertureSineGratingShader.frag.txt'}, 1);
+    gratingShader = LoadGLSLProgramFromFiles({fullfile(pepRoot, 'utils', 'BetterSineGratingShader.vert.txt'), fullfile(pepRoot, 'utils', 'BetterApertureSineGratingShader.frag.txt')}, 1);
 end
 
 % Setup shader:
