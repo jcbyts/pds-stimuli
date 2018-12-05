@@ -436,7 +436,7 @@ classdef newera < marmoview.liquid
       while o.dev.BytesAvailable > 0,
         fread(o.dev,o.dev.BytesAvailable);
 %         pause(0.050); % <-- urgh!
-        WaitSecs(0.050)
+        WaitSecs(0.050);
       end
     end
   end % private emethods
