@@ -87,8 +87,13 @@ classdef stimulus < handle %#ok<*MCSUP>
         end
         
         function initLog(obj)
-            obj.log = [];
-            obj.stimValue = false;
+            if isempty(obj.stimValue)
+                obj.stimValue = 0;
+            end
+            
+            obj.log = [obj.stimValue; GetSecs]; % clear log up to this point
+%             obj.log = [];
+%             obj.stimValue = false; % don't reset stim value anymore
         end
         
         % --- set function logs the value when it is change

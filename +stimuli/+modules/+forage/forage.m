@@ -25,6 +25,7 @@ if nargin < 1
             'holdDuration',             'frames to hold fixation before reward', ...
             'radius',                   'radius of the objects (deg)', ...
             'motionType',               'randomwalk, linear', ...
+            'rewardWindow',             'additional window around the target', ...
             };
     fprintf('No arguments passed in: call from within pldaps\n')
     fprintf('<strong>Optional Parameters:</strong>\n')
@@ -68,6 +69,7 @@ switch state
             'holdDuration',             30, ...     % frames to hold fixation before reward
             'radius',                   1, ...      % radius of the objects (deg)
             'motionType',               'randomwalk', ... % randomwalk, linear
+            'rewardWindow',             1, ...
             };
         
         % step through argument pairs and add them to the module
@@ -94,6 +96,7 @@ switch state
             'onLifetime',       p.trial.(sn).onLifetime, ...
             'offLifetime',      p.trial.(sn).offLifetime, ...
             'holdDuration',     p.trial.(sn).holdDuration);
+        
 
     
     %--------------------------------------------------------------------------
@@ -115,6 +118,8 @@ switch state
         % randomize speed
         p.trial.(sn).hTargs.speed = (p.trial.(sn).maxSpeed - p.trial.(sn).minSpeed) .* rand(setupRNG, size(p.trial.(sn).hTargs.speed)) + p.trial.(sn).minSpeed;
         
+        p.trial.(sn).MotN = p.trial.(sn).hTargs.N;
+        
         % --- preallocate variables to track
         p.trial.(sn).eyes    = nan(p.trial.(sn).maxFrames, 2);
         p.trial.(sn).x       = nan(p.trial.(sn).maxFrames, p.trial.(sn).MotN);
@@ -126,6 +131,8 @@ switch state
         if isfield(p.trial.(sn), 'motionType')
             p.trial.(sn).hTargs.motionType = p.trial.(sn).motionType;
         end
+        
+        p.trial.(sn).hTargs.rewardWindow = p.trial.(sn).rewardWindow;
     
     % ---------------------------------------------------------------------
     % --- Update all behavior of the objects

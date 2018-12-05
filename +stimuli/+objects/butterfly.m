@@ -39,7 +39,7 @@ classdef butterfly < stimuli.objects.stimulus
         holdDuration@double=200  % how many frames to hold before reward
         motionType              % governs movement 
         
-        rewardWindow@double = 2;
+        rewardWindow@double = .1;
 
         % --- parameters governing the appearance of objects
         objects
