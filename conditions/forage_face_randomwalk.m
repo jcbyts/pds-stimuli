@@ -22,3 +22,4 @@ c.(sn).radius               = 1;            % radius of the objects (deg)
 c.(sn).onLifetime           = 1 * 120;      % time objects remain on (frames)
 c.(sn).offLifetime          = 2 * 120;      % time objects remain off (frames)   
 c.(sn).holdDuration         = 1.5;
+c.(sn).rewardWindow         = 0.1; % additional padding around radius of target

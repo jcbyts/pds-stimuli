@@ -44,20 +44,6 @@ settingsStruct.(sn).numToShow     = 1; % number of images to show per trial
 settingsStruct.(sn).imgDir = ip.Results.imgDir; %'/media/marmorig/Data/RangeDatabase1080p/';
 
 
-% %--------------------------------------------------------------------------
-% % Add faceforage module
-% sn='faceforage';
-% settingsStruct.(sn).stateFunction.name = 'stimuli.forage.forage';
-% settingsStruct.(sn).stateFunction.order = 2;
-% settingsStruct.(sn).use = true;
-% 
-% % -------------------------------------------------------------------------
-% % Add fixflash module
-% sn = 'fixflash';
-% settingsStruct.(sn).stateFunction.name = 'stimuli.fixflash.default';
-% settingsStruct.(sn).stateFunction.order = 2;
-% settingsStruct.(sn).use = true;
-
 if ip.Results.pauseBefore
     settingsStruct.pldaps.pause.preExperiment = true;
 else
@@ -65,15 +51,6 @@ else
 end
 
 settingsStruct = loadCalibration(settingsStruct);
-% try
-%     cm = getpref('marmoview_calibration', subject);
-%     cm2 = cm(:,:,1)';
-%     cm2(:,:,2) = cm(:,:,2)';
-%     
-%     settingsStruct.eyelink.calibration_matrix = cm2;
-%     settingsStruct.eyelink.useRawData = true;
-% end
-
 
 p = pldaps(@stimuli.pldapsDefaultTrial, settingsStruct);
 

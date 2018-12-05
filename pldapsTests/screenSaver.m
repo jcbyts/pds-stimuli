@@ -29,7 +29,7 @@ end
 while 1
     pause(10)
     Screen('DrawTexture', p.trial.display.ptr, A.tex(randi(numToShow)), [], [0 0 1900 1080] )
-    Screen('Flip',p.trial.display.ptr)
+    Screen('Flip',p.trial.display.ptr);
 end
 
 %%

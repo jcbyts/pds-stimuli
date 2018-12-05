@@ -39,7 +39,7 @@ end
 
 %%
 h.closeMovie
-Screen('Flip', p.trial.display.ptr)
+Screen('Flip', p.trial.display.ptr);
 %%
 moviefilename='/home/marmorig/HeadPokeTraining001.MP4';
 SimpleMovieDemo(moviefilename);

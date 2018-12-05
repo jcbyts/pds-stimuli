@@ -20,6 +20,7 @@ ip.addParameter('pauseBefore', false)
 ip.addParameter('imageEveryNTrials', 4)
 ip.addParameter('imgDir', getpref('pep', 'colonyPics'))
 ip.addParameter('autoCorr', 'pBlank')
+ip.addParameter('Contrast', 0.10)
 ip.addParameter('settingsStruct', struct())
 ip.parse(varargin{:})
 
@@ -49,7 +50,7 @@ settingsStruct.(sn).use = true;
 settingsStruct.(sn).OnDuration  = 2; % if generative model is exponentialDecay or fixed
 settingsStruct.(sn).OffDuration = 2;
 settingsStruct.(sn).pBlank = .5;
-settingsStruct.(sn).contrast    = .1;  % Michelson contrast of the gratings (DEPENDS ON BLEND FUNCTION)
+settingsStruct.(sn).contrast    = ip.Results.Contrast;  % Michelson contrast of the gratings (DEPENDS ON BLEND FUNCTION)
 settingsStruct.(sn).tfs         = 0;   % temporal frequencies showns
 settingsStruct.(sn).nOctaves    = 5;   % number of octaves to show above base frequency
 settingsStruct.(sn).Freq0       = .2;  % Base frequence (cycles/deg)
@@ -88,6 +89,7 @@ settingsStruct.(sn).radius               = 1;            % radius of the objects
 settingsStruct.(sn).onLifetime           = 1 * 120;      % time objects remain on (frames)
 settingsStruct.(sn).offLifetime          = 2 * 120;      % time objects remain off (frames)   
 settingsStruct.(sn).holdDuration         = 1.5;
+settingsStruct.(sn).rewardWindow         = .1;
 
 if ip.Results.pauseBefore
     settingsStruct.pldaps.pause.preExperiment = true;
