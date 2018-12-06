@@ -1,4 +1,4 @@
-subject = 'test';% 'Harold'
+subject = 'Ellie';% 'Harold'
 pauseBeforeExperiment = false;
 
 %% Natural Image Free View: warm up
@@ -6,6 +6,8 @@ close all
 
 settingsStruct = struct();
 settingsStruct.pldaps.maxTrialLength = 5;
+settingsStruct.newEraSyringePump.vol = .025;
+
 p = runNaturalImageFreeView('subject', subject, ...
     'pauseBefore', pauseBeforeExperiment, ...
     'imgDir', getpref('pep', 'colonyPics'), ...
@@ -19,7 +21,7 @@ close all
 settingsStruct = struct();
 settingsStruct.pldaps.maxTrialLength = 20;
 settingsStruct.pldaps.finish = 60*10/settingsStruct.pldaps.maxTrialLength + 5;
-
+settingsStruct.newEraSyringePump.vol = .025;
 
 p = runFaceForageCSD('subject', subject, ...
     'pauseBefore', pauseBeforeExperiment, ...
@@ -58,12 +60,13 @@ close all
 settingsStruct = struct();
 settingsStruct.pldaps.maxTrialLength = 20;
 settingsStruct.pldaps.finish = 60*10/settingsStruct.pldaps.maxTrialLength + 5;
+settingsStruct.newEraSyringePump.vol = .05;
 
 p = runFaceForageHartley('subject', subject, ...
     'pauseBefore', pauseBeforeExperiment, ...
-    'imageEveryNTrials', 15, ...
+    'imageEveryNTrials', 5, ...
     'autoCorr', 'pBlank', ...
-    'Contrast', 0.10, ...
+    'Contrast', 0.10, ...m
     'settingsStruct', settingsStruct);
 
 pds.plotTiming(p, true);
@@ -74,6 +77,7 @@ close all
 settingsStruct = struct();
 settingsStruct.pldaps.maxTrialLength = 20;
 settingsStruct.pldaps.finish = 60*10/settingsStruct.pldaps.maxTrialLength + 5;
+settingsStruct.newEraSyringePump.vol = .05;
 
 p = runFaceForageHartley('subject', subject, ...
     'pauseBefore', pauseBeforeExperiment, ...

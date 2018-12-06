@@ -15,14 +15,32 @@ h.frameIndex=[9000 12000];
 h.open
 
 
+% choice targets
+hChoice = stimuli.objects.circles('position', p.trial.display.ctr(1:2), 'radius', 100);
+n = 10;
+th = 0:(360/n):(360-(360/n));
+x = cosd(th)*100;
+y = sind(th)*100;
+hChoice.weight = [];
+hChoice.position = bsxfun(@plus, p.trial.display.ctr(1:2),[x(:) y(:)]);
+hChoice.radius   = repmat(20, n , 1);
+hChoice.stimValue = 1;
+
+
+%% draw
+
+
+
+
 
 %% draw frame loop
 for i=1:(h.frameIndex(2)-h.frameIndex(1))
-%     h.update
     h.update
+    hChoice.frameUpdate(p);
+    
     h.draw
-%     h.draw
-    %     h.drawNext
+    hChoice.frameDraw(p);
+    
     Screen('Flip', p.trial.display.ptr);
 end
 
