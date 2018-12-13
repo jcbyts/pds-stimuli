@@ -11,12 +11,21 @@ end
 switch state
         
     case p.trial.pldaps.trialStates.framePrepareDrawing
-       
-        p.trial.(sn).h.update
+
+        p.trial.(sn).h.drawNext
+        
+        if p.trial.(sn).h.pts == 0 % use frame indexing
+            p.trial.(sn).frameShown(p.trial.iFrame) = p.trial.(sn).frameIndex(1) + p.trial.iFrame - 1;
+        else % use time index
+            p.trial.(sn).frameShown(p.trial.iFrame) = p.trial.(sn).h.pts;
+        end
+%         p.trial.(sn).h.update
         
     case p.trial.pldaps.trialStates.frameDraw
         
-        p.trial.(sn).h.draw
+%         p.trial.(sn).h.draw
+%         p.trial.(sn).h.drawNext
+%         p.trial.(sn).frameShown(p.trial.iFrame) = p.trial.(sn).h.pts;
         
     case p.trial.pldaps.trialStates.trialSetup
         
@@ -25,11 +34,11 @@ switch state
 %         setupRNG=p.trial.(sn).rngs.conditionerRNG;
         
         if ~isfield(p.trial.(sn), 'moviefilename')
-            p.trial.(sn).moviefilename='/home/marmorig/Videos/HeadPokeTraining001.MP4';
+            p.trial.(sn).moviefilename = '/home/marmorig/Videos/HeadPokeTraining001.MP4';
         end
         
         if ~isfield(p.trial.(sn), 'frameIndex')
-            p.trial.(sn).frameIndex=[1 inf];
+            p.trial.(sn).frameIndex = [1 inf];
         end
        
         
@@ -37,14 +46,16 @@ switch state
          p.trial.(sn).h.frameIndex=p.trial.(sn).frameIndex;
          p.trial.(sn).h.open
          
-        
+        p.trial.(sn).frameShown = nan(p.trial.pldaps.maxFrames, 1);
         
     case p.trial.pldaps.trialStates.experimentPostOpenScreen
         
+        stimuli.setupDefaultFrameStates(p, sn);
+        stimuli.setupRandomSeed(p, sn);
         
-        p.trial.(sn).rngs.randomNumberGenerater='mt19937ar';
-        p.trial.(sn).rngs.trialSeeds = randi(2^32, [3e3 1]);
         
     case p.trial.pldaps.trialStates.trialCleanUpandSave
+        
+        p.trial.(sn).h.closeMovie;
         
 end
