@@ -9,7 +9,7 @@ settingsStruct = struct(); % settingsStruct is a structure that modifies pldaps 
 
 settingsStruct.session.subject = 'test';
 
-settingsStruct.pldaps.nosave = true; % don't save any files
+settingsStruct.pldaps.nosave = false; % don't save any files
 % 
 settingsStruct.display.destinationFactorNew = GL_ONE_MINUS_SRC_ALPHA;
 settingsStruct.display.sourceFactorNew = GL_SRC_ALPHA;
@@ -26,7 +26,6 @@ sn = 'HDmovies';
 settingsStruct.(sn).stateFunction.name  = 'stimuli.modules.HDmovies';
 settingsStruct.(sn).stateFunction.order = 1;    % when to run this module with respect to other modules
 settingsStruct.(sn).use                 = true; % use this module
-settingsStruct.(sn).moviefilename = '/home/propixxrig/Videos/HeadPokeTraining001.MP4';
 % calling pldaps with @stimuli.pldapsDefaultTrial will make sure that
 % pldaps takes all the measurements that are required for our modules
 % (e.g., eye position)
