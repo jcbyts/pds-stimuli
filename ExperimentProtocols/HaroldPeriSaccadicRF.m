@@ -1,4 +1,4 @@
-subject = 'Ellie';% 'Harold'
+subject = 'test';% 'Harold'
 pauseBeforeExperiment = false;
 
 %% Natural Image Free View: warm up
@@ -6,7 +6,7 @@ close all
 
 settingsStruct = struct();
 settingsStruct.pldaps.maxTrialLength = 5;
-settingsStruct.newEraSyringePump.vol = .025;
+settingsStruct.newEraSyringePump.vol = .05;
 
 p = runNaturalImageFreeView('subject', subject, ...
     'pauseBefore', pauseBeforeExperiment, ...
@@ -33,8 +33,13 @@ p = runFaceForageCSD('subject', subject, ...
 
 pds.plotTiming(p, true);
 
-%% Face Forage with spatial mapping
+%% Face Forage with spatial mapping (large)
 close all
+
+settingsStruct = struct();
+settingsStruct.pldaps.maxTrialLength = 20;
+settingsStruct.pldaps.finish = 60*10/settingsStruct.pldaps.maxTrialLength + 5;
+settingsStruct.newEraSyringePump.vol = .035;
 
 spatialSquaresOpts = struct();
 spatialSquaresOpts.N        = 10; % number of squares on each frame
@@ -54,13 +59,39 @@ p = runFaceForageSpatialMapping('subject', subject,...
 
 pds.plotTiming(p, true)
 
+%% Face Forage with spatial mapping (tiny)
+close all
+
+settingsStruct = struct();
+settingsStruct.pldaps.maxTrialLength = 20;
+settingsStruct.pldaps.finish = 60*10/settingsStruct.pldaps.maxTrialLength + 5;
+settingsStruct.newEraSyringePump.vol = .035;
+
+spatialSquaresOpts = struct();
+spatialSquaresOpts.N        = 400; % number of squares on each frame
+spatialSquaresOpts.lifetime = 8; % lifetime of squares frames
+% spatialSquaresOpts.position = [1 -1 5 -5]; % stimulus rect (in degrpees) 
+% spatialSquaresOpts.size = .25;
+spatialSquaresOpts.position = [-20 20 20 -20]; % stimulus rect (in degrees) 
+spatialSquaresOpts.size = .1; % made it smaller. let's see if this works -- Jake
+spatialSquaresOpts.contrast = 1;
+
+
+p = runFaceForageSpatialMapping('subject', subject,...
+    'pauseBefore', pauseBeforeExperiment,...
+    'spatialSquares', spatialSquaresOpts, ...
+    'imageEveryNTrials', 10, ...
+    'settingsStruct', settingsStruct);
+
+pds.plotTiming(p, true)
+
 %% Face Forage with Hartley 1: pBlank
 close all
 
 settingsStruct = struct();
 settingsStruct.pldaps.maxTrialLength = 20;
 settingsStruct.pldaps.finish = 60*10/settingsStruct.pldaps.maxTrialLength + 5;
-settingsStruct.newEraSyringePump.vol = .05;
+settingsStruct.newEraSyringePump.vol = .035;
 
 p = runFaceForageHartley('subject', subject, ...
     'pauseBefore', pauseBeforeExperiment, ...
@@ -77,7 +108,7 @@ close all
 settingsStruct = struct();
 settingsStruct.pldaps.maxTrialLength = 20;
 settingsStruct.pldaps.finish = 60*10/settingsStruct.pldaps.maxTrialLength + 5;
-settingsStruct.newEraSyringePump.vol = .05;
+settingsStruct.newEraSyringePump.vol = .035;
 
 p = runFaceForageHartley('subject', subject, ...
     'pauseBefore', pauseBeforeExperiment, ...
@@ -85,6 +116,40 @@ p = runFaceForageHartley('subject', subject, ...
     'autoCorr', 'exponentialDecay', ...
     'Contrast', 0.10, ...
     'settingsStruct', settingsStruct);
+
+pds.plotTiming(p, true);
+
+
+
+
+%% HD movies
+close all
+
+% make everything bigger (viewdist scales the pixels per degree
+% calculation)
+settingsStruct = struct();
+settingsStruct.session.subject = subject;
+settingsStruct.display.destinationFactorNew = GL_ONE_MINUS_SRC_ALPHA;
+settingsStruct.display.sourceFactorNew = GL_SRC_ALPHA;
+settingsStruct.display.useOverlay = 1;
+settingsStruct.pldaps.pause.preExperiment = false;
+settingsStruct.pldaps.maxTrialLength = 30;
+
+
+sn = 'HDmovies';
+settingsStruct.(sn).stateFunction.name  = 'stimuli.modules.HDmovies';
+settingsStruct.(sn).stateFunction.order = 1;    % when to run this module with respect to other modules
+settingsStruct.(sn).use                 = true; % use this module
+settingsStruct.(sn).moviedatabase = 'videos';
+% calling pldaps with @stimuli.pldapsDefaultTrial will make sure that
+% pldaps takes all the measurements that are required for our modules
+% (e.g., eye position)
+
+settingsStruct = loadCalibration(settingsStruct);
+
+p = pldaps(@stimuli.pldapsDefaultTrial, settingsStruct);
+
+p = p.run;
 
 pds.plotTiming(p, true);
 
@@ -113,7 +178,6 @@ p = runFixFlashSpatialMap('subject', subject,...
     'settingsStruct', settingsStruct);
 
 pds.plotTiming(p, true);
-
 
 
 %% Presaccadic selection with gabors

@@ -11,13 +11,15 @@ classdef HDmovie < handle
         tex
     end
     
-    properties (Access = private)
+    properties (GetAccess = public, SetAccess = private)
         movietexture
         lastpts
         pts
         count
         texids
         texpts
+        t0
+        t1
     end
     
     methods
@@ -37,7 +39,9 @@ classdef HDmovie < handle
         
         function open(h)
             
-            [h.movie, h.duration, h.frate] = Screen('OpenMovie', h.ptr, h.filename,4);%, [], [], [], 3);
+%             [, async=0] [, preloadSecs=1] [, specialFlags1=0][, pixelFormat=4][, maxNumberThreads=-1][, movieOptions])
+%             [h.movie, h.duration, h.frate] = Screen('OpenMovie', h.ptr, h.filename,0,1,2); %,1,2,1,0);%, [], [], [], 3);
+            [h.movie, h.duration, h.frate] = Screen('OpenMovie', h.ptr, h.filename,0,1,2,1);
             nFrames=ceil(h.duration*h.frate);
             if isinf(h.frameIndex(2))
                 h.frameIndex(2)=nFrames;
@@ -60,14 +64,20 @@ classdef HDmovie < handle
             % Play 'movie', at a playbackrate = rate, with 1.0 == 100% audio volume.
             Screen('PlayMovie', h.movie, 1, 0, 1.0);
             [h.movietexture, h.pts] = Screen('GetMovieImage', h.ptr, h.movie);
+            h.draw
             
+            % internal timekeeping
+            h.t1 = GetSecs;
+            h.t0 = GetSecs;
+%             h.movietexture = 0;
+%             h.pts = 1;
         end
         
         function loadFrames(h)
             % this often crashed PTB and is going to be removed
             fprintf('Loading frames from [%s]\n', h.filename)
             while h.count < (h.frameIndex(2)-h.frameIndex(1))
-                [h.movietexture, h.pts] = Screen('GetMovieImage', h.ptr, h.movie);%, 1, [], [], 0);
+                [h.movietexture, h.pts] = Screen('GetMovieImage', h.ptr, h.movie); %, 0);%, 1, [], [], 0);
             
             
                 if (h.movietexture > 0) && ( (h.pts - h.lastpts) >= (1/h.frate) )% || (indexisFrames == 2))
@@ -88,6 +98,7 @@ classdef HDmovie < handle
         
         function update(h)
             if (h.movietexture == 0) && ( (h.pts - h.lastpts) >= (1/h.frate) )% || (indexisFrames == 2))
+                fprintf('GetMovieImage\n')
                 [h.movietexture, h.pts] = Screen('GetMovieImage', h.ptr, h.movie);%, 1, [], [], 0);
             end
         end
@@ -97,23 +108,35 @@ classdef HDmovie < handle
                 % Yes. Draw the new texture immediately to screen:
                 Screen('DrawTexture', h.ptr, h.movietexture, [], [0 0 h.dim(1) h.dim(2)]);
                 
-                % Release texture:
-                Screen('Close', h.movietexture);
-                h.movietexture=0;
+%                 % Release texture:
+%                 Screen('Close', h.movietexture);
+%                 h.movietexture=0;
             end
         end
         
         function drawNext(h)
             
-            [h.movietexture, h.pts] = Screen('GetMovieImage', h.ptr, h.movie);%, 1, [], [], 0);
+            % don't wait for frame
+%             [h.movietexture, h.pts] = Screen('GetMovieImage', h.ptr, h.movie, 0, 1);%, 1, [], [], 0);
+            h.t1 = GetSecs;
+            
+            if (h.t1 - h.t0) > (1/h.frate)
+                fprintf('Update Texture\n')
+                % Release texture:
+                if h.movietexture > 0
+                    Screen('Close', h.movietexture);
+                end
+                [h.movietexture, h.pts] = Screen('GetMovieImage', h.ptr, h.movie, 0, 0);
+                h.t0 = h.t1;
+            end
             
             if h.movietexture > 0
+                fprintf('Draw Texture\n')
                 % Yes. Draw the new texture immediately to screen:
                 Screen('DrawTexture', h.ptr, h.movietexture, [], [0 0 h.dim(1) h.dim(2)]);
-                
-                % Release texture:
-                Screen('Close', h.movietexture);
             end
+                
+%             end
         end
         
         function drawFrame(h, currentindex)
