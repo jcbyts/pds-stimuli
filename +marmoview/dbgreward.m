@@ -7,7 +7,7 @@
 
 % 30-05-2016 - Shaun L. Cloherty <s.cloherty@ieee.org>
 
-classdef dbgreward < marmoview.liquid & marmoview.sound,
+classdef dbgreward < marmoview.liquid & marmoview.sound
   properties,
     volume@double = 0.0;
   end

@@ -26,105 +26,85 @@
 
 %%
 % PDS = pds{1};
-load('Z:\Data\PLDAPS\PDS_bkp\Ellie20181206runFaceForageSpatialMapping1153.PDS', '-mat');
+load('Z:\Data\PLDAPS\PDS_bkp\test20181214stimuli.pldapsDefaultTrial1417.PDS', '-mat');
 
 
-%%
+%% setup parameters
 sca
-[pa, trialLevelMatrix] = recreateParams(PDS);
 
-% iTrial=find(cellfun(@(x) x.natImgBackground.use, PDS.conditions));
-% iTrial=iTrial(2);
+trial = pds.getPdsTrialData(PDS);
 
 iTrial = 1;
-pa.setLevels(trialLevelMatrix(:,iTrial));
+defaults{1}=trial(iTrial);
+defaultsNames{1}=sprintf('trial%d', iTrial);
 
-
-% pa.natImgBackground.imgDir = getpref('pep', 'colonyPics');
-% pa.natImgBackground
-
-% im = imread(fullfile(pa.natImgBackground.imgDir, pa.natImgBackground.fileList(pa.natImgBackground.imgIndex).name));
-% figure(1); clf
-% imshow(im)
-% pa.natImgBackground.texToDraw=pa.natImgBackground.imgIndex;
-% pa.pldaps.iTrial = iTrial;
-%
-
-
-
-p=pldaps;
-
-% pa.display = p.defaultParameters.display;
-% pa.datapixx.use = false;
+pa=params(defaults,defaultsNames);
 
 % modify display parameters so the screen opens
 pa.display.scrnNum = max(Screen('Screens'));
-pa.display.screenSize = pa.display.winRect + [2e3 0 1e3 0];
+pa.display.screenSize = pa.display.winRect + [1e3 0 1e3 0];
 pa.display.useOverlay = 0;
 pa.display.switchOverlayCLUTs = 1;
 pa.datapixx.use = false;
 
-% pa.setLevels(1);
+% setup pldaps object
+p=pldaps;
 p.defaultParameters=pa;
 p.trial=pa;
 
-pa.datapixx.use
-
-
-
-
+% open screen
 p.openScreen
 
-%
-% % 
-% p.trial.pldaps.modNames.all = getModules(p, 0);
-% % 
-% % % experimentSetup before openScreen to allow modifyiers
-% [moduleNames, moduleFunctionHandles, moduleRequestedStates, moduleLocationInputs] = getModules(p);
-% %         
-% % run all modules state experimentPreOpenScreen
-% moduleRequestedStates.experimentPreOpenScreen = 1:numel(moduleNames);
-%%         
-moduleRequestedStates.experimentPostOpenScreen = 1;
-runStateforModules(p,'experimentPostOpenScreen', {'hartley'}, {str2func(pa.hartley.stateFunction.name)}, moduleRequestedStates, true);
-% 
-% 
+% experimentPostOpenScreen
+onlyActive = false; % run all modules post open screen routines
+[moduleNames,moduleFunctionHandles,moduleRequestedStates,moduleLocationInputs] = getModules(p, onlyActive);
+runStateforModules(p,'experimentPostOpenScreen',moduleNames,moduleFunctionHandles,moduleRequestedStates,moduleLocationInputs);
 
-%
-% iTrial=6;
-% pa.setLevels(trialLevelMatrix(:,iTrial));
+
+
+trialIdx = [1];
 
 % turn off all devices -- we're not using them
-% pa.datapixx.use = false;
-pa.eyelink.use = false;
-pa.sound.use = false;
-pa.newEraSyringePump.use = false;
+paS = struct();
+paS.eyelink.use = false;
+paS.sound.use = false;
+paS.newEraSyringePump.use = false;
 
-pa.display.scrnNum = max(Screen('Screens'));
-% pa.display.screenSize = pa.display.winRect + [1.5e3 0 1.5e3 0];
-pa.display.useOverlay = 0;
-pa.display.switchOverlayCLUTs = 1;
-pa.display.overlayptr = pa.display.ptr;
-pa.pldaps.draw.framerate.use = 0; % turn off framerate
+paS.display.scrnNum = max(Screen('Screens'));
+paS.display.useOverlay = 0;
+paS.display.switchOverlayCLUTs = 1;
+paS.display.overlayptr = pa.display.ptr;
+paS.pldaps.draw.framerate.use = 0; % turn off framerate
+paS.datapixx.use = false;
 
-% pa.display.monkeyCLUT = pa.display.humanCLUT;
+paS.reward = marmoview.dbgreward(1);
 
-p.trial=pa;
-p.trial = mergeToSingleStruct(p.trial);
+%%
+nTrials = numel(trialIdx);
+
+I = cell(nTrials,1);
+
+for ii = 1:nTrials
+iTrial = trialIdx(ii);
+
+p.trial = mergeStruct(trial(iTrial), paS);
 
 p.data=PDS.data;
 p.trial.sound.use=0;
 p.trial.iFrame=1;
 p.trial.pldaps.draw.grid.use=0;
 p.trial.pldaps.draw.cursor.use=0;
+p.trial.pldaps.iTrial = iTrial;
 
 %
-% TOTAL HACK
-if isfield(p.trial, 'faceforage') && p.trial.forage.use
-    id = p.trial.faceforage.hTargs.objects.id;
-    p.trial.faceforage.hTargs.objects = stimuli.objects.face(p, 'maxContrast', p.trial.faceforage.hTargs.maxContrast);
-    p.trial.faceforage.hTargs.objects.id = id;
-end
+% % TOTAL HACK
+% if isfield(p.trial, 'faceforage') && p.trial.forage.use
+%     id = p.trial.faceforage.hTargs.objects.id;
+%     p.trial.faceforage.hTargs.objects = stimuli.objects.face(p, 'maxContrast', p.trial.faceforage.hTargs.maxContrast);
+%     p.trial.faceforage.hTargs.objects.id = id;
+% end
+
+% fix colors
 fn = fieldnames(p.trial.display.clut);
 p.trial.display.clut = PDS.initialParametersMerged.display.clut; % take what was shown
 for i = 1:numel(fn)
@@ -132,10 +112,16 @@ for i = 1:numel(fn)
 end
 
 showWin = false;
-[I,I2]=replayModularTrial(p,[0 0 200 200], true, showWin, [100 1100]);
+ROI = [-200 -200 200 200];
+I2=replayModularTrialRoi(p,ROI, true, showWin);
+
+I{ii} = squeeze(mean(I2,3));
+end
+
+
 % [I,I2]=replayModularTrial(p,[0 0 200 200], true, showWin, [100 1100]);
 
-sca
+% sca
 %
 % figure(1); clf
 % for k=1:size(I,4)
@@ -172,7 +158,7 @@ for i = 1:size(I,4)
 %         imwrite(y, newmap, 'Zero Phase.gif', 'DelayTime', delayTime, 'WriteMode', 'append');
 %     end
 
-    currFrame = struct('cdata', squeeze(I(:,:,:,i)), 'colormap', []);
+    currFrame = struct('cdata', squeeze(I2(:,:,:,i)), 'colormap', []);
     writeVideo(vidObj,currFrame);
 end
 
