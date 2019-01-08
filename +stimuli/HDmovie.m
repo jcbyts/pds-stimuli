@@ -98,7 +98,7 @@ classdef HDmovie < handle
         
         function update(h)
             if (h.movietexture == 0) && ( (h.pts - h.lastpts) >= (1/h.frate) )% || (indexisFrames == 2))
-                fprintf('GetMovieImage\n')
+%                 fprintf('GetMovieImage\n')
                 [h.movietexture, h.pts] = Screen('GetMovieImage', h.ptr, h.movie);%, 1, [], [], 0);
             end
         end
@@ -121,7 +121,7 @@ classdef HDmovie < handle
             h.t1 = GetSecs;
             
             if (h.t1 - h.t0) > (1/h.frate)
-                fprintf('Update Texture\n')
+%                 fprintf('Update Texture\n')
                 % Release texture:
                 if h.movietexture > 0
                     Screen('Close', h.movietexture);
@@ -131,7 +131,7 @@ classdef HDmovie < handle
             end
             
             if h.movietexture > 0
-                fprintf('Draw Texture\n')
+%                 fprintf('Draw Texture\n')
                 % Yes. Draw the new texture immediately to screen:
                 Screen('DrawTexture', h.ptr, h.movietexture, [], [0 0 h.dim(1) h.dim(2)]);
             end
