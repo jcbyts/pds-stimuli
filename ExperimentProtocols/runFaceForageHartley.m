@@ -50,11 +50,11 @@ settingsStruct.(sn).stateFunction.order = -1; % draw before behavior
 settingsStruct.(sn).use = true;
 settingsStruct.(sn).OnDuration  = 2; % if generative model is exponentialDecay or fixed
 settingsStruct.(sn).OffDuration = 2;
-settingsStruct.(sn).pBlank =    ip.Results.pBlank;
+settingsStruct.(sn).pBlank      =    ip.Results.pBlank;
 settingsStruct.(sn).contrast    = ip.Results.Contrast;  % Michelson contrast of the gratings (DEPENDS ON BLEND FUNCTION)
 settingsStruct.(sn).tfs         = 0;   % temporal frequencies showns
-settingsStruct.(sn).nOctaves    = 5;   % number of octaves to show above base frequency
-settingsStruct.(sn).Freq0       = .2;  % Base frequence (cycles/deg)
+settingsStruct.(sn).nOctaves    = 6;   % number of octaves to show above base frequency
+settingsStruct.(sn).Freq0       = .5;  % Base frequence (cycles/deg)
 
 %--------------------------------------------------------------------------
 % Add natural background module
