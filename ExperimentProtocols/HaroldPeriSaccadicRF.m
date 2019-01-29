@@ -1,4 +1,4 @@
-subject = 'test';% 'Harold'
+subject = 'Ellie';% 'Harold'
 pauseBeforeExperiment = false;
 collectEyelinkQueue = false; % can lead to dropped frames if true
 %% Natural Image Free View: warm up
