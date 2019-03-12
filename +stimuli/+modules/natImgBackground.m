@@ -60,7 +60,8 @@ switch state
 %         p.trial.display.sourceFactorNew = GL_SRC_ALPHA;
 %         Screen('BlendFunction', p.trial.display.ptr, p.trial.display.sourceFactorNew, p.trial.display.destinationFactorNew);
 
-        if ~isfield(p.trial.(sn), 'imgDir')
+        
+        if ~isfield(p.trial.(sn), 'imgDir') || ~isdir(p.trial.(sn).imgDir)
             
             impath = getpref('pep', 'imgDir');
             assert(isdir(impath), 'imgDir path does not exist. You have to set that up for natImgBackgorund to run')
