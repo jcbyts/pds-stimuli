@@ -575,6 +575,9 @@ end           % % % ****!!!!**** Moved overall function end below all subfunctio
         
         %---------------------------------------------------------------------%
         % Eyelink specific:
+        
+         [samplesIn,eventsIn, p.trial.eyelink.drained] = Eyelink('GetQueuedData');
+         
         if p.trial.eyelink.use
             [Q, rowId] = pds.eyelink.saveQueue(p);
             p.trial.eyelink.samples = Q;

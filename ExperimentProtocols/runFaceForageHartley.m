@@ -22,6 +22,7 @@ ip.addParameter('imgDir', getpref('pep', 'colonyPics'))
 ip.addParameter('autoCorr', 'pBlank')
 ip.addParameter('Contrast', 0.10)
 ip.addParameter('settingsStruct', struct())
+ip.addParameter('pBlank', .5)
 ip.parse(varargin{:})
 
 settingsStruct = ip.Results.settingsStruct;
@@ -49,11 +50,11 @@ settingsStruct.(sn).stateFunction.order = -1; % draw before behavior
 settingsStruct.(sn).use = true;
 settingsStruct.(sn).OnDuration  = 2; % if generative model is exponentialDecay or fixed
 settingsStruct.(sn).OffDuration = 2;
-settingsStruct.(sn).pBlank = .5;
+settingsStruct.(sn).pBlank      =    ip.Results.pBlank;
 settingsStruct.(sn).contrast    = ip.Results.Contrast;  % Michelson contrast of the gratings (DEPENDS ON BLEND FUNCTION)
 settingsStruct.(sn).tfs         = 0;   % temporal frequencies showns
-settingsStruct.(sn).nOctaves    = 5;   % number of octaves to show above base frequency
-settingsStruct.(sn).Freq0       = .2;  % Base frequence (cycles/deg)
+settingsStruct.(sn).nOctaves    = 6;   % number of octaves to show above base frequency
+settingsStruct.(sn).Freq0       = .5;  % Base frequence (cycles/deg)
 
 %--------------------------------------------------------------------------
 % Add natural background module
@@ -75,13 +76,13 @@ settingsStruct.(sn).stateFunction.order = 2;
 settingsStruct.(sn).use = true;
 % foraging parameters -- Most of these parameters are overwritten below in
 % the conditions!
-settingsStruct.(sn).MotN                 = 3;            % number of moving targets
+settingsStruct.(sn).MotN                 = 2;            % number of moving targets
 settingsStruct.(sn).minSpeed             = 1;            % minimum speed targets can move (deg/sec)
 settingsStruct.(sn).maxSpeed             = 3;            % maximum speed (deg/sec)
 settingsStruct.(sn).motionType           = 'randomwalk'; % motion follows this pattern (linear or randomwalk)
 settingsStruct.(sn).type                 = 'face';       % face or grating
 settingsStruct.(sn).appearGazeContingent = false;        % do the objects regenerate in a gaze-contingent coordinate frame
-settingsStruct.(sn).appearRangePar       = 5;            % range of the generating distribution for the appearance of objects (deg)
+settingsStruct.(sn).appearRangePar       = 1.5;            % range of the generating distribution for the appearance of objects (deg)
 settingsStruct.(sn).appearCenter         = [0 0];        % center of the regenerating distribution (deg, relative to center of screen)
 settingsStruct.(sn).appearTau            = 10;            % do the objects fade on? (frames)
 settingsStruct.(sn).maxContrast          = 1;            % contrast of the objects

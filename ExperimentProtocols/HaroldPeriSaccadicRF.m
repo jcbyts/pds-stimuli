@@ -1,12 +1,13 @@
-subject = 'test';% 'Harold'
+subject = 'Ellie';% 'Harold'
 pauseBeforeExperiment = false;
-
+collectEyelinkQueue = false; % can lead to dropped frames if true
 %% Natural Image Free View: warm up
 close all
 
 settingsStruct = struct();
-settingsStruct.pldaps.maxTrialLength = 5;
+settingsStruct.pldaps.maxTrialLength = 60;
 settingsStruct.newEraSyringePump.vol = .05;
+settingsStruct.eyelink.collectQueue = collectEyelinkQueue;
 
 p = runNaturalImageFreeView('subject', subject, ...
     'pauseBefore', pauseBeforeExperiment, ...
@@ -20,8 +21,9 @@ close all
 
 settingsStruct = struct();
 settingsStruct.pldaps.maxTrialLength = 20;
-settingsStruct.pldaps.finish = 60*10/settingsStruct.pldaps.maxTrialLength + 5;
+settingsStruct.pldaps.finish = 60*5/settingsStruct.pldaps.maxTrialLength;
 settingsStruct.newEraSyringePump.vol = .025;
+settingsStruct.eyelink.collectQueue = collectEyelinkQueue;
 
 p = runFaceForageCSD('subject', subject, ...
     'pauseBefore', pauseBeforeExperiment, ...
@@ -40,6 +42,7 @@ settingsStruct = struct();
 settingsStruct.pldaps.maxTrialLength = 20;
 settingsStruct.pldaps.finish = 60*10/settingsStruct.pldaps.maxTrialLength + 5;
 settingsStruct.newEraSyringePump.vol = .035;
+settingsStruct.eyelink.collectQueue = collectEyelinkQueue;
 
 spatialSquaresOpts = struct();
 spatialSquaresOpts.N        = 10; % number of squares on each frame
@@ -66,6 +69,7 @@ settingsStruct = struct();
 settingsStruct.pldaps.maxTrialLength = 20;
 settingsStruct.pldaps.finish = 60*10/settingsStruct.pldaps.maxTrialLength + 5;
 settingsStruct.newEraSyringePump.vol = .035;
+settingsStruct.eyelink.collectQueue = collectEyelinkQueue;
 
 spatialSquaresOpts = struct();
 spatialSquaresOpts.N        = 400; % number of squares on each frame
@@ -90,13 +94,15 @@ close all
 
 settingsStruct = struct();
 settingsStruct.pldaps.maxTrialLength = 20;
-settingsStruct.pldaps.finish = 60*10/settingsStruct.pldaps.maxTrialLength + 5;
+settingsStruct.pldaps.finish = 60*10/settingsStruct.pldaps.maxTrialLength;
 settingsStruct.newEraSyringePump.vol = .035;
+settingsStruct.eyelink.collectQueue = collectEyelinkQueue;
 
 p = runFaceForageHartley('subject', subject, ...
     'pauseBefore', pauseBeforeExperiment, ...
     'imageEveryNTrials', 5, ...
     'autoCorr', 'pBlank', ...
+    'pBlank', 0.5, ...
     'Contrast', 0.10, ...m
     'settingsStruct', settingsStruct);
 
@@ -106,9 +112,10 @@ pds.plotTiming(p, true);
 close all
 
 settingsStruct = struct();
-settingsStruct.pldaps.maxTrialLength = 20;
-settingsStruct.pldaps.finish = 60*10/settingsStruct.pldaps.maxTrialLength + 5;
+settingsStruct.pldaps.maxTrialLength = 15;
+settingsStruct.pldaps.finish = 60*10/settingsStruct.pldaps.maxTrialLength;
 settingsStruct.newEraSyringePump.vol = .035;
+settingsStruct.eyelink.collectQueue = collectEyelinkQueue;
 
 p = runFaceForageHartley('subject', subject, ...
     'pauseBefore', pauseBeforeExperiment, ...
@@ -134,7 +141,7 @@ settingsStruct.display.sourceFactorNew = GL_SRC_ALPHA;
 settingsStruct.display.useOverlay = 1;
 settingsStruct.pldaps.pause.preExperiment = false;
 settingsStruct.pldaps.maxTrialLength = 30;
-
+settingsStruct.eyelink.collectQueue = collectEyelinkQueue;
 
 sn = 'HDmovies';
 settingsStruct.(sn).stateFunction.name  = 'stimuli.modules.HDmovies';
@@ -147,7 +154,7 @@ settingsStruct.(sn).moviedatabase = 'videos';
 
 settingsStruct = loadCalibration(settingsStruct);
 
-p = pldaps(@stimuli.pldapsDefaultTrial, settingsStruct);
+p = pldaps(settingsStruct);
 
 p = p.run;
 

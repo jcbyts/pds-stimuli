@@ -63,13 +63,13 @@ settingsStruct.(sn).stateFunction.name = 'stimuli.modules.forage.forage';
 settingsStruct.(sn).stateFunction.order = -1;
 settingsStruct.(sn).use = true;
 % foraging parameters
-settingsStruct.(sn).MotN                 = 3;            % number of moving targets
+settingsStruct.(sn).MotN                 = 2;            % number of moving targets
 settingsStruct.(sn).minSpeed             = 1;            % minimum speed targets can move (deg/sec)
 settingsStruct.(sn).maxSpeed             = 3;            % maximum speed (deg/sec)
 settingsStruct.(sn).motionType           = 'randomwalk'; % motion follows this pattern (linear or randomwalk)
 settingsStruct.(sn).type                 = 'face';       % face or grating
 settingsStruct.(sn).appearGazeContingent = false;        % do the objects regenerate in a gaze-contingent coordinate frame
-settingsStruct.(sn).appearRangePar       = 5;            % range of the generating distribution for the appearance of objects (deg)
+settingsStruct.(sn).appearRangePar       = 1.5;            % range of the generating distribution for the appearance of objects (deg)
 settingsStruct.(sn).appearCenter         = [0 0];        % center of the regenerating distribution (deg, relative to center of screen)
 settingsStruct.(sn).appearTau            = 10;            % do the objects fade on? (frames)
 settingsStruct.(sn).maxContrast          = 1;            % contrast of the objects
