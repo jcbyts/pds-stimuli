@@ -106,7 +106,7 @@ switch state
         % --- Random seed
         if isfield(p.trial.(sn),'rngs') && isfield(p.trial.(sn).rngs, 'conditionerRNG')
             p.trial.(sn).rngs.conditionerRNG.reset; % reset saved stream
-            p.trial.(sn).hTargs.rng.reset;
+            p.trial.(sn).hTargs.setRandomSeed(p.trial.(sn).hTargs.rng.Seed);
         else
             [p.trial.(sn).rngs.conditionerRNG] = RandStream(p.trial.(sn).rngs.randomNumberGenerater, 'seed', p.trial.(sn).rngs.trialSeeds(p.trial.pldaps.iTrial));
             p.trial.(sn).hTargs.setRandomSeed();
