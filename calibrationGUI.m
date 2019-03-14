@@ -369,7 +369,11 @@ pds.behavior.reward.give(handles.p);
 for k=1:nFrames
     [eye, raw]=getEye(handles.p);
     handles.A.rawxy(:,k)=raw;
-    Screen('DrawTextures', handles.p.defaultParameters.display.ptr, texids, [], dstRects);
+    if handles.marmosetFaceCheckbox.Value
+        Screen('DrawTextures', handles.p.defaultParameters.display.ptr, texids, [], dstRects);
+    else
+        Screen('DrawDots', handles.p.defaultParameters.display.overlayptr, xypx', 12, handles.p.defaultParameters.display.clut.red, [], 2);
+    end
     Screen('DrawDots', handles.p.defaultParameters.display.overlayptr, eye', 4, handles.p.defaultParameters.display.clut.eyepos, [], 0);
     Screen('Flip', handles.p.defaultParameters.display.ptr, 0);
     if rand < .0025

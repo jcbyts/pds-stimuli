@@ -24,6 +24,7 @@ switch state
         p.trial.(sn).hTarg.contrast = .5;
         p.trial.(sn).hTarg.tf = 10;
         p.trial.(sn).hTarg.phase = randi(360);
+        p.trial.(sn).hTarg.stimValue = 1;
         
     % --- Draw task semantics using info from hTrial
     case p.trial.pldaps.trialStates.framePrepareDrawing

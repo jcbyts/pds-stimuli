@@ -63,8 +63,8 @@ classdef plaidGaborTarget < stimuli.objects.target
             contrastPreMultiplicator = .5;
             
             modulateColor = [0 0 0 0];
-%             obj.gabortex = CreateProceduralGabor(p.trial.display.ptr, obj.radius, obj.radius, [], modulateColor, disableNormalization,contrastPreMultiplicator);
-            obj.gabortex = CreateProceduralGabor(p.trial.display.ptr, obj.radius, obj.radius, modulateColor, [],contrastPreMultiplicator);
+            obj.gabortex = CreateProceduralGabor(p.trial.display.ptr, obj.radius, obj.radius, [], modulateColor, disableNormalization,contrastPreMultiplicator);
+%             obj.gabortex = CreateProceduralGabor(p.trial.display.ptr, obj.radius, obj.radius, modulateColor, [],contrastPreMultiplicator);
             
             
         end

@@ -8,24 +8,26 @@ settingsStruct.pldaps.nosave = true; % don't save any files
 
 
 % set blend function appropriately
-settingsStruct.display.destinationFactorNew = GL_ONE_MINUS_SRC_ALPHA;
-settingsStruct.display.sourceFactorNew = GL_SRC_ALPHA;
-
-settingsStruct.display.normalizeColor = 1;
-settingsStruct.display.colorclamp = 1;
+% settingsStruct.display.destinationFactorNew = GL_ONE_MINUS_SRC_ALPHA;
+% settingsStruct.display.sourceFactorNew = GL_SRC_ALPHA;
 % 
-settingsStruct.display.destinationFactorNew = GL_ONE;
-settingsStruct.display.sourceFactorNew = GL_ONE;
-
-settingsStruct.display.useOverlay = 0;
-
-settingsStruct.pldaps.useModularStateFunctions = true;
-settingsStruct.pldaps.trialMasterFunction='runModularTrial';
+% settingsStruct.display.normalizeColor = 1;
+% settingsStruct.display.colorclamp = 1;
+% % 
+% settingsStruct.display.destinationFactorNew = GL_ONE;
+% settingsStruct.display.sourceFactorNew = GL_ONE;
+% 
+% settingsStruct.display.useOverlay = 1;
+% 
+% settingsStruct.pldaps.useModularStateFunctions = true;
+% settingsStruct.pldaps.trialMasterFunction='runModularTrial';
 
 % make everything bigger (viewdist scales the pixels per degree
 % calculation)
-settingsStruct.display.viewdist = 100; % cm
+% settingsStruct.display.viewdist = 100; % cm
 settingsStruct.pldaps.pause.preExperiment = false;
+
+settingsStruct = loadCalibration(settingsStruct);
 
 %% add module to test
 sn = 'testing';
@@ -41,7 +43,24 @@ p = pldaps(@stimuli.pldapsDefaultTrial, settingsStruct);
 p = p.run;
 
 %% add module to test
+sn = 'oknbistable';
+settingsStruct.(sn).stateFunction.name  = 'stimuli.modules.oknbistable.DotsTrial';
+settingsStruct.(sn).stateFunction.order = 2;    % when to run this module with respect to other modules
+settingsStruct.(sn).use                 = true; % use this module    
+
+% calling pldaps with @stimuli.pldapsDefaultTrial will make sure that
+% pldaps takes all the measurements that are required for our modules
+% (e.g., eye position)
+p = pldaps(@stimuli.pldapsDefaultTrial, settingsStruct);
+
+p = p.run;
+%% add module to test
 settingsStruct = struct(); % settingsStruct is a structure that modifies pldaps default parameters
+
+settingsStruct.pldaps.pause.preExperiment = false;
+
+settingsStruct = loadCalibration(settingsStruct);
+
 sn = 'MotionMapping';
 settingsStruct.pldaps.nosave = true; % don't save any files
 
@@ -67,6 +86,14 @@ p = p.run;
 
 
 %% test gabor target
+
+settingsStruct = struct(); % settingsStruct is a structure that modifies pldaps default parameters
+
+settingsStruct.pldaps.pause.preExperiment = false;
+
+settingsStruct = loadCalibration(settingsStruct);
+
+
 sn = 'testing';
 settingsStruct.(sn).stateFunction.name  = 'stimuli.tests.testGaborTargetTrial';
 settingsStruct.(sn).stateFunction.order = 2;    % when to run this module with respect to other modules
@@ -82,6 +109,13 @@ p = pldaps(@stimuli.pldapsDefaultTrial, settingsStruct);
 p = p.run;
 
 %% test triplaid gabor
+
+settingsStruct = struct(); % settingsStruct is a structure that modifies pldaps default parameters
+
+settingsStruct.pldaps.pause.preExperiment = false;
+
+settingsStruct = loadCalibration(settingsStruct);
+
 sn = 'testing';
 settingsStruct.(sn).stateFunction.name  = 'stimuli.tests.testTriPlaidTrial';
 settingsStruct.(sn).stateFunction.order = 2;    % when to run this module with respect to other modules

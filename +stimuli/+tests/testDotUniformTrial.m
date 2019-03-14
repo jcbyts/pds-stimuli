@@ -19,6 +19,7 @@ switch state
         
         p.trial.(sn).hDots.setRandomSeed(p.trial.(sn).rngs.trialSeeds(p.trial.pldaps.iTrial));
         p.trial.(sn).hDots.trialSetup(p);
+        p.trial.(sn).hDots.stimValue = true;
 
     % --- Draw task semantics using info from hTrial
     case p.trial.pldaps.trialStates.framePrepareDrawing

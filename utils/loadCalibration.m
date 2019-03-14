@@ -1,6 +1,7 @@
 function S = loadCalibration(S)
 
-if (strcmp(S.session.subject,'test'))
+if ~isfield(S, 'session') || ~isfield(S.session, 'subject') || (strcmp(S.session.subject,'test'))
+    S.session.subject = 'test';
     S.eyelink.use = false;
     S.eyelink.useAsEyepos = false;
     S.arrington.use = false;

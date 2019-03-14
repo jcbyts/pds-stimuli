@@ -32,7 +32,7 @@ classdef dotsbase < stimuli.objects.target % (Abstract) % should this be abstrac
         numDots@double      = 50;
         
         dotType@double      = 1;    % anti-aliased dots
-        useOverlay          = true;
+        useOverlay          = false;
         % dotType:
         %
         %   0 - square dots (default)
@@ -61,6 +61,16 @@ classdef dotsbase < stimuli.objects.target % (Abstract) % should this be abstrac
        drawCnt
     end
     
+    methods
+        
+        function set.direction(o, val)
+            od = o.direction;
+            offd = angle(exp(1i*(val-od)/180*pi));
+            [oldth, oldrho] = cart2pol(o.dx, o.dy);
+            [o.dx, o.dy] =  pol2cart(oldth+offd, oldrho);
+            o.direction = val;
+        end
+    end
     
     methods (Access = public)
         function o = dotsbase(varargin)
@@ -100,6 +110,7 @@ classdef dotsbase < stimuli.objects.target % (Abstract) % should this be abstrac
             end
             
         end
+        
         
         function trialSetup(o, ~, ~)
             
