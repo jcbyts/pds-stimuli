@@ -80,10 +80,21 @@ outStruct.pldaps.save.v73       = true; % use hdf5 file format
  outStruct.	newEraSyringePump.	diameter         = 38;
  outStruct.	newEraSyringePump.	lowNoiseMode     = 0;
  outStruct.	newEraSyringePump.	port             = '/dev/ttyUSB0';
- outStruct.	newEraSyringePump.	rate             = 2900;
+ outStruct.	newEraSyringePump.	rate             = 9600; %2900;
  outStruct.	newEraSyringePump.	triggerMode      = 'T2';
  outStruct.	newEraSyringePump.	use              = true;
  outStruct.	newEraSyringePump.	volumeUnits      = 'ML';
+%  
+%  
+%   s.	newEraSyringePump.	alarmMode = 1;
+%  s.	newEraSyringePump.	allowNewDiameter = false;
+%  s.	newEraSyringePump.	diameter = 38;
+%  s.	newEraSyringePump.	lowNoiseMode = 0;
+%  s.	newEraSyringePump.	port = '/dev/cu.usbserial';
+%  s.	newEraSyringePump.	rate = 2900;
+%  s.	newEraSyringePump.	triggerMode = 'T2';
+%  s.	newEraSyringePump.	use = false;
+%  s.	newEraSyringePump.	volumeUnits = 'ML';
  
  outStruct.	sound.	deviceid     = [ ]; % if empty, PsychportAudio will find the device
  outStruct.	sound.	use          = true;
@@ -98,8 +109,8 @@ end
 setpref('pldaps',fn(:),outStructc); %set new
 
 %% setup paths for pep
-setpref('pep', 'colonyPics', '/home/propixxrig/Pictures/colony_pics')
-setpref('pep', 'imgDir', '/home/propixxrig/Pictures/colony_pics')
-setpref('pep', 'marmosetFaceLibrary', '/home/propixxrig/Pictures/colony_marmoset_faces')
-setpref('pep', 'videos', '/home/propixxrig/Videos/clips')
+setpref('pep', 'colonyPics', '/home/marmorig/Pictures/colony_pics')
+setpref('pep', 'imgDir', '/home/marmorig/Pictures/colony_pics')
+setpref('pep', 'marmosetFaceLibrary', '/home/marmorig/Pictures/colony_marmoset_faces')
+setpref('pep', 'videos', '/home/marmorig/Videos/clips')
 

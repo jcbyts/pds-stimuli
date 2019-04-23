@@ -30,6 +30,8 @@ apt-get install libgstreamer1.0-dev libgstreamer-plugins-bad1.0-dev \
 ########################################################################################################################
 # Install Nvidia drivers
 #
+sudo add-apt-repository ppa:graphics-drivers/ppa
+sudo apt-get update
 
 ########################################################################################################################
 # Install Sublime Text
@@ -57,7 +59,9 @@ sudo apt-key adv --recv-keys --keyserver hkp://pool.sks-keyservers.net:80 0xA5D3
 
 sudo apt-get update
 
-sudo apt-get install psychtoolbox
+sudo apt-get install psychtoolbox-3-common 
+sudo apt-get install octave-psychtoolbox-3
+sudo apt-get install matlab-psychtoolbox-3
 
 ########################################################################################################################
 # Install SR Research for Eyelink
@@ -86,3 +90,6 @@ sudo ./vputil
 # Install rs 232 USB to serial driver for new era syringe
 #
 # Follow instructions at https://www.usb-drivers.org/usb-serial-port-adapter-rs-232-in-ubuntu-linux.html
+sudo modprobe usbserial vendor=05ad product=0fba
+
+05ad:0fba
