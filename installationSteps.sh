@@ -13,6 +13,18 @@ apt-get install inotify-tools make pkg-config wget python3-gi python3-pyqt5 pyth
 ########################################################################################################################
 # Install Gstreamer
 #
+apt-get update
+apt-get install libgstreamer1.0-dev libgstreamer-plugins-bad1.0-dev \
+        libglib2.0-dev \
+        libudev-dev \
+        libtinyxml-dev \
+        libusb-1.0-0-dev \
+        libzip-dev \
+        libgirepository1.0-dev \
+        gstreamer1.0-plugins-good \
+        gstreamer1.0-plugins-bad \
+        gstreamer1.0-tools \
+        python3-gst-1.0
 
 
 ########################################################################################################################
