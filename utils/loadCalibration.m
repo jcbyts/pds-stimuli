@@ -1,12 +1,13 @@
 function S = loadCalibration(S)
 
 if ~isfield(S, 'session') || ~isfield(S.session, 'subject') || (strcmp(S.session.subject,'test'))
-    S.session.subject = 'test';
-    S.eyelink.use = false;
-    S.eyelink.useAsEyepos = false;
-    S.arrington.use = false;
+    warning('Using test subject. Eyelink turned off.')
+    S.session.subject       = 'test';
+    S.eyelink.use           = false;
+    S.eyelink.useAsEyepos   = false;
+    S.arrington.use         = false;
     S.arrington.useAsEyepos = false;
-    S.mouse.useAsEyepos = true;
+    S.mouse.useAsEyepos     = true;
     
     return
 end
@@ -22,7 +23,7 @@ try
     
     S.arrington.calibration_matrix = cm2;
 catch
-    warning('error loading calibration: it didn''t work')
+    warning('loadCalibration: This subject has not been calibrated yet. Run calibrationGUI(p) while paused')
     return
 end
 
