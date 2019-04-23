@@ -34,19 +34,53 @@ apt-get install libgstreamer1.0-dev libgstreamer-plugins-bad1.0-dev \
 ########################################################################################################################
 # Install Sublime Text
 #
+wget -qO - https://download.sublimetext.com/sublimehq-pub.gpg | sudo apt-key add -
+sudo apt-get install apt-transport-https
+
+echo "deb https://download.sublimetext.com/ apt/stable/" | sudo tee /etc/apt/sources.list.d/sublime-text.list
+
+sudo apt-get update
+sudo apt-get install sublime-text
 
 ########################################################################################################################
-# Install Gstreamer
+# Install Matlab
+# got to mathworks.com and log in. Go to license / download and install / select version
+
+# after installation
+sudo apt-get install matlab-support
+
+########################################################################################################################
+# Install psychtoolbox
 #
+wget -O- http://neuro.debian.net/lists/bionic.us-nh.full | sudo tee /etc/apt/sources.list.d/neurodebian.sources.list
+sudo apt-key adv --recv-keys --keyserver hkp://pool.sks-keyservers.net:80 0xA5D32F012649A5A9
+
+sudo apt-get update
+
+sudo apt-get install psychtoolbox
 
 ########################################################################################################################
 # Install SR Research for Eyelink
-#
+# https://www.sr-support.com/forum/downloads/eyelink-display-software/46-eyelink-developers-kit-for-linux-linux-display-software
+wget -O - "http://download.sr-support.com/software/dists/SRResearch/SRResearch_key" | sudo apt-key add -
+
+sudo add-apt-repository "deb http://download.sr-support.com/software SRResearch main"
+sudo apt-get update
+
+sudo apt-get install eyelink-display-software
 
 ########################################################################################################################
 # Install Vpixx Utilities for Propixx
-#
+# you might have to log in at vpixx.com first
+cd ~/Downloads/
+wget http://www.vpixx.com/developer/VPixx_Software_Tools.zip
+unzip VPixx_Software_Tools.zip
+cd VPixx_Software_Tools/vputil/bin/linux/
 
+sudo cp libi1d3.so.0 /usr/lib/libi1d3.so.0
+sudo cp libi1Pro.so.0 /usr/lib/libi1Pro.so.0
+sudo chmod +x vputil
+sudo ./vputil
 
 ########################################################################################################################
 # Install rs 232 USB to serial driver for new era syringe
