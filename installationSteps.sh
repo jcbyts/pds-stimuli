@@ -90,6 +90,19 @@ sudo ./vputil
 # Install rs 232 USB to serial driver for new era syringe
 #
 # Follow instructions at https://www.usb-drivers.org/usb-serial-port-adapter-rs-232-in-ubuntu-linux.html
-sudo modprobe usbserial vendor=05ad product=0fba
+# sudo modprobe usbserial vendor=05ad product=0fba
 
-05ad:0fba
+# 05ad:0fba
+
+########################################################################################################################
+# Install Cuda
+# https://mrprajesh.blogspot.com/2018/11/install-cuda-10-on-linux-mint-19-or.html
+
+########################################################################################################################
+# Install ZeroMQ for Open-ephys communication
+# echo "deb http://download.opensuse.org/repositories/network:/messaging:/zeromq:/release-stable/Debian_9.0/ ./" /etc/apt/sources.list
+
+wget https://download.opensuse.org/repositories/network:/messaging:/zeromq:/release-stable/xUbuntu_18.04/Release.key -O- | sudo apt-key add
+echo "deb http://download.opensuse.org/repositories/network:/messaging:/zeromq:/release-stable/xUbuntu_18.04/ ./" >> /etc/apt/sources.list
+sudo apt-get update
+apt-get install libzmq3-dev
