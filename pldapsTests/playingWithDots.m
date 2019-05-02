@@ -4,7 +4,7 @@ settingsStruct.display.colorclamp     = 0;
 settingsStruct.display.normalizeColor = 1;
 settingsStruct.display.destinationFactorNew=GL_ONE_MINUS_SRC_ALPHA;
 settingsStruct.display.sourceFactorNew=GL_SRC_ALPHA;
-
+settingsStruct.display.useOverlay = 0;
 % settingsStruct.display.destinationFactorNew=GL_ONE;
 % settingsStruct.display.sourceFactorNew=GL_ONE;
 
@@ -131,7 +131,7 @@ Screen('Flip', p.trial.display.ptr, 0);
 Screen('Close', tex)
 %%
 
-d=stimuli.dots(p, ...
+d=stimuli.objects.dotsUniform(p, ...
     'size', 5, ...
     'speed', 5, ... 
     'direction', 90, ...

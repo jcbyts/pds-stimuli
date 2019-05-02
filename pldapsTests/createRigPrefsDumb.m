@@ -11,26 +11,24 @@ outStruct.datapixx.enablePropixxRearProjection = true;
 outStruct.datapixx.LogOnsetTimestampLevel = 0; % This is useful for test, but it's quite slow
 
 % display settings
-outStruct.display.displayName = 'PROPIXX';
-outStruct.display.scrnNum = 1;
-outStruct.display.viewdist = 87;
-outStruct.display.heightcm = 40;
-outStruct.display.widthcm = 70;
-outStruct.display.useOverlay = 1;
-outStruct.display.colorclamp = 1;
-outStruct.display.normalizeColor = 1;
+outStruct.display.      displayName = 'PROPIXX';
+outStruct.display.      scrnNum = 1;
+outStruct.display.      viewdist = 87;
+outStruct.display.      heightcm = 40;
+outStruct.display.      widthcm = 70;
+outStruct.display.      useOverlay     = 2;
+outStruct.display.      colorclamp     = 0;
+outStruct.display.      normalizeColor = 1;
 
 outStruct.	display.	bgColor = [ 0.5000    0.5000    0.5000 ];
-outStruct.	display.	colorclamp = 0;
 outStruct.	display.	destinationFactorNew = 'GL_ONE_MINUS_SRC_ALPHA';
-outStruct.	display.	sourceFactorNew = 'GL_SRC_ALPHA';
+outStruct.	display.	sourceFactorNew      = 'GL_SRC_ALPHA';
 outStruct.	display.	stereoFlip = [ ];
 outStruct.	display.	stereoMode = 0;
 outStruct.  display.    crosstalk = 0;
 outStruct.	display.	switchOverlayCLUTs = false;
 outStruct.  display.    ipd = 3;
 outStruct.  display.    useGL = false; % flag for custom 3D rendering features
-outStruct.  display.    switchOverlayCLUTs = false;
 
 % eyelink settings
 outStruct.	eyelink.	buffereventlength = 30;
@@ -54,7 +52,7 @@ outStruct.	eyelink.	useRawData = true;
 outStruct.	git.	use = true;
 
 % mouse settings
-outStruct.mouse.useAsEyepos=0;
+outStruct.mouse.useAsEyepos= 1;
 
 % pldaps main settings
 outStruct.pldaps.dirs.data       ='~/Data';
@@ -76,14 +74,15 @@ outStruct.pldaps.save.v73       = true; % use hdf5 file format
 
 % new era syringe
  outStruct.	newEraSyringePump.	alarmMode        = 0;
- outStruct.	newEraSyringePump.	allowNewDiameter = false;
- outStruct.	newEraSyringePump.	diameter         = 38;
- outStruct.	newEraSyringePump.	lowNoiseMode     = 0;
+ outStruct.	newEraSyringePump.	allowNewDiameter = true;
+ outStruct.	newEraSyringePump.	diameter         = 20;
+ outStruct.	newEraSyringePump.	lowNoiseMode     = 1;
  outStruct.	newEraSyringePump.	port             = '/dev/ttyUSB0';
- outStruct.	newEraSyringePump.	rate             = 9600; %2900;
- outStruct.	newEraSyringePump.	triggerMode      = 'T2';
+ outStruct.	newEraSyringePump.	rate             = 10;
+ outStruct.	newEraSyringePump.	triggerMode      = 'F2'; %'T2';
  outStruct.	newEraSyringePump.	use              = true;
- outStruct.	newEraSyringePump.	volumeUnits      = 'ML';
+ outStruct.	newEraSyringePump.	volume           = 5;
+ outStruct.	newEraSyringePump.	volumeUnits      = 'UL';
 %  
 %  
 %   s.	newEraSyringePump.	alarmMode = 1;
@@ -113,4 +112,11 @@ setpref('pep', 'colonyPics', '/home/marmorig/Pictures/colony_pics')
 setpref('pep', 'imgDir', '/home/marmorig/Pictures/colony_pics')
 setpref('pep', 'marmosetFaceLibrary', '/home/marmorig/Pictures/colony_marmoset_faces')
 setpref('pep', 'videos', '/home/marmorig/Videos/clips')
+
+% default calibration matrix for eyelink
+c=[1 0; 0 1; 0 0]; % assume default calibration
+% initialize a calibration matrix
+cm = c; % left eye
+cm(:,:,2)=c; % right eye
+setpref('marmoview_calibration', 'test', cm)
 
