@@ -36,17 +36,16 @@ switch state
         if p.trial.(sn).staircaseOn && p.trial.(sn).minFixDuration < p.trial.(sn).maxFixDuration
             
             
-            lastError = p.trial.(sn).error;
-                            
-            switch lastError
-                case 0 % staircase up
-                    p.conditions{p.trial.pldaps.iTrial + 1}.(sn).minFixDuration =  p.trial.(sn).minFixDuration + p.trial.(sn).staircaseStep;
-                case 1 % do nothing
-                    p.conditions{p.trial.pldaps.iTrial + 1}.(sn).minFixDuration =  p.trial.(sn).minFixDuration;
-                case 2 % staircase down
-                    p.conditions{p.trial.pldaps.iTrial + 1}.(sn).minFixDuration =  p.trial.(sn).minFixDuration - .75*p.trial.(sn).staircaseStep;
+            holdDuration = p.trial.(sn).holdDuration;
+            if holdDuration == 0 % never obtained fixation
+                % do nothing
+                p.conditions{p.trial.pldaps.iTrial + 1}.(sn).minFixDuration =  p.trial.(sn).minFixDuration;
+            elseif holdDuration > p.trial.(sn).minFixDuration % staircase up
+                p.conditions{p.trial.pldaps.iTrial + 1}.(sn).minFixDuration =  p.trial.(sn).minFixDuration + p.trial.(sn).staircaseStep;
+            else % staircase down
+                p.conditions{p.trial.pldaps.iTrial + 1}.(sn).minFixDuration =  p.trial.(sn).minFixDuration - .75*p.trial.(sn).staircaseStep;
             end
-            
+                                            
         end % staircase on
         
         if p.trial.(sn).showGUI
